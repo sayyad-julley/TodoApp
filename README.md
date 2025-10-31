@@ -40,6 +40,7 @@ The Golden Path is a standardized development workflow designed to help teams bu
 - ✅ **Traycer AI Integration**: Automatic implementation plan generation
 - ✅ **Golden Path Compliance**: Ensures consistent project structure
 - ✅ **Complete Stack**: React frontend, Node.js backend, PostgreSQL database
+- ✅ **Dark/Light Mode**: Theme toggle with system preference detection and persistence
 - ✅ **Security Built-In**: JWT authentication, rate limiting, security middleware
 - ✅ **AWS-Native**: Ready for AWS deployment (ECS, RDS, CodePipeline)
 - ✅ **Testing Setup**: Jest, Vitest, and E2E testing configured
@@ -265,10 +266,12 @@ A complete full-stack todo application template:
 
 **Frontend:**
 - React 18 with Vite
-- Ant Design UI components
-- Tailwind CSS for styling
+- Ant Design UI components with dark mode support
+- Tailwind CSS for styling (class-based dark mode)
 - React Router for navigation
 - Axios for API calls
+- Theme context with dark/light mode toggle
+- System theme preference detection
 
 **Backend:**
 - Node.js with Express
@@ -286,7 +289,9 @@ A complete full-stack todo application template:
 - User registration and authentication
 - CRUD operations for todos
 - User-specific todo isolation
+- Dark/Light mode toggle with persistent preference
 - Security best practices
+- Responsive design with mobile-first approach
 
 ## Project Structure
 
@@ -351,6 +356,30 @@ my-todo-app/
 ├── IMPLEMENTATION_GUIDE.md         # Traycer-generated guide
 └── catalog-info.yaml               # Backstage catalog info
 ```
+
+## User Interface Features
+
+### Dark/Light Mode Toggle
+
+The template includes a comprehensive dark/light mode implementation:
+
+- **Theme Toggle Button**: Located in the header with sun/moon icons
+- **System Preference Detection**: Automatically detects and applies system theme on first visit
+- **Persistent Preference**: Saves theme choice to localStorage
+- **Smooth Transitions**: Animated theme switching for better UX
+- **Full Coverage**: All components and pages support both themes
+- **Ant Design Integration**: Automatically switches between light and dark algorithms
+
+**Usage:**
+- Click the sun/moon icon in the header to toggle themes
+- Your preference is automatically saved and restored on next visit
+- The app respects your system's theme preference by default
+
+**Implementation Details:**
+- Theme context (`ThemeContext.jsx`) manages global theme state
+- Tailwind CSS class-based dark mode enabled
+- Ant Design theme algorithm switching
+- All components styled with `dark:` utility classes
 
 ## Development Workflow
 
