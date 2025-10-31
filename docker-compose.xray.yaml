@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  adot:
+    image: public.ecr.aws/aws-observability/aws-otel-collector:latest
+    container_name: adot-collector
+    command: ["--config=/etc/otel-config.yaml"]
+    environment:
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+    volumes:
+      - ./adot-config.yaml:/etc/otel-config.yaml:ro
+      - ${HOME}/.aws:/home/aoc/.aws:ro
+    ports:
+      - "2000:2000/udp"    # AWS X-Ray UDP receiver
+    restart: unless-stopped
+

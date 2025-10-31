@@ -1,0 +1,63 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Golden Path",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.png",
+  "colors": {
+    "primary": "#3B82F6",
+    "light": "#60A5FA",
+    "dark": "#1D4ED8",
+    "anchors": {
+      "from": "#3B82F6",
+      "to": "#1D4ED8"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Support",
+      "url": "mailto:support@goldenpath.dev"
+    },
+    {
+      "name": "GitHub",
+      "url": "https://github.com/your-org/golden-path"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Overview",
+      "pages": [
+        "overview"
+      ]
+    },
+    {
+      "group": "Get Started",
+      "pages": [
+        "GOLDEN_PATH",
+        "guides/setup-secrets-manager",
+        "guides/setup-xray-and-guardduty",
+        "guides/setup-codebuild-pipeline"
+      ]
+    },
+    {
+      "group": "Templates",
+      "pages": [
+        "templates/fullstack-todo"
+      ]
+    },
+    {
+      "group": "Tool Integration",
+      "pages": [
+        "guides/traycer-integration",
+        "guides/mintlify-documentation",
+        "guides/coderabbit-setup",
+        "guides/qa-wolf-testing"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/your-org/golden-path"
+  }
+}

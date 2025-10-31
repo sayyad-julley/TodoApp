@@ -1,0 +1,98 @@
+---
+title: Fullstack Todo Template
+description: React + Node.js Todo app template with MongoDB for local development
+---
+
+# Fullstack Todo Template
+
+The Fullstack Todo template provides a production-ready React + Node.js application. Local development now uses MongoDB via Mongoose.
+
+## Stack
+
+- Frontend: React 18, Vite, Ant Design, Tailwind CSS
+- Backend: Node.js (Express), JWT auth
+- Database (local): MongoDB (Mongoose)
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 18+
+- Docker (to run MongoDB locally) or a local MongoDB server
+
+### Start MongoDB
+
+```bash
+docker run -d --name todoapp-mongo -p 27017:27017 \
+  -e MONGO_INITDB_ROOT_USERNAME=root \
+  -e MONGO_INITDB_ROOT_PASSWORD=example \
+  mongo:7
+```
+
+### Environment Variables (Backend)
+
+File: `golden-path/templates/fullstack-todo/backend/.env`
+
+```bash
+JWT_SECRET=dev-secret-change-me
+PORT=5000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5174
+MONGO_URI=mongodb://root:example@localhost:27017/todoapp?authSource=admin
+```
+
+> Note: For a MongoDB server without authentication, you can use:
+> `MONGO_URI=mongodb://localhost:27017/todoapp`
+
+### Run Backend
+
+```bash
+cd golden-path/templates/fullstack-todo/backend
+npm install
+npm start
+```
+
+Health endpoint: `http://localhost:5000/health`
+
+### Run Frontend
+
+```bash
+cd golden-path/templates/fullstack-todo/frontend
+npm install
+npm run dev -- --port 5174
+```
+
+App: `http://localhost:5174`
+
+### API Proxy
+
+The frontend proxies API requests to the backend via Vite `vite.config.js`:
+
+```js
+server: {
+  proxy: {
+    '/api': { target: 'http://localhost:5000', changeOrigin: true }
+  }
+}
+```
+
+## Authentication
+
+- Register: `POST /api/auth/register`
+- Login: `POST /api/auth/login`
+
+Store the returned JWT in `localStorage` (handled by the template). Requests include `Authorization: Bearer <token>`.
+
+## Todos API
+
+- GET `/api/todos?filter=all|completed|pending`
+- POST `/api/todos` { title, description? }
+- PUT `/api/todos/:id` { title?, description?, completed? }
+- DELETE `/api/todos/:id`
+
+## Production Notes
+
+- Use a managed MongoDB (e.g., MongoDB Atlas) or adapt to RDS/PostgreSQL if preferred.
+- Configure secrets via your cloud secret manager.
+
+

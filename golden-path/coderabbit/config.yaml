@@ -1,0 +1,88 @@
+# CodeRabbit Configuration
+# This file configures CodeRabbit's code review behavior
+
+# General settings
+general:
+  # Enable/disable CodeRabbit for this repository
+  enabled: true
+  
+  # Minimum confidence level for suggestions (0-1)
+  min_confidence: 0.7
+  
+  # Maximum number of comments per file
+  max_comments_per_file: 10
+
+# Code quality rules
+code_quality:
+  # Enable security checks
+  security_checks: true
+  
+  # Enable performance suggestions
+  performance_checks: true
+  
+  # Enable maintainability checks
+  maintainability_checks: true
+  
+  # Enable accessibility checks for frontend code
+  accessibility_checks: true
+
+# Language-specific settings
+languages:
+  javascript:
+    # Enable ESLint rule suggestions
+    eslint_suggestions: true
+    
+    # Enable TypeScript checks if applicable
+    typescript_checks: false
+    
+  python:
+    # Enable PEP 8 style suggestions
+    pep8_suggestions: true
+    
+  css:
+    # Enable CSS best practices
+    css_best_practices: true
+
+# File patterns to include/exclude
+patterns:
+  include:
+    - "**/*.js"
+    - "**/*.jsx"
+    - "**/*.ts"
+    - "**/*.tsx"
+    - "**/*.py"
+    - "**/*.css"
+    - "**/*.scss"
+    - "**/*.html"
+    - "**/*.md"
+  
+  exclude:
+    - "node_modules/**"
+    - "dist/**"
+    - "build/**"
+    - "coverage/**"
+    - "*.min.js"
+    - "*.bundle.js"
+
+# Review focus areas
+focus_areas:
+  - "security"
+  - "performance"
+  - "maintainability"
+  - "accessibility"
+  - "code_style"
+  - "documentation"
+
+# Custom rules
+custom_rules:
+  # Enforce consistent naming conventions
+  naming_conventions: true
+  
+  # Check for TODO comments
+  todo_comments: true
+  
+  # Check for console.log statements in production code
+  console_logs: true
+  
+  # Check for hardcoded values
+  hardcoded_values: true

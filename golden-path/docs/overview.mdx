@@ -1,0 +1,144 @@
+---
+title: Golden Path Overview
+description: A standardized development workflow for building world-class full-stack applications
+---
+
+# Golden Path Overview
+
+The Golden Path is a meta-repository that provides templates, scripts, and comprehensive guides for building production-ready full-stack applications with best practices, integrated tooling, and AWS-native infrastructure.
+
+## What is the Golden Path?
+
+The Golden Path is a standardized development workflow designed to help teams:
+- **Accelerate Development**: Start new projects with production-ready templates
+- **Maintain Quality**: Built-in code quality, testing, and review processes
+- **Deploy Safely**: AWS-native infrastructure with CI/CD pipelines
+- **Monitor Effectively**: Comprehensive observability and security monitoring
+
+## Core Components
+
+### Templates
+
+Pre-built project templates that include:
+- Complete application structure
+- AWS infrastructure setup
+- CI/CD pipeline configuration
+- Testing frameworks
+- Documentation structure
+
+**Available Templates:**
+- **fullstack-todo**: React + Node.js todo application
+  - Local dev database: MongoDB (via Mongoose)
+  - Production options: MongoDB Atlas or AWS-hosted alternatives
+
+### Scripts
+
+Automation scripts for common tasks:
+- **create-new-app.sh**: Scaffold new projects from templates
+- **setup-aws-pipeline.sh**: Configure AWS CodePipeline
+- **validate-template.sh**: Validate template structure and configuration
+
+### Guides
+
+Step-by-step documentation for:
+- AWS service setup (Secrets Manager, X-Ray, GuardDuty, CodePipeline)
+- Tool integration (Traycer, Mintlify, CodeRabbit, QA Wolf)
+- Development workflows
+- Deployment procedures
+
+## Architecture Philosophy
+
+### Monorepo Structure
+
+All templates follow a consistent monorepo structure:
+- Clear separation of frontend, backend, and infrastructure
+- Shared configuration and tooling
+- Unified development workflow
+
+### AWS-Native
+
+Designed to run seamlessly on AWS:
+- **Compute**: ECS Fargate or Lambda
+- **Database**: RDS (PostgreSQL) or managed MongoDB (e.g., Atlas) depending on template
+- **Storage**: S3 and CloudFront
+- **CI/CD**: CodePipeline and CodeBuild
+- **Monitoring**: X-Ray, CloudWatch, GuardDuty
+
+### Security-First
+
+Security built into every layer:
+- Secrets management with AWS Secrets Manager
+- JWT authentication with refresh tokens
+- Automated security scanning
+- Threat detection with GuardDuty
+
+### Observability-Built-In
+
+Comprehensive monitoring from day one:
+- Distributed tracing with X-Ray
+- Structured logging with CloudWatch
+- Performance monitoring and alerting
+- Error tracking and reporting
+
+## Tool Ecosystem
+
+### Traycer
+
+AI-powered development assistant with predefined workflows:
+- Feature development guidance
+- Bug fixing processes
+- Code refactoring patterns
+
+### Mintlify
+
+Beautiful, searchable documentation:
+- API reference documentation
+- Architecture guides
+- Development workflows
+
+### QA Wolf
+
+End-to-end testing platform:
+- Playwright-based test automation
+- CI/CD integration
+- Visual regression testing
+
+### CodeRabbit
+
+Automated code review:
+- Security vulnerability detection
+- Performance optimization suggestions
+- Code quality checks
+
+## Quick Start
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd golden-path
+   ```
+
+2. **Create a new project**
+   ```bash
+   ./scripts/create-new-app.sh
+   ```
+
+3. **Follow the setup guides**
+   - Set up AWS services
+   - Configure tool integrations
+   - Deploy your application
+
+## Getting Help
+
+- **Documentation**: See [GOLDEN_PATH.md](../GOLDEN_PATH.md) for detailed documentation
+- **Guides**: Check the guides in `/golden-path/guides/` for step-by-step instructions
+- **Issues**: Report issues on GitHub
+- **Discussions**: Join discussions for questions and feedback
+
+## Contributing
+
+Want to improve the Golden Path? See [CONTRIBUTING.md](../../CONTRIBUTING.md) for guidelines.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](../../LICENSE) file for details.
