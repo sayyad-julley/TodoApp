@@ -253,12 +253,12 @@ const EnhancedTodoList = () => {
   return (
     <div className="max-w-4xl mx-auto">
       {/* User Statistics Header */}
-      <Card className="shadow-sm mb-4" styles={{ body: { padding: 20 } }}>
+      <Card className="shadow-sm mb-4 dark:bg-gray-800 dark:border-gray-700" styles={{ body: { padding: 20 } }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <UserOutlined className="text-lg" />
-              <Title level={3} style={{ margin: 0 }}>
+              <UserOutlined className="text-lg dark:text-gray-200" />
+              <Title level={3} style={{ margin: 0 }} className="dark:text-gray-100">
                 {getDisplayName()}'s Tasks
               </Title>
             </div>
@@ -278,9 +278,9 @@ const EnhancedTodoList = () => {
       </Card>
 
       {/* Main Todo List */}
-      <Card className="shadow-sm" styles={{ body: { padding: 24 } }}>
+      <Card className="shadow-sm dark:bg-gray-800 dark:border-gray-700" styles={{ body: { padding: 24 } }}>
         <div className="flex items-center justify-between mb-4">
-          <Title level={2} style={{ marginBottom: 0 }}>Tasks</Title>
+          <Title level={2} style={{ marginBottom: 0 }} className="dark:text-gray-100">Tasks</Title>
           <div className="flex items-center gap-2">
             <Segmented
               value={filter}
@@ -295,7 +295,7 @@ const EnhancedTodoList = () => {
         </div>
 
         {/* Create Todo Form */}
-        <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+        <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <div className="flex flex-col gap-3">
             <Input
               placeholder="What needs to be done?"
@@ -371,7 +371,7 @@ const EnhancedTodoList = () => {
             rowKey="id"
             dataSource={visibleTodos.filter(Boolean)}
             bordered
-            className="bg-white"
+            className="bg-white dark:bg-gray-800 dark:border-gray-700"
             renderItem={(todo) => (
               <List.Item
                 key={todo.id}

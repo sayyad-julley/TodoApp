@@ -34,8 +34,8 @@ const Register = () => {
 
   return (
     <div className="flex items-center justify-center min-h-[60vh]">
-      <Card className="w-full max-w-sm shadow-sm">
-        <Title level={3} style={{ textAlign: 'center', marginBottom: 16 }}>Create account</Title>
+      <Card className="w-full max-w-sm shadow-sm dark:bg-gray-800 dark:border-gray-700">
+        <Title level={3} style={{ textAlign: 'center', marginBottom: 16 }} className="dark:text-gray-100">Create account</Title>
         <Form layout="vertical" onFinish={onFinish}>
           <Form.Item label="Username" name="username" rules={[{ required: true, message: 'Username is required' }, { min: 3, message: 'Minimum 3 characters' }]}>
             <Input placeholder="Your name" />
@@ -71,8 +71,8 @@ const Register = () => {
             </Button>
           </Form.Item>
         </Form>
-        <Text type="secondary">
-          Already have an account? <Link to="/login">Sign in</Link>
+        <Text type="secondary" className="dark:text-gray-400">
+          Already have an account? <Link to="/login" className="dark:text-blue-400">Sign in</Link>
         </Text>
       </Card>
     </div>
