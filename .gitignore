@@ -48,6 +48,8 @@ lerna-debug.log*
 .env.production.local
 .env.*.local
 *.env
+env/
+env
 
 # Build outputs
 dist/

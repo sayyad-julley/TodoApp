@@ -1,0 +1,10 @@
+{
+  "browser": "chromium",
+  "codePath": "./tests",
+  "gifPath": "./qawolf/gifs",
+  "host": "http://localhost:5173",
+  "looseCode": true,
+  "name": "qawolf-tests",
+  "testPath": "./tests"
+}
+
