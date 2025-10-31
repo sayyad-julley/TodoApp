@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 
 // AWS X-Ray SDK
@@ -83,6 +84,23 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Serve static files from React app in production
+const publicPath = path.join(__dirname, 'public');
+const fs = require('fs');
+if (fs.existsSync(publicPath) && !isDev) {
+  // Serve static files
+  app.use(express.static(publicPath));
+  
+  // Serve React app for all non-API routes (SPA routing)
+  app.get('*', (req, res, next) => {
+    // Skip if it's an API route
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(publicPath, 'index.html'));
+  });
+}
+
 // Error handling
 app.use(errorHandler);
 
@@ -91,8 +109,8 @@ if (enableXRay) {
   app.use(XRayExpress.closeSegment());
 }
 
-// 404 handler
-app.use('*', (req, res) => {
+// 404 handler for API routes only
+app.use('/api/*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 

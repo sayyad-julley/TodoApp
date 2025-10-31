@@ -20,13 +20,13 @@ function HeaderRight() {
         type="text"
         icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
         onClick={toggleTheme}
-        className="flex items-center justify-center"
+        className="flex items-center justify-center text-gray-600 hover:text-gray-900 dark:text-gray-200 dark:hover:text-yellow-400 dark:hover:bg-gray-700"
         aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
       />
       {isAuthenticated && (
         <>
-          <span className="text-sm text-gray-600 dark:text-gray-300">{getDisplayName()}</span>
-          <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline" onClick={logout}>Logout</button>
+          <span className="text-sm text-gray-600 dark:text-white">{getDisplayName()}</span>
+          <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline dark:hover:text-blue-300" onClick={logout}>Logout</button>
         </>
       )}
     </div>
@@ -49,15 +49,15 @@ function AppContent() {
       <AuthProvider>
         <AntApp>
           <Router>
-            <Layout className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-            <Layout.Header className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+            <Layout className="min-h-screen h-full w-full bg-gray-50 dark:bg-[#0f172a] transition-colors duration-200">
+            <Layout.Header className="bg-white dark:bg-[#1e293b] shadow-sm border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
               <div className="max-w-7xl mx-auto flex items-center h-16 w-full">
-                <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">To‑Do App</h1>
+                <h1 className="text-xl font-semibold text-gray-900 dark:text-white">To‑Do App</h1>
                 <HeaderRight />
               </div>
             </Layout.Header>
 
-              <Layout.Content className="max-w-7xl w-full mx-auto py-8 px-4 sm:px-6 lg:px-8">
+              <Layout.Content className="max-w-7xl w-full mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-[#0f172a] min-h-[calc(100vh-4rem)] transition-colors duration-200">
                 <Routes>
                   <Route path="/" element={<ProtectedRoute><EnhancedTodoList /></ProtectedRoute>} />
                   <Route path="/login" element={<Login />} />

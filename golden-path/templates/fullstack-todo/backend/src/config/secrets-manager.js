@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+const AWS = require('aws-sdk');
 
 // X-Ray will capture this AWS SDK instance when initialized from server.js
 // If this file is used independently, it will work without X-Ray capture
@@ -6,7 +6,7 @@ import AWS from 'aws-sdk';
 /**
  * AWS Secrets Manager integration for the Todo App
  */
-export class SecretsManager {
+class SecretsManager {
   constructor(region = process.env.AWS_REGION || 'us-east-1') {
     this.client = new AWS.SecretsManager({ region });
   }
@@ -95,8 +95,15 @@ export class SecretsManager {
 }
 
 // Create singleton instance
-export const secretsManager = new SecretsManager();
+const secretsManager = new SecretsManager();
 
 // Convenience functions
-export const getDatabaseConfig = () => secretsManager.getDatabaseConfig();
-export const getJWTSecret = () => secretsManager.getJWTSecret();
+const getDatabaseConfig = () => secretsManager.getDatabaseConfig();
+const getJWTSecret = () => secretsManager.getJWTSecret();
+
+module.exports = {
+  SecretsManager,
+  secretsManager,
+  getDatabaseConfig,
+  getJWTSecret
+};

@@ -29,6 +29,7 @@ import {
 } from '@ant-design/icons'
 import { todoAPI } from '../utils/api'
 import { useAuth } from '../contexts/AuthContext'
+import { useTheme } from '../contexts/ThemeContext'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
@@ -48,6 +49,7 @@ const EnhancedTodoList = () => {
   const [loadingAction, setLoadingAction] = useState(null)
 
   const { loading: authLoading, token, getDisplayName } = useAuth()
+  const { isDarkMode } = useTheme()
   const { message } = AntApp.useApp()
 
   // Normalize todo data from API
@@ -253,38 +255,39 @@ const EnhancedTodoList = () => {
   return (
     <div className="max-w-4xl mx-auto">
       {/* User Statistics Header */}
-      <Card className="shadow-sm mb-4 dark:bg-gray-800 dark:border-gray-700" styles={{ body: { padding: 20 } }}>
+      <Card className="shadow-sm mb-4 p-4 bg-gray-50 dark:bg-[#0f172a] dark:border dark:border-gray-700 rounded-lg" styles={{ body: { padding: 20 } }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <UserOutlined className="text-lg dark:text-gray-200" />
-              <Title level={3} style={{ margin: 0 }} className="dark:text-gray-100">
+              <UserOutlined className="text-lg dark:text-blue-400" />
+              <Title level={3} style={{ margin: 0 }} className="dark:text-white">
                 {getDisplayName()}'s Tasks
               </Title>
             </div>
             <div className="flex items-center gap-6 text-sm">
-              <Badge count={calculatedStats.created} showZero color="blue">
-                <Text type="secondary">Created</Text>
+              <Badge count={calculatedStats.created} showZero color="blue" className="dark:[&_.ant-badge-count]:bg-blue-600 dark:[&_.ant-badge-count]:text-white">
+                <Text type="secondary" className="dark:text-gray-200">Created</Text>
               </Badge>
-              <Badge count={calculatedStats.completed} showZero color="green">
-                <Text type="secondary">Completed</Text>
+              <Badge count={calculatedStats.completed} showZero color="green" className="dark:[&_.ant-badge-count]:bg-green-600 dark:[&_.ant-badge-count]:text-white">
+                <Text type="secondary" className="dark:text-gray-200">Completed</Text>
               </Badge>
-              <Badge count={calculatedStats.completionRate} showZero color="purple">
-                <Text type="secondary">{calculatedStats.completionRate}% Complete</Text>
-              </Badge>
+              <span className="text-sm text-gray-600 dark:text-gray-200 px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-700">
+                {calculatedStats.completionRate}% Complete
+              </span>
             </div>
           </div>
         </div>
       </Card>
 
       {/* Main Todo List */}
-      <Card className="shadow-sm dark:bg-gray-800 dark:border-gray-700" styles={{ body: { padding: 24 } }}>
+      <Card className="shadow-sm bg-white dark:bg-[#1e293b] dark:border dark:border-gray-700 dark:shadow-lg" styles={{ body: { padding: 24 } }}>
         <div className="flex items-center justify-between mb-4">
-          <Title level={2} style={{ marginBottom: 0 }} className="dark:text-gray-100">Tasks</Title>
-          <div className="flex items-center gap-2">
+          <Title level={2} style={{ marginBottom: 0 }} className="dark:text-white">Tasks</Title>
+            <div className="flex items-center gap-2">
             <Segmented
               value={filter}
               onChange={(val) => setFilter(val)}
+              className="dark:[&_.ant-segmented]:bg-gray-800 dark:[&_.ant-segmented-item]:text-gray-300 dark:[&_.ant-segmented-item-selected]:bg-blue-600 dark:[&_.ant-segmented-item-selected]:text-white dark:[&_.ant-segmented-item:hover]:bg-gray-700"
               options={[
                 { label: 'All', value: 'all' },
                 { label: 'Pending', value: 'pending' },
@@ -295,7 +298,7 @@ const EnhancedTodoList = () => {
         </div>
 
         {/* Create Todo Form */}
-        <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div className="mb-4 p-4 bg-gray-50 dark:bg-[#0f172a] dark:border dark:border-gray-700 rounded-lg">
           <div className="flex flex-col gap-3">
             <Input
               placeholder="What needs to be done?"
@@ -303,6 +306,7 @@ const EnhancedTodoList = () => {
               onChange={(e) => setNewTodo(e.target.value)}
               onPressEnter={addTodo}
               size="large"
+              className="dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:placeholder:text-gray-400"
             />
 
             <div className="flex flex-wrap gap-2">
@@ -312,6 +316,8 @@ const EnhancedTodoList = () => {
                 onChange={setSelectedPriority}
                 style={{ width: 120 }}
                 allowClear
+                className="dark:[&_.ant-select-selector]:bg-gray-800 dark:[&_.ant-select-selector]:border-gray-600 dark:[&_.ant-select-selector]:text-gray-100"
+                popupClassName="dark:[&_.ant-select-item]:bg-gray-800 dark:[&_.ant-select-item]:text-gray-100 dark:[&_.ant-select-item-option-selected]:bg-gray-700"
               >
                 <Option value="low">Low</Option>
                 <Option value="medium">Medium</Option>
@@ -325,6 +331,8 @@ const EnhancedTodoList = () => {
                 onChange={setSelectedCategory}
                 style={{ width: 120 }}
                 allowClear
+                className="dark:[&_.ant-select-selector]:bg-gray-800 dark:[&_.ant-select-selector]:border-gray-600 dark:[&_.ant-select-selector]:text-gray-100"
+                popupClassName="dark:[&_.ant-select-item]:bg-gray-800 dark:[&_.ant-select-item]:text-gray-100 dark:[&_.ant-select-item-option-selected]:bg-gray-700"
               >
                 <Option value="personal">Personal</Option>
                 <Option value="work">Work</Option>
@@ -338,6 +346,7 @@ const EnhancedTodoList = () => {
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
                 style={{ width: 150 }}
+                className="dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:placeholder:text-gray-400"
               />
 
               <DatePicker
@@ -346,6 +355,8 @@ const EnhancedTodoList = () => {
                 onChange={setDueDate}
                 style={{ width: 120 }}
                 allowClear
+                className="dark:[&_.ant-picker-input]:bg-gray-800 dark:[&_input]:text-gray-100 dark:[&_input]:placeholder:text-gray-400"
+                popupClassName="dark:[&_.ant-picker-dropdown]:bg-gray-800"
               />
 
               <Button
@@ -364,27 +375,28 @@ const EnhancedTodoList = () => {
         {/* Todo List */}
         {loading ? (
           <div className="w-full flex items-center justify-center py-12">
-            <Spin size="large" />
+            <Spin size="large" className="dark:[&_.ant-spin-dot-item]:bg-blue-400" />
           </div>
         ) : (
           <List
             rowKey="id"
             dataSource={visibleTodos.filter(Boolean)}
-            bordered
-            className="bg-white dark:bg-gray-800 dark:border-gray-700"
+            bordered={false}
+            className="bg-transparent dark:bg-transparent"
             renderItem={(todo) => (
               <List.Item
                 key={todo.id}
-                className={`todo-item ${todo.completed ? 'todo-completed' : ''}`}
+                className={`todo-item bg-white dark:!bg-[#0f172a] dark:!border-gray-700 dark:hover:!bg-[#1e293b] border border-gray-200 dark:border-gray-700 mb-2 rounded-lg transition-colors ${todo.completed ? 'todo-completed' : ''}`}
                 actions={[
                   <Button
                     type="text"
                     icon={<MoreOutlined />}
                     onClick={() => openSubtasksModal(todo)}
                     disabled={todo.subtasks.length === 0}
+                    className="dark:text-gray-300 dark:hover:text-blue-400 dark:hover:bg-gray-700"
                   >
                     {todo.subtasks.length > 0 && (
-                      <Badge count={todo.subtasks.filter(st => !st.completed).length} size="small" />
+                      <Badge count={todo.subtasks.filter(st => !st.completed).length} size="small" className="dark:[&_.ant-badge-count]:bg-blue-600 dark:[&_.ant-badge-count]:text-white" />
                     )}
                   </Button>,
                   <Button
@@ -393,6 +405,7 @@ const EnhancedTodoList = () => {
                     icon={<DeleteOutlined />}
                     onClick={() => deleteTodo(todo.id)}
                     loading={loadingAction === `delete-${todo.id}`}
+                    className="dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
                   />
                 ]}
               >
@@ -401,26 +414,31 @@ const EnhancedTodoList = () => {
                     checked={todo.completed}
                     onChange={() => toggleTodo(todo.id)}
                     disabled={loadingAction === `toggle-${todo.id}`}
+                    className="dark:[&_.ant-checkbox-inner]:bg-gray-700 dark:[&_.ant-checkbox-inner]:border-gray-500 dark:[&_.ant-checkbox-checked_.ant-checkbox-inner]:bg-blue-600 dark:[&_.ant-checkbox-checked_.ant-checkbox-inner]:border-blue-600"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span style={{
-                          textDecoration: todo.completed ? 'line-through' : 'none',
-                          opacity: todo.completed ? 0.6 : 1,
-                          fontWeight: todo.completed ? 'normal' : '500'
-                        }}>
+                        <span 
+                          className="text-gray-900 dark:!text-white todo-title-text" 
+                          style={{
+                            textDecoration: todo.completed ? 'line-through' : 'none',
+                            opacity: todo.completed ? 0.6 : 1,
+                            fontWeight: todo.completed ? 'normal' : '500',
+                            color: isDarkMode ? '#ffffff' : undefined
+                          }}
+                        >
                           {todo.title}
                         </span>
-                        <Tag color={getPriorityColor(todo.priority)} size="small">
+                        <Tag color={getPriorityColor(todo.priority)} size="small" className="dark:border-0">
                           {todo.priority}
                         </Tag>
                         {todo.category && (
-                          <Tag color="default" size="small">
+                          <Tag color="default" size="small" className="dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
                             {todo.category}
                           </Tag>
                         )}
                         {todo.isOverdue && (
-                          <Tag color="red" icon={<ExclamationCircleOutlined />} size="small">
+                          <Tag color="red" icon={<ExclamationCircleOutlined />} size="small" className="dark:border-0">
                             Overdue
                           </Tag>
                         )}
@@ -428,24 +446,24 @@ const EnhancedTodoList = () => {
 
                       <div className="flex items-center gap-2">
                         {todo.dueDate && (
-                          <Tag icon={<CalendarOutlined />} color="default" size="small">
+                          <Tag icon={<CalendarOutlined className="dark:text-gray-300" />} color="default" size="small" className="dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
                             {dayjs(todo.dueDate).format('MMM D')}
                           </Tag>
                         )}
                         {todo.tags.length > 0 && (
                           <div className="flex gap-1">
                             {todo.tags.slice(0, 2).map(tag => (
-                              <Tag key={tag} icon={<TagOutlined />} size="small">
+                              <Tag key={tag} icon={<TagOutlined className="dark:text-gray-300" />} size="small" className="dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
                                 {tag}
                               </Tag>
                             ))}
                             {todo.tags.length > 2 && (
-                              <Tag size="small">+{todo.tags.length - 2}</Tag>
+                              <Tag size="small" className="dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">+{todo.tags.length - 2}</Tag>
                             )}
                           </div>
                         )}
                         {todo.subtaskProgress > 0 && (
-                          <Text type="secondary" className="text-xs">
+                          <Text type="secondary" className="text-xs dark:text-gray-400">
                             {todo.subtaskProgress}% complete
                           </Text>
                         )}
@@ -463,32 +481,37 @@ const EnhancedTodoList = () => {
       <Modal
         title={
           <div className="flex items-center gap-2">
-            <span>Subtasks</span>
-            <Text type="secondary">({subtasksModal.todo?.title})</Text>
+            <span className="dark:text-gray-50">Subtasks</span>
+            <Text type="secondary" className="dark:text-gray-400">({subtasksModal.todo?.title})</Text>
           </div>
         }
         open={subtasksModal.visible}
         onCancel={closeSubtasksModal}
+        className="dark:[&_.ant-modal-content]:bg-[#1e293b] dark:[&_.ant-modal-header]:bg-[#1e293b] dark:[&_.ant-modal-header]:border-gray-700 dark:[&_.ant-modal-title]:text-gray-50 dark:[&_.ant-modal-body]:text-gray-100"
         footer={[
-          <Button key="close" onClick={closeSubtasksModal}>
+          <Button key="close" onClick={closeSubtasksModal} className="dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700">
             Close
           </Button>
         ]}
       >
         {subtasksModal.todo && (
           <List
+            className="dark:bg-[#1e293b]"
             dataSource={subtasksModal.todo.subtasks}
             renderItem={(subtask) => (
               <List.Item
                 key={subtask._id}
+                className="dark:bg-[#1e293b] dark:border-gray-700 dark:hover:bg-[#334155]"
                 actions={[
                   <Checkbox
                     checked={subtask.completed}
                     onChange={() => toggleSubtask(subtasksModal.todo.id, subtask._id)}
+                    className="dark:[&_.ant-checkbox-inner]:bg-gray-700 dark:[&_.ant-checkbox-inner]:border-gray-500 dark:[&_.ant-checkbox-checked_.ant-checkbox-inner]:bg-blue-600 dark:[&_.ant-checkbox-checked_.ant-checkbox-inner]:border-blue-600 dark:[&_span]:text-gray-100"
                   />
                 ]}
               >
                 <span
+                  className="dark:text-gray-100"
                   style={{
                     textDecoration: subtask.completed ? 'line-through' : 'none',
                     opacity: subtask.completed ? 0.6 : 1

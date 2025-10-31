@@ -1,0 +1,18 @@
+# Dockerfile for Backend Development
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY golden-path/templates/fullstack-todo/backend/package*.json ./
+RUN npm ci
+
+# Copy source code
+COPY golden-path/templates/fullstack-todo/backend/ ./
+
+# Expose backend port
+EXPOSE 5000
+
+# Start development server
+CMD ["npm", "run", "dev"]
+

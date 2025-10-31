@@ -20,7 +20,7 @@ AWS X-Ray has been integrated into the following components:
   - X-Ray SDK initialization with dynamic naming
   - Express middleware for incoming request tracing
   - Global HTTP/HTTPS capture for outbound calls
-  - AWS SDK v2 capture for Secrets Manager integration
+  - AWS SDK v2 capture for Secrets Manager integration.
 
 #### Key Components
 ```javascript
