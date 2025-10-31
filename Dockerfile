@@ -3,7 +3,8 @@
 # Frontend dev server runs on port 5173, backend API on port 5000
 
 # Stage 1: Build Frontend
-FROM node:18-alpine AS frontend-builder
+# Using GitHub Container Registry to avoid Docker Hub rate limits
+FROM ghcr.io/docker-library/node:18-alpine AS frontend-builder
 
 WORKDIR /app/frontend
 
@@ -20,7 +21,8 @@ COPY golden-path/templates/fullstack-todo/frontend/ ./
 RUN npm run build
 
 # Stage 2: Build Backend
-FROM node:18-alpine AS backend-builder
+# Using GitHub Container Registry to avoid Docker Hub rate limits
+FROM ghcr.io/docker-library/node:18-alpine AS backend-builder
 
 WORKDIR /app/backend
 
@@ -34,7 +36,8 @@ RUN npm ci --include=dev
 COPY golden-path/templates/fullstack-todo/backend/ ./
 
 # Stage 3: Production Image
-FROM node:18-alpine AS production
+# Using GitHub Container Registry to avoid Docker Hub rate limits
+FROM ghcr.io/docker-library/node:18-alpine AS production
 
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init

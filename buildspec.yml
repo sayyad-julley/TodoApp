@@ -1,0 +1,60 @@
+version: 0.2
+
+# Environment variables can be set in CodeBuild project settings
+# or retrieved from AWS Secrets Manager
+env:
+  secrets-manager:
+    # Optionally store Docker Hub credentials in Secrets Manager:
+    # DOCKERHUB_USERNAME: dockerhub/credentials:username
+    # DOCKERHUB_PASSWORD: dockerhub/credentials:password
+  variables:
+    IMAGE_REPO_NAME: "simple-docker-service-0affd119c45b"
+    AWS_DEFAULT_REGION: "us-east-1"
+    AWS_ACCOUNT_ID: "239083306280"
+
+phases:
+  pre_build:
+    commands:
+      # Login to Amazon ECR
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      
+      # Optional: Login to Docker Hub to avoid rate limits (alternative to using ghcr.io)
+      # Uncomment the following lines and set DOCKERHUB_USERNAME and DOCKERHUB_PASSWORD in CodeBuild environment variables
+      # or use AWS Secrets Manager to retrieve them
+      # - echo Logging in to Docker Hub...
+      # - echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
+      
+      # Alternative: Login to Docker Hub using Secrets Manager
+      # - |
+      #   DOCKERHUB_USERNAME=$(aws secretsmanager get-secret-value --secret-id dockerhub/credentials --query SecretString --output text | jq -r .username)
+      #   DOCKERHUB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id dockerhub/credentials --query SecretString --output text | jq -r .password)
+      #   echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
+      
+      # Get the latest commit SHA for image tagging
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG -t $IMAGE_REPO_NAME:latest -f ./Dockerfile .
+      # Note: If using Docker Hub images in Dockerfile, ensure Docker Hub authentication
+      # is done in pre_build phase above to avoid rate limit errors
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker tag $IMAGE_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
+      - echo Writing image definitions file...
+      - printf '{"ImageURI":"%s"}' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
+

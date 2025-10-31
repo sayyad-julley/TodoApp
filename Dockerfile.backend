@@ -1,5 +1,6 @@
 # Dockerfile for Backend Development
-FROM node:18-alpine
+# Using GitHub Container Registry to avoid Docker Hub rate limits
+FROM ghcr.io/docker-library/node:18-alpine
 
 WORKDIR /app
 

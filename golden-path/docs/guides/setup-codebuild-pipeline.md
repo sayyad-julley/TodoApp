@@ -373,6 +373,19 @@ aws cloudwatch put-dashboard \
    - Verify package.json is valid
    - Check for private package access
 
+5. **Docker Hub Rate Limit Errors (429 Too Many Requests)**
+   - **Error**: `429 Too Many Requests - You have reached your unauthenticated pull rate limit`
+   - **Solution 1 (Recommended)**: Use GitHub Container Registry (ghcr.io) for base images
+     - Update Dockerfile to use `ghcr.io/docker-library/node:18-alpine` instead of `node:18-alpine`
+     - This registry has no rate limits for public images
+   - **Solution 2**: Authenticate with Docker Hub in buildspec.yml
+     - Add Docker Hub login in `pre_build` phase
+     - Store credentials in AWS Secrets Manager or CodeBuild environment variables
+     - Authenticated users have higher rate limits
+   - **Solution 3**: Use AWS ECR Public Gallery for compatible base images
+     - Some official images are available at `public.ecr.aws`
+     - Check availability for your required base image
+
 ### Pipeline Issues
 
 **Pipeline Not Triggering:**
