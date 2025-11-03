@@ -11,6 +11,18 @@ const {
   deleteSubtask: deleteSubtaskModel
 } = require('../models/Todo');
 
+const { inMemoryTodoOps, inMemoryUserOps } = require('../models/InMemoryUser');
+
+// Check if MongoDB is connected
+const isMongoConnected = () => {
+  try {
+    const mongoose = require('mongoose');
+    return mongoose.connection.readyState === 1;
+  } catch {
+    return false;
+  }
+};
+
 async function getTodos(req, res) {
   try {
     const filter = (req.query && req.query.filter) || 'all';
@@ -35,7 +47,16 @@ async function getTodos(req, res) {
       limit: limit ? parseInt(limit) : undefined
     };
 
-    const todos = await findByUserId(req.user.id, filter, options);
+    let todos;
+    const useInMemory = !isMongoConnected();
+
+    if (useInMemory) {
+      console.log('Using in-memory todo storage (MongoDB not connected)');
+      todos = await inMemoryTodoOps.findByUserId(req.user.id, filter, options);
+    } else {
+      todos = await findByUserId(req.user.id, filter, options);
+    }
+
     return res.status(200).json({ todos });
   } catch (error) {
     console.error('Error in getTodos:', error);
@@ -51,6 +72,7 @@ async function createTodo(req, res) {
     }
 
     const todoData = {
+      userId: req.user.id, // Use userId for compatibility with both models
       user: req.user.id, // Use the new 'user' field
       title,
       description: description || '',
@@ -60,9 +82,21 @@ async function createTodo(req, res) {
       category: category || 'general'
     };
 
-    const todo = await createTodoModel(todoData);
+    let todo;
+    const useInMemory = !isMongoConnected();
+
+    if (useInMemory) {
+      console.log('Using in-memory todo storage for create (MongoDB not connected)');
+      todo = await inMemoryTodoOps.create(todoData);
+      // Update user statistics when creating a todo
+      await inMemoryUserOps.updateUserStatistics(req.user.id, 'todosCreated');
+    } else {
+      todo = await createTodoModel(todoData);
+    }
+
     return res.status(201).json({ todo });
   } catch (error) {
+    console.error('Error in createTodo:', error);
     return res.status(500).json({ message: 'Failed to create todo' });
   }
 }
@@ -86,22 +120,46 @@ async function updateTodo(req, res) {
       return res.status(400).json({ message: 'No updatable fields provided' });
     }
 
+    let updated;
+    const useInMemory = !isMongoConnected();
+
     const updates = {};
     if (typeof title !== 'undefined') updates.title = title;
     if (typeof description !== 'undefined') updates.description = description;
-    if (typeof completed !== 'undefined') updates.completed = completed;
+    if (typeof completed !== 'undefined') {
+      updates.completed = completed;
+      if (completed) {
+        updates.completedAt = new Date();
+        // Update user statistics when completing a todo
+        if (useInMemory) {
+          await inMemoryUserOps.updateUserStatistics(req.user.id, 'todosCompleted');
+        }
+      }
+    }
     if (typeof priority !== 'undefined') updates.priority = priority;
     if (typeof dueDate !== 'undefined') updates.dueDate = dueDate;
     if (typeof tags !== 'undefined') updates.tags = tags;
     if (typeof category !== 'undefined') updates.category = category;
     if (typeof status !== 'undefined') updates.status = status;
 
-    const updated = await update(id, req.user.id, updates);
+    if (useInMemory) {
+      console.log('Using in-memory todo storage for update (MongoDB not connected)');
+      // Verify ownership first
+      const todo = await inMemoryTodoOps.findById(id);
+      if (!todo || (todo.user_id !== req.user.id && todo.userId !== req.user.id && todo.user !== req.user.id)) {
+        return res.status(404).json({ message: 'Todo not found' });
+      }
+      updated = await inMemoryTodoOps.update(id, updates);
+    } else {
+      updated = await update(id, req.user.id, updates);
+    }
+
     if (!updated) {
       return res.status(404).json({ message: 'Todo not found' });
     }
     return res.status(200).json({ todo: updated });
   } catch (error) {
+    console.error('Error in updateTodo:', error);
     return res.status(500).json({ message: 'Failed to update todo' });
   }
 }
@@ -109,12 +167,27 @@ async function updateTodo(req, res) {
 async function deleteTodo(req, res) {
   try {
     const { id } = req.params;
-    const ok = await deleteTodoModel(id, req.user.id);
+    let ok;
+    const useInMemory = !isMongoConnected();
+
+    if (useInMemory) {
+      console.log('Using in-memory todo storage for delete (MongoDB not connected)');
+      // Verify ownership first
+      const todo = await inMemoryTodoOps.findById(id);
+      if (!todo || (todo.user_id !== req.user.id && todo.userId !== req.user.id && todo.user !== req.user.id)) {
+        return res.status(404).json({ message: 'Todo not found' });
+      }
+      ok = await inMemoryTodoOps.delete(id);
+    } else {
+      ok = await deleteTodoModel(id, req.user.id);
+    }
+
     if (!ok) {
       return res.status(404).json({ message: 'Todo not found' });
     }
     return res.status(204).send();
   } catch (error) {
+    console.error('Error in deleteTodo:', error);
     return res.status(500).json({ message: 'Failed to delete todo' });
   }
 }
@@ -122,9 +195,19 @@ async function deleteTodo(req, res) {
 // New enhanced endpoints
 async function getTodoStatistics(req, res) {
   try {
-    const stats = await getStatisticsModel(req.user.id);
+    let stats;
+    const useInMemory = !isMongoConnected();
+
+    if (useInMemory) {
+      console.log('Using in-memory todo storage for statistics (MongoDB not connected)');
+      stats = await inMemoryTodoOps.getStatistics(req.user.id);
+    } else {
+      stats = await getStatisticsModel(req.user.id);
+    }
+
     return res.status(200).json({ statistics: stats });
   } catch (error) {
+    console.error('Error in getTodoStatistics:', error);
     return res.status(500).json({ message: 'Failed to fetch statistics' });
   }
 }
