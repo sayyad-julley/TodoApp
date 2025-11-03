@@ -1,0 +1,494 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: fullstack-todo-template
+  title: Full-Stack Todo Application Template
+  description: |
+    A comprehensive, production-ready todo application template with modern web technologies.
+
+    This template includes everything you need to build a scalable todo application:
+    ✅ React 18 frontend with TypeScript and Vite
+    ✅ Node.js/Express backend with MongoDB
+    ✅ JWT authentication and authorization
+    ✅ Docker containerization
+    ✅ AWS X-Ray distributed tracing
+    ✅ Comprehensive testing setup
+    ✅ Development automation scripts
+    ✅ Production-ready deployment configuration
+    ✅ Dark/light mode support
+    ✅ Responsive design
+    ✅ Advanced todo features (subtasks, categories, priorities)
+  tags:
+    - todo
+    - fullstack
+    - react
+    - nodejs
+    - mongodb
+    - docker
+    - express
+    - typescript
+    - jwt
+    - authentication
+    - template
+    - scaffold
+    - production-ready
+    - aws
+    - xray
+    - web-application
+    - task-management
+    - crm
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+    github.com/project-slug: fullstack-todo-${{ parameters.name | dump | lower | replace(/\s+/g, '-') }}
+    github.com/project-repository: ${{ parameters.name | dump }}-todo-app
+spec:
+  owner: user:guest
+  type: service
+
+  # Technology Stack and Tools
+  # This template includes the following technologies and tools:
+  #
+  # Frontend Technologies:
+  # - React 18.2.0: Modern JavaScript library for building user interfaces
+  # - Vite 5.0.8: Fast build tool and development server
+  # - React Router DOM 6.20.1: Client-side routing for React applications
+  # - Ant Design 5.12.8: UI component library with comprehensive design system
+  # - Ant Design Icons 5.2.6: Icon library for Ant Design
+  # - Tailwind CSS 3.3.6: Utility-first CSS framework for rapid UI development
+  # - PostCSS 8.4.32: CSS transformation tool
+  # - Autoprefixer 10.4.16: PostCSS plugin to parse CSS and add vendor prefixes
+  # - Day.js 1.11.10: Lightweight date/time manipulation library
+  # - Axios 1.6.2: Promise-based HTTP client for API requests
+  #
+  # Backend Technologies:
+  # - Node.js 18: JavaScript runtime built on Chrome's V8 engine
+  # - Express.js 4.18.2: Fast, unopinionated web framework for Node.js
+  # - MongoDB 8.8.0: NoSQL document-oriented database
+  # - Mongoose 8.8.0: Elegant MongoDB object modeling for Node.js
+  # - JWT (jsonwebtoken 9.0.2): JSON Web Token implementation for authentication
+  # - bcryptjs 2.4.3: Password hashing library
+  # - Joi 17.11.0: Object schema validation library
+  # - Helmet 7.1.0: Security middleware for Express
+  # - CORS 2.8.5: Cross-Origin Resource Sharing middleware
+  # - Express Rate Limit 7.1.5: Rate limiting middleware for Express
+  # - dotenv 16.3.1: Environment variable management
+  #
+  # AWS Integration:
+  # - AWS SDK 2.1692.0: Amazon Web Services SDK for JavaScript
+  # - AWS X-Ray SDK Core 3.11.0: Distributed tracing and monitoring
+  # - AWS X-Ray SDK Express 3.11.0: X-Ray integration for Express.js
+  # - AWS OpenTelemetry Collector: Distributed tracing and observability
+  #
+  # Development Tools:
+  # - TypeScript 5.8.0: Static type checking for JavaScript
+  # - ESLint: JavaScript and TypeScript code linting
+  # - Prettier 2.3.2: Code formatting tool
+  # - Vitest 1.0.4: Fast unit testing framework
+  # - Jest 29.7.0: JavaScript testing framework
+  # - Nodemon 3.0.2: Automatic development server restart
+  # - Supertest 6.3.3: HTTP assertion testing library
+  # - Playwright 1.32.3: End-to-end testing framework
+  # - Testing Library: React testing utilities
+  #
+  # Container and DevOps:
+  # - Docker: Container platform with multi-stage builds
+  # - Docker Compose: Multi-container Docker application orchestration
+  # - GitHub Container Registry (ghcr.io): Container registry to avoid Docker Hub rate limits
+  # - Node.js Alpine Linux images: Lightweight container base images
+  # - Dumb-init: Proper signal handling in containers
+  # - Health checks: Container health monitoring
+  #
+  # Package Management:
+  # - Yarn 4.4.1: Fast, reliable, and secure dependency management
+  # - npm ci: Fast, reliable, reproducible builds
+  #
+  # Backstage Platform:
+  # - @backstage/cli 0.34.4: Backstage CLI tool
+  # - @backstage/core-app-api 1.19.1: Core Backstage application APIs
+  # - @backstage/core-components 0.18.2: Reusable Backstage components
+  # - @backstage/plugin-scaffolder 1.34.2: Software scaffolding plugin
+  # - @backstage/plugin-catalog 1.31.4: Software catalog plugin
+  # - @backstage/plugin-search 1.4.31: Search functionality plugin
+  # - Material-UI 4.12.2: React UI framework
+  #
+  # Security Features:
+  # - JWT-based authentication
+  # - Password hashing with bcrypt
+  # - Rate limiting
+  # - CORS protection
+  # - Security headers with Helmet
+  # - Input validation with Joi
+  # - Non-root container users
+  #
+  # Monitoring and Observability:
+  # - AWS X-Ray distributed tracing
+  # - OpenTelemetry integration
+  # - Health check endpoints
+  # - Container health monitoring
+  #
+  # Development Experience:
+  # - Hot module replacement (HMR)
+  # - Development proxy configuration
+  # - Automatic server restart
+  # - Code linting and formatting
+  # - TypeScript support
+  # - Dark mode support
+  # - Responsive design
+
+  # These parameters are used to generate the input form in the frontend, and are
+  # used to gather input data for the execution of the template.
+  parameters:
+    - title: Project Information
+      required:
+        - name
+        - owner
+      properties:
+        name:
+          title: Project Name
+          type: string
+          description: Unique name of the project (use lowercase letters and numbers only)
+          pattern: '^[a-z0-9-]+$'
+          ui:autofocus: true
+          ui:placeholder: my-todo-app
+        description:
+          title: Description
+          type: string
+          description: Optional description for your todo application
+          default: A comprehensive todo application built with modern web technologies
+          ui:options:
+            rows: 3
+        owner:
+          title: Project Owner
+          type: string
+          description: Owner of the project
+          ui:field: OwnerPicker
+          default: user:guest
+        includeAuth:
+          title: Include Authentication
+          type: boolean
+          description: Include JWT-based user authentication system
+          default: true
+        includeDocker:
+          title: Include Docker Support
+          type: boolean
+          description: Include Docker files and docker-compose configuration
+          default: true
+        includeAWS:
+          title: Include AWS Integration
+          type: boolean
+          description: Include AWS X-Ray distributed tracing
+          default: false
+        databaseType:
+          title: Database Type
+          type: string
+          description: Choose your preferred database
+          enum: ['mongodb', 'postgresql', 'mysql']
+          default: mongodb
+        nodeVersion:
+          title: Node.js Version
+          type: string
+          description: Choose Node.js version
+          enum: ['18', '20', '21']
+          default: '18'
+        port:
+          title: Backend Port
+          type: number
+          description: Port for the backend API server
+          default: 5000
+        frontendPort:
+          title: Frontend Port
+          type: number
+          description: Port for the frontend development server
+          default: 5143
+
+    - title: Repository Configuration
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          description: Git repository URL where the project will be created
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+              - gitlab.com
+              - bitbucket.org
+        defaultBranch:
+          title: Default Branch
+          type: string
+          description: Default branch name for the repository
+          default: main
+        license:
+          title: License
+          type: string
+          description: Choose a license for your project
+          enum: ['MIT', 'Apache-2.0', 'GPL-3.0', 'BSD-3-Clause']
+          default: MIT
+
+  # These steps are executed in the scaffolder backend, using data that we gathered
+  # via the parameters above.
+  steps:
+    # Each step executes an action, in this case one templates files into the working directory.
+    - id: fetch-base
+      name: 📥 Fetch Project Template
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          includeAuth: ${{ parameters.includeAuth }}
+          includeDocker: ${{ parameters.includeDocker }}
+          includeAWS: ${{ parameters.includeAWS }}
+          databaseType: ${{ parameters.databaseType }}
+          nodeVersion: ${{ parameters.nodeVersion }}
+          port: ${{ parameters.port }}
+          frontendPort: ${{ parameters.frontendPort }}
+          license: ${{ parameters.license }}
+
+    # Generate comprehensive README.md
+    - id: generate-readme
+      name: 📚 Generate Documentation
+      action: fetch:plain
+      input:
+        url: ./content/README.md
+        targetPath: README.md
+
+    # Generate package.json files with project-specific values
+    - id: generate-backend-package
+      name: ⚙️ Configure Backend Package
+      action: fetch:template
+      input:
+        url: ./content/backend/package.json
+        targetPath: backend/package.json
+        values:
+          name: ${{ parameters.name }}-backend
+          description: ${{ parameters.description }} - Backend API
+          version: 1.0.0
+
+    - id: generate-frontend-package
+      name: ⚙️ Configure Frontend Package
+      action: fetch:template
+      input:
+        url: ./content/frontend/package.json
+        targetPath: frontend/package.json
+        values:
+          name: ${{ parameters.name }}-frontend
+          description: ${{ parameters.description }} - Frontend Application
+          version: 1.0.0
+
+    # Generate environment configuration files
+    - id: generate-backend-env
+      name: 🔧 Configure Backend Environment
+      action: fetch:template
+      input:
+        url: ./content/backend/.env.example
+        targetPath: backend/.env
+        values:
+          port: ${{ parameters.port }}
+          databaseType: ${{ parameters.databaseType }}
+          includeAWS: ${{ parameters.includeAWS }}
+
+    - id: generate-frontend-env
+      name: 🔧 Configure Frontend Environment
+      action: fetch:template
+      input:
+        url: ./content/frontend/.env.example
+        targetPath: frontend/.env
+        values:
+          apiUrl: http://localhost:${{ parameters.port }}
+          port: ${{ parameters.frontendPort }}
+
+    # Generate Docker configuration (if enabled)
+    - id: generate-docker-config
+      name: 🐳 Generate Docker Configuration
+      if: ${{ parameters.includeDocker }}
+      action: fetch:template
+      input:
+        url: ./content/docker-compose.yml
+        targetPath: docker-compose.yml
+        values:
+          databaseType: ${{ parameters.databaseType }}
+          port: ${{ parameters.port }}
+
+    # Generate Git configuration files
+    - id: generate-gitignore
+      name: 📄 Generate .gitignore
+      action: fetch:plain
+      input:
+        url: ./content/.gitignore
+        targetPath: .gitignore
+
+    - id: generate-license
+      name: 📄 Generate License File
+      action: fetch:template
+      input:
+        url: ./content/LICENSE.${{ parameters.license | lower }}
+        targetPath: LICENSE
+        values:
+          name: ${{ parameters.name }}
+          year: '2024'
+
+    # This step publishes the contents of the working directory to the repository.
+    # It supports multiple Git providers (GitHub, GitLab, Bitbucket)
+    - id: publish
+      name: 🚀 Publish to Repository
+      action: publish:github
+      input:
+        description: |
+          🎉 **Full-Stack Todo Application Generated Successfully!**
+
+          **Project:** ${{ parameters.name }}
+          **Description:** ${{ parameters.description }}
+          **Database:** ${{ parameters.databaseType }}
+          **Node.js Version:** ${{ parameters.nodeVersion }}
+
+          **Features Included:**
+          ✅ React 18 frontend with TypeScript and Vite
+          ✅ Node.js/Express backend with ${{ parameters.databaseType }}
+          ✅ JWT authentication and authorization
+          ✅ Comprehensive todo management features
+          ✅ Responsive design with dark/light mode
+          ✅ Docker containerization
+          ✅ Production-ready deployment configuration
+          {{#parameters.includeAWS}}✅ AWS X-Ray distributed tracing{{/parameters.includeAWS}}
+
+          **Quick Start:**
+          1. Clone the repository
+          2. Run `npm install` in both frontend and backend directories
+          3. Start MongoDB: `docker-compose up -d mongodb`
+          4. Start backend: `cd backend && npm run dev`
+          5. Start frontend: `cd frontend && npm run dev`
+          6. Access your app at http://localhost:${{ parameters.frontendPort }}
+
+          Built with ❤️ using the Full-Stack Todo Template
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: ${{ parameters.defaultBranch }}
+
+    # The final step is to register our new component in the catalog.
+    - id: register
+      name: 📋 Register in Catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+    # Send a success notification to the user
+    - id: notify-success
+      name: 🎉 Notify User
+      action: notification:send
+      input:
+        recipients: entity
+        entityRefs:
+          - user:default/guest
+        title: '✅ Full-Stack Todo Application Created Successfully!'
+        info: |
+          Your project "${{ parameters.name }}" has been created and published to ${{ parameters.repoUrl }}.
+
+          **Next Steps:**
+          1. 📁 Clone your repository: `git clone ${{ steps['publish'].output.remoteUrl }}`
+          2. 📦 Install dependencies: `npm install` (in both frontend & backend)
+          3. 🗄️ Start database: `docker-compose up -d mongodb`
+          4. 🚀 Start development servers
+          5. 🎯 Access your application!
+
+          **Access Points:**
+          - Frontend: http://localhost:${{ parameters.frontendPort }}
+          - Backend API: http://localhost:${{ parameters.port }}
+          - Health Check: http://localhost:${{ parameters.port }}/health
+
+          Check the README.md file in your project for detailed documentation.
+        severity: 'normal'
+
+  # Outputs are displayed to the user after a successful execution of the template.
+  output:
+    links:
+      - title: 📂 Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+        icon: github
+      - title: 📋 Open in Catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
+      - title: 📚 Documentation
+        url: ${{ steps['publish'].output.remoteUrl }}/blob/main/README.md
+        icon: docs
+      - title: 🚀 Live Demo
+        url: http://localhost:${{ parameters.frontendPort }}
+        icon: web
+
+    text:
+      - "🎉 **Congratulations! Your Full-Stack Todo Application is ready!**"
+      - ""
+      - "## 📋 Project Summary"
+      - "**Name:** ${{ parameters.name }}"
+      - "**Description:** ${{ parameters.description }}"
+      - "**Database:** ${{ parameters.databaseType }}"
+      - "**Node.js:** ${{ parameters.nodeVersion }}"
+      - "**License:** ${{ parameters.license }}"
+      - ""
+      - "## 🚀 Quick Start Guide"
+      - ""
+      - "### 1. Clone Your Repository"
+      - "```bash"
+      - "git clone ${{ steps['publish'].output.remoteUrl }}"
+      - "cd ${{ parameters.name }}"
+      - "```"
+      - ""
+      - "### 2. Install Dependencies"
+      - "```bash"
+      - "# Backend dependencies"
+      - "cd backend && npm install"
+      - ""
+      - "# Frontend dependencies"
+      - "cd ../frontend && npm install"
+      - "```"
+      - ""
+      - "### 3. Start Development Environment"
+      - "```bash"
+      - "# Start database (if using Docker)"
+      - "docker-compose up -d mongodb"
+      - ""
+      - "# Start backend server"
+      - "cd backend && npm run dev"
+      - ""
+      - "# Start frontend server (in new terminal)"
+      - "cd frontend && npm run dev"
+      - "```"
+      - ""
+      - "### 4. Access Your Application"
+      - "- 🎨 **Frontend:** http://localhost:${{ parameters.frontendPort }}"
+      - "- 🔧 **Backend API:** http://localhost:${{ parameters.port }}"
+      - "- ❤️ **Health Check:** http://localhost:${{ parameters.port }}/health"
+      - "- 📊 **API Documentation:** http://localhost:${{ parameters.port }}/api-docs"
+      - ""
+      - "## ✨ Features Included"
+      - "{{#parameters.includeAuth}}- 🔐 **JWT Authentication** - Secure user registration and login{{/parameters.includeAuth}}"
+      - "- 📝 **Todo Management** - Create, update, delete, and organize todos"
+      - "- 🏷️ **Categories & Tags** - Organize tasks with custom categories and tags"
+      - "- ⚡ **Priority Levels** - Set priority levels (low, medium, high, urgent)"
+      - "- 📅 **Due Dates** - Set and track due dates with overdue detection"
+      - "- 🌙 **Dark/Light Mode** - Built-in theme switching"
+      - "- 📱 **Responsive Design** - Works perfectly on all devices"
+      - "- 📊 **Statistics Dashboard** - Track productivity and progress"
+      - "{{#parameters.includeDocker}}- 🐳 **Docker Support** - Containerized deployment{{/parameters.includeDocker}}"
+      - "{{#parameters.includeAWS}}- 🔍 **AWS X-Ray** - Distributed tracing and monitoring{{/parameters.includeAWS}}"
+      - ""
+      - "## 📚 Additional Resources"
+      - "- 📖 **Complete Documentation:** [README.md](${{ steps['publish'].output.remoteUrl }}/blob/main/README.md)"
+      - "- 🛠️ **API Reference:** [API Documentation](./docs/api.md)"
+      - "- 🚀 **Deployment Guide:** [Deployment Guide](./docs/deployment.md)"
+      - "- 🧪 **Testing Guide:** [Testing Documentation](./docs/testing.md)"
+      - ""
+      - "## 🤝 Need Help?"
+      - "- Check the [Issues](${{ steps['publish'].output.remoteUrl }}/issues) page"
+      - "- Review the comprehensive [README](./README.md)"
+      - "- Join our community discussions"
+      - ""
+      - "---"
+      - "Built with ❤️ using the **Full-Stack Todo Template** in Backstage"
+      - ""
+      - "*Your template has been registered in the Backstage catalog and is ready for use!*"
