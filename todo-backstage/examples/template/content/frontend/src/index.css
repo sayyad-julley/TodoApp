@@ -1,0 +1,541 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Root level dark mode - entire window/screen */
+html {
+  background-color: #ffffff;
+  color: #1f2937;
+  min-height: 100%;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.dark html {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  height: 100%;
+  width: 100%;
+  background-color: #ffffff;
+  color: #1f2937;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 200ms ease, color 200ms ease;
+  overflow-x: hidden;
+}
+
+.dark body {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+#root {
+  min-height: 100vh;
+  height: 100%;
+  width: 100%;
+  background-color: #ffffff;
+  transition: background-color 200ms ease;
+}
+
+.dark #root {
+  background-color: #0f172a;
+}
+
+/* Ensure all container elements fill the screen */
+.ant-app,
+.ant-layout {
+  min-height: 100vh;
+  width: 100%;
+  background-color: inherit;
+}
+
+.dark .ant-app,
+.dark .ant-layout {
+  background-color: #0f172a;
+}
+
+/* Navbar/Header styling */
+.dark .ant-layout-header {
+  background-color: #1e293b !important;
+  border-bottom-color: #475569 !important;
+  color: #f1f5f9;
+}
+
+.dark .ant-layout-header h1,
+.dark .ant-layout-header .ant-typography {
+  color: #ffffff !important;
+}
+
+/* Handle any overflow or scrolling areas */
+.ant-layout-content {
+  background-color: inherit;
+}
+
+.dark .ant-layout-content {
+  background-color: #0f172a;
+}
+
+/* Smooth transitions for dark mode */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Ant Design dark mode enhancements - Comprehensive overrides */
+
+/* Cards */
+.dark .ant-card {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+/* Ensure dark mode backgrounds work with Tailwind arbitrary values */
+.dark [class*="dark:bg-\[#0f172a\]"] {
+  background-color: #0f172a !important;
+}
+
+.dark [class*="dark:border-gray-700"] {
+  border-color: #475569 !important;
+}
+
+/* Force card background override for specific dark theme */
+.dark .ant-card[class*="dark:bg-\[#0f172a\]"] {
+  background-color: #0f172a !important;
+}
+
+.dark .ant-card-head {
+  border-bottom-color: #475569;
+  color: #f1f5f9;
+}
+
+.dark .ant-card-head-title {
+  color: #f1f5f9;
+}
+
+.dark .ant-card-body {
+  color: #f1f5f9;
+}
+
+/* Typography */
+.dark .ant-typography {
+  color: #f1f5f9;
+}
+
+.dark .ant-typography h1,
+.dark .ant-typography h2,
+.dark .ant-typography h3,
+.dark .ant-typography h4,
+.dark .ant-typography h5,
+.dark .ant-typography h6 {
+  color: #f1f5f9;
+}
+
+.dark .ant-typography-secondary {
+  color: #cbd5e1;
+}
+
+/* Lists */
+.dark .ant-list {
+  color: #f1f5f9;
+  background-color: transparent;
+}
+
+.dark .ant-list-item {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Override list item background for dark:bg-[#0f172a] */
+.dark .ant-list-item[class*="dark:bg-\[#0f172a\]"] {
+  background-color: #0f172a !important;
+}
+
+.dark .ant-list-item[class*="dark:border-gray-700"] {
+  border-color: #475569 !important;
+}
+
+.dark .ant-list-item:hover {
+  background-color: #334155 !important;
+}
+
+/* Override hover for items with dark:bg-[#0f172a] */
+.dark .ant-list-item[class*="dark:bg-\[#0f172a\]"]:hover {
+  background-color: #1e293b !important;
+}
+
+.dark .ant-list-item-meta-title {
+  color: #f1f5f9;
+}
+
+.dark .ant-list-item-meta-description {
+  color: #cbd5e1;
+}
+
+.dark .ant-list-item-action {
+  color: #cbd5e1;
+}
+
+.dark .ant-list-item-action > li {
+  color: #cbd5e1;
+}
+
+/* Inputs */
+.dark .ant-input,
+.dark .ant-input-password,
+.dark .ant-picker {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+.dark .ant-input::placeholder,
+.dark .ant-input-password input::placeholder {
+  color: #94a3b8;
+}
+
+.dark .ant-input:focus,
+.dark .ant-input-focused,
+.dark .ant-input-password:focus,
+.dark .ant-picker:focus,
+.dark .ant-picker-focused {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.dark .ant-input:hover,
+.dark .ant-input-password:hover,
+.dark .ant-picker:hover {
+  border-color: #64748b;
+}
+
+/* Select Dropdowns */
+.dark .ant-select-selector {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark .ant-select-selection-placeholder {
+  color: #94a3b8 !important;
+}
+
+.dark .ant-select-selection-item {
+  color: #f1f5f9 !important;
+}
+
+.dark .ant-select-arrow {
+  color: #94a3b8;
+}
+
+.dark .ant-select-dropdown {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+.dark .ant-select-item {
+  color: #f1f5f9;
+  background-color: #1e293b;
+}
+
+.dark .ant-select-item-option-selected {
+  background-color: #334155 !important;
+  color: #f1f5f9;
+}
+
+.dark .ant-select-item-option:hover {
+  background-color: #334155;
+}
+
+/* Date Picker */
+.dark .ant-picker-input > input {
+  color: #f1f5f9;
+  background-color: #1e293b;
+}
+
+.dark .ant-picker-input > input::placeholder {
+  color: #94a3b8;
+}
+
+.dark .ant-picker-dropdown {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+.dark .ant-picker-panel {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+.dark .ant-picker-cell {
+  color: #cbd5e1;
+}
+
+.dark .ant-picker-cell:hover:not(.ant-picker-cell-disabled):not(.ant-picker-cell-selected) {
+  background-color: #334155;
+}
+
+.dark .ant-picker-cell-selected .ant-picker-cell-inner {
+  background-color: #3b82f6;
+  color: #ffffff;
+}
+
+/* Buttons */
+.dark .ant-btn {
+  border-color: #475569;
+}
+
+.dark .ant-btn-primary {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.dark .ant-btn-primary:hover,
+.dark .ant-btn-primary:focus {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.dark .ant-btn-text {
+  color: #cbd5e1;
+}
+
+.dark .ant-btn-text:hover,
+.dark .ant-btn-text:focus {
+  background-color: #334155;
+  color: #f1f5f9;
+}
+
+.dark .ant-btn-dangerous {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.dark .ant-btn-dangerous:hover,
+.dark .ant-btn-dangerous:focus {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+}
+
+/* Checkboxes */
+.dark .ant-checkbox-inner {
+  background-color: #334155;
+  border-color: #64748b;
+}
+
+.dark .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.dark .ant-checkbox:hover .ant-checkbox-inner {
+  border-color: #3b82f6;
+}
+
+.dark .ant-checkbox + span {
+  color: #f1f5f9 !important;
+}
+
+.dark .ant-checkbox-wrapper {
+  color: #f1f5f9;
+}
+
+.dark .ant-checkbox-wrapper > span {
+  color: #f1f5f9;
+}
+
+/* Force white color for task names in dark mode */
+.dark .todo-item .todo-title-text,
+.dark .ant-list-item .todo-title-text,
+.dark .ant-checkbox-wrapper .todo-title-text {
+  color: #ffffff !important;
+}
+
+.dark .ant-checkbox-disabled .ant-checkbox-inner {
+  background-color: #1e293b;
+  border-color: #475569;
+  opacity: 0.5;
+}
+
+/* Tags */
+.dark .ant-tag {
+  border-color: transparent;
+  color: #f1f5f9;
+}
+
+.dark .ant-tag-default {
+  background-color: #334155;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
+.dark .ant-tag-blue {
+  background-color: #1e40af;
+  color: #ffffff;
+  border-color: #1e40af;
+}
+
+.dark .ant-tag-green {
+  background-color: #166534;
+  color: #ffffff;
+  border-color: #166534;
+}
+
+.dark .ant-tag-orange {
+  background-color: #9a3412;
+  color: #ffffff;
+  border-color: #9a3412;
+}
+
+.dark .ant-tag-red {
+  background-color: #991b1b;
+  color: #ffffff;
+  border-color: #991b1b;
+}
+
+.dark .ant-tag-purple {
+  background-color: #6b21a8;
+  color: #ffffff;
+  border-color: #6b21a8;
+}
+
+/* Badges */
+.dark .ant-badge-count {
+  background-color: #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 0 0 1px #1e293b;
+}
+
+.dark .ant-badge-status-dot {
+  background-color: #3b82f6;
+}
+
+/* Segmented Control */
+.dark .ant-segmented {
+  background-color: #1e293b;
+  color: #cbd5e1;
+}
+
+.dark .ant-segmented-item {
+  color: #cbd5e1;
+}
+
+.dark .ant-segmented-item-selected {
+  background-color: #3b82f6;
+  color: #ffffff;
+}
+
+.dark .ant-segmented-item:hover:not(.ant-segmented-item-selected):not(.ant-segmented-item-disabled) {
+  background-color: #334155;
+  color: #f1f5f9;
+}
+
+/* Modals */
+.dark .ant-modal-content {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+.dark .ant-modal-header {
+  background-color: #1e293b;
+  border-bottom-color: #475569;
+}
+
+.dark .ant-modal-title {
+  color: #f1f5f9;
+}
+
+.dark .ant-modal-body {
+  color: #f1f5f9;
+}
+
+.dark .ant-modal-footer {
+  border-top-color: #475569;
+}
+
+.dark .ant-modal-close {
+  color: #94a3b8;
+}
+
+.dark .ant-modal-close:hover {
+  color: #f1f5f9;
+}
+
+/* Spin/Loading */
+.dark .ant-spin-dot-item {
+  background-color: #3b82f6;
+}
+
+.dark .ant-spin-text {
+  color: #cbd5e1;
+}
+
+/* Form Items */
+.dark .ant-form-item-label > label {
+  color: #e2e8f0;
+}
+
+.dark .ant-form-item-explain-error {
+  color: #ef4444;
+}
+
+.dark .ant-form-item-explain-success {
+  color: #10b981;
+}
+
+/* Dropdowns */
+.dark .ant-dropdown {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+.dark .ant-dropdown-menu {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+.dark .ant-dropdown-menu-item {
+  color: #f1f5f9;
+}
+
+.dark .ant-dropdown-menu-item:hover {
+  background-color: #334155;
+}
+
+.dark .ant-dropdown-menu-item-selected {
+  background-color: #334155;
+  color: #3b82f6;
+}
+
+/* Improve scrollbar in dark mode */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
