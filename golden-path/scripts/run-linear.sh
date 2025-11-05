@@ -9,8 +9,9 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Set Linear API credentials
-# Get credentials from environment variables or use defaults
-export LINEAR_API_KEY="${LINEAR_API_KEY:-${LINEAR_API_KEY}}"
+# Get credentials from environment variables
+# LINEAR_API_KEY must be set before running this script
+export LINEAR_API_KEY="${LINEAR_API_KEY}"
 export LINEAR_TEAM_ID="${LINEAR_TEAM_ID:-1a042dce-47d0-426a-9236-d18187f9f1de}"  # todoapp team
 
 # Check if Linear API key is set
