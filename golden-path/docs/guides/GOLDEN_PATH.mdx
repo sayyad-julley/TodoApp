@@ -1,0 +1,330 @@
+---
+title: Golden Path Guide
+description: Comprehensive guide to the Golden Path development workflow
+---
+
+# Golden Path - World-Class Full-Stack Development
+
+## Purpose
+
+The Golden Path is a standardized development workflow designed to help teams build world-class full-stack applications with best practices, integrated tooling, and production-ready infrastructure from day one. This meta-repository provides templates, scripts, and comprehensive guides to accelerate development while maintaining high code quality, security, and observability standards.
+
+## Flow
+
+### How Developers Use the Golden Path
+
+<Steps>
+  <Step title="Clone a Template">
+    Choose a template from `/golden-path/templates/` that matches your project needs
+  </Step>
+  <Step title="Run Setup Script">
+    Execute `./golden-path/scripts/create-new-app.sh` to scaffold a new project
+  </Step>
+  <Step title="Configure AWS Services">
+    Follow guides in `/golden-path/guides/` to set up infrastructure
+  </Step>
+  <Step title="Start Building">
+    Your project is ready with CI/CD, testing, monitoring, and documentation already configured
+  </Step>
+</Steps>
+
+### Quick Start
+
+```bash
+# Clone the golden path repository
+git clone <repository-url>
+cd golden-path
+
+# Create a new project from template
+./golden-path/scripts/create-new-app.sh
+
+# Follow the prompts to set up your project
+# Then follow the setup guides for AWS services
+```
+
+## Who Uses It
+
+<CardGroup cols={2}>
+  <Card title="Development Teams" icon="users">
+    Standardize development workflows across projects
+  </Card>
+  <Card title="New Projects" icon="rocket">
+    Rapidly bootstrap production-ready applications
+  </Card>
+  <Card title="Rapid Prototyping" icon="lightning">
+    Quickly spin up full-stack applications with best practices
+  </Card>
+  <Card title="Enterprise Teams" icon="building">
+    Ensure consistency, security, and observability from the start
+  </Card>
+</CardGroup>
+
+## Architecture Philosophy
+
+### Monorepo Structure
+
+The golden path templates follow a monorepo structure with clear separation of concerns:
+
+- Frontend application in `/frontend/`
+- Backend API in `/backend/`
+- Database migrations in `/database/`
+- Infrastructure as Code in `/.aws/`
+- End-to-end tests in `/tests/`
+
+### AWS-Native
+
+All templates are designed to run seamlessly on AWS:
+
+<CardGroup cols={2}>
+  <Card title="Compute" icon="server">
+    ECS (Fargate) or Lambda for serverless
+  </Card>
+  <Card title="Database" icon="database">
+    RDS PostgreSQL with automated backups
+  </Card>
+  <Card title="Storage" icon="hard-drive">
+    S3 for static assets, CloudFront for CDN
+  </Card>
+  <Card title="CI/CD" icon="arrows-rotate">
+    CodePipeline with CodeBuild
+  </Card>
+  <Card title="Monitoring" icon="chart-line">
+    X-Ray for tracing, CloudWatch for logs and metrics
+  </Card>
+  <Card title="Security" icon="shield">
+    GuardDuty for threat detection, Secrets Manager for credentials
+  </Card>
+</CardGroup>
+
+### Security-First
+
+Security is built into every layer:
+
+<Steps>
+  <Step title="Secrets Management">
+    AWS Secrets Manager for secure credential storage
+  </Step>
+  <Step title="Authentication">
+    JWT authentication with refresh tokens
+  </Step>
+  <Step title="Rate Limiting">
+    Rate limiting and CORS configuration
+  </Step>
+  <Step title="Automated Scanning">
+    Security scanning with CodeRabbit
+  </Step>
+  <Step title="Threat Detection">
+    GuardDuty integration for threat detection
+  </Step>
+  <Step title="Input Validation">
+    Input validation and sanitization
+  </Step>
+</Steps>
+
+### Observability-Built-In
+
+Every template includes comprehensive observability:
+
+<CardGroup cols={2}>
+  <Card title="Distributed Tracing" icon="network">
+    AWS X-Ray for request tracing across services
+  </Card>
+  <Card title="Structured Logging" icon="file-text">
+    CloudWatch for centralized logging
+  </Card>
+  <Card title="Performance Monitoring" icon="chart-bar">
+    Performance monitoring and alerting
+  </Card>
+  <Card title="Error Tracking" icon="exclamation-triangle">
+    Error tracking and reporting
+  </Card>
+</CardGroup>
+
+## Tool Integration Overview
+
+### Traycer - AI Development Assistant
+
+Traycer provides AI-assisted development workflows with predefined specifications:
+
+**Location**: `/golden-path/traycer/specs/`
+
+- Feature development guidelines
+- Bug fixing processes
+- Code refactoring patterns
+- Documentation generation
+
+**Learn More**: [Traycer Integration Guide](/integrations/traycer)
+
+### Mintlify - Documentation
+
+Mintlify powers beautiful, searchable documentation:
+
+**Location**: `/golden-path/docs/`
+
+- API reference documentation
+- Architecture guides
+- Development workflows
+- Deployment instructions
+
+**Learn More**: [Mintlify Integration Guide](/integrations/mintlify)
+
+### QA Wolf - End-to-End Testing
+
+QA Wolf enables comprehensive E2E testing:
+
+**Location**: `/golden-path/templates/<template>/tests/e2e/`
+
+- Playwright-based test automation
+- CI/CD integration
+- Visual regression testing
+- Cross-browser testing
+
+**Learn More**: [QA Wolf Testing Guide](/integrations/qa-wolf)
+
+### CodeRabbit - AI Code Review
+
+CodeRabbit provides automated code review:
+
+**Location**: `/golden-path/coderabbit/config.yaml`
+
+- Security vulnerability detection
+- Performance optimization suggestions
+- Code quality checks
+- Best practices enforcement
+
+**Learn More**: [CodeRabbit Setup Guide](/integrations/coderabbit)
+
+### AWS Services
+
+Integrated AWS services for production-ready infrastructure:
+
+<CardGroup cols={3}>
+  <Card title="CodePipeline" icon="arrows-rotate">
+    CI/CD automation
+  </Card>
+  <Card title="CodeBuild" icon="hammer">
+    Build and test execution
+  </Card>
+  <Card title="ECS" icon="server">
+    Container orchestration
+  </Card>
+  <Card title="RDS" icon="database">
+    Managed PostgreSQL database
+  </Card>
+  <Card title="S3" icon="cloud">
+    Static asset storage
+  </Card>
+  <Card title="CloudFront" icon="globe">
+    Content delivery network
+  </Card>
+  <Card title="X-Ray" icon="network">
+    Distributed tracing
+  </Card>
+  <Card title="GuardDuty" icon="shield">
+    Threat detection
+  </Card>
+  <Card title="Secrets Manager" icon="lock">
+    Secure credential storage
+  </Card>
+</CardGroup>
+
+## Available Templates
+
+### fullstack-todo
+
+A complete full-stack todo application template featuring:
+
+**Frontend:**
+- React 18 + Vite + Tailwind CSS
+- Ant Design UI components with dark mode support
+- React Router for navigation
+
+**Backend:**
+- Node.js + Express + PostgreSQL
+- JWT authentication
+- Rate limiting and security middleware
+
+**Infrastructure:**
+- Full AWS setup with ECS, RDS, CodePipeline
+- MongoDB for local development (Mongoose)
+
+**Testing:**
+- Jest, React Testing Library
+- QA Wolf E2E testing
+
+**Documentation:**
+- Mintlify docs with API reference
+
+**Location**: `/golden-path/templates/fullstack-todo/`
+
+**Learn More**: [Fullstack Todo Template](/templates/fullstack-todo)
+
+<Note>
+More templates coming soon!
+</Note>
+
+## Detailed Guides
+
+For step-by-step instructions on setting up individual components:
+
+<CardGroup cols={2}>
+  <Card title="AWS Secrets Manager" icon="lock" href="/aws/secrets-manager">
+    Set up secure credential storage
+  </Card>
+  <Card title="AWS X-Ray & GuardDuty" icon="shield" href="/aws/xray-guardduty">
+    Configure distributed tracing and threat detection
+  </Card>
+  <Card title="CodeBuild & CodePipeline" icon="arrows-rotate" href="/aws/codebuild-pipeline">
+    Set up CI/CD automation
+  </Card>
+  <Card title="Traycer Integration" icon="robot" href="/integrations/traycer">
+    AI-assisted development workflows
+  </Card>
+  <Card title="Mintlify Documentation" icon="file-text" href="/integrations/mintlify">
+    Beautiful, searchable documentation
+  </Card>
+  <Card title="CodeRabbit Setup" icon="code" href="/integrations/coderabbit">
+    Automated code review
+  </Card>
+  <Card title="QA Wolf Testing" icon="flask" href="/integrations/qa-wolf">
+    End-to-end testing platform
+  </Card>
+</CardGroup>
+
+## Getting Started
+
+<Steps>
+  <Step title="Clone Repository">
+    ```bash
+    git clone <repository-url>
+    cd TodoApp-GoldenPath
+    ```
+  </Step>
+  <Step title="Choose Your Method">
+    Use Backstage templates or the setup script
+    - [Quick Start Guide](/quick-start)
+    - [Backstage Integration](/integrations/backstage)
+  </Step>
+  <Step title="Set Up AWS Services">
+    Configure AWS infrastructure
+    - [AWS Secrets Manager](/aws/secrets-manager)
+    - [X-Ray & GuardDuty](/aws/xray-guardduty)
+    - [CodePipeline Setup](/aws/codebuild-pipeline)
+  </Step>
+  <Step title="Configure Tools">
+    Set up integrated tools
+    - [Tool Integration Guides](/integrations/backstage)
+  </Step>
+  <Step title="Start Building">
+    Your project is ready with all best practices in place!
+  </Step>
+</Steps>
+
+## Contributing
+
+Want to improve the Golden Path? See [CONTRIBUTING.md](/../CONTRIBUTING.md) for guidelines.
+
+## License
+
+This golden path repository is licensed under the MIT License - see [LICENSE](/../LICENSE) file for details.
+

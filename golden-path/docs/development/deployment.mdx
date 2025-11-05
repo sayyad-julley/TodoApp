@@ -1,0 +1,494 @@
+---
+title: Deployment Guide
+description: Complete guide to deploying Golden Path applications to production
+---
+
+# Deployment Guide
+
+Complete guide to deploying your Golden Path application to AWS with all services configured.
+
+## Overview
+
+This guide covers deploying:
+- Frontend to S3 + CloudFront
+- Backend to ECS Fargate
+- Database setup (RDS or MongoDB Atlas)
+- CI/CD pipeline configuration
+- Monitoring and observability
+
+## Prerequisites
+
+<CardGroup cols={2}>
+  <Card title="AWS Account" icon="aws">
+    Active AWS account with appropriate permissions
+  </Card>
+  <Card title="AWS CLI" icon="terminal">
+    AWS CLI installed and configured
+  </Card>
+  <Card title="Docker" icon="docker">
+    Docker installed for container builds
+  </Card>
+  <Card title="GitHub Repository" icon="github">
+    Code in a GitHub repository
+  </Card>
+</CardGroup>
+
+## Environment Variables
+
+### Production Environment
+
+Set these in your deployment environment:
+
+```bash
+# AWS Configuration
+AWS_REGION=us-east-1
+
+# Secrets Manager ARNs (from AWS Secrets Manager setup)
+JWT_SECRET_ARN=arn:aws:secretsmanager:us-east-1:account-id:secret:todoapp/jwt/secret-xxxxx
+DB_SECRET_ARN=arn:aws:secretsmanager:us-east-1:account-id:secret:todoapp/database/credentials-xxxxx
+
+# Application Configuration
+NODE_ENV=production
+PORT=5000
+FRONTEND_URL=https://your-domain.com
+
+# Service Name for X-Ray
+SERVICE_NAME=todo-api
+```
+
+<Warning>
+Never commit production environment variables to version control. Use AWS Secrets Manager or environment variable management in your deployment platform.
+</Warning>
+
+## Deployment Methods
+
+<AccordionGroup>
+<Accordion title="Method 1: Docker Compose (Development)">
+Best for local testing and development environments.
+
+### Build and Run
+
+```bash
+# Build images
+docker-compose build
+
+# Start services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+```
+
+### Docker Compose Configuration
+
+The project includes `docker-compose.yml`:
+- Frontend container
+- Backend container
+- MongoDB container (if using MongoDB)
+- X-Ray daemon (optional)
+
+### Environment Variables in Docker
+
+```bash
+# docker-compose.yml
+services:
+  backend:
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - JWT_SECRET_ARN=${JWT_SECRET_ARN}
+      - DB_SECRET_ARN=${DB_SECRET_ARN}
+```
+
+</Accordion>
+
+<Accordion title="Method 2: ECS Fargate (Recommended)">
+Best for production AWS deployments.
+
+### Prerequisites
+
+- ECR repository created
+- ECS cluster configured
+- Application Load Balancer set up
+- Security groups configured
+
+### Build and Push Docker Image
+
+```bash
+# Build image
+docker build -t todo-backend:latest -f Dockerfile.backend .
+
+# Tag for ECR
+docker tag todo-backend:latest \
+  123456789012.dkr.ecr.us-east-1.amazonaws.com/todo-backend:latest
+
+# Login to ECR
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin \
+  123456789012.dkr.ecr.us-east-1.amazonaws.com
+
+# Push image
+docker push \
+  123456789012.dkr.ecr.us-east-1.amazonaws.com/todo-backend:latest
+```
+
+### Create ECS Task Definition
+
+```json
+{
+  "family": "todo-backend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "todo-backend",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/todo-backend:latest",
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "PORT",
+          "value": "5000"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "JWT_SECRET_ARN",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:account-id:secret:todoapp/jwt/secret"
+        },
+        {
+          "name": "DB_SECRET_ARN",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:account-id:secret:todoapp/database/credentials"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/todo-backend",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "taskRoleArn": "arn:aws:iam::account-id:role/ecs-task-role",
+  "executionRoleArn": "arn:aws:iam::account-id:role/ecs-execution-role"
+}
+```
+
+### Deploy Service
+
+```bash
+# Create service
+aws ecs create-service \
+  --cluster todo-cluster \
+  --service-name todo-backend \
+  --task-definition todo-backend \
+  --desired-count 2 \
+  --launch-type FARGATE \
+  --network-configuration "awsvpcConfiguration={subnets=[subnet-xxx],securityGroups=[sg-xxx],assignPublicIp=ENABLED}" \
+  --load-balancers targetGroupArn=arn:aws:elasticloadbalancing:region:account-id:targetgroup/todo-backend/xxx,containerName=todo-backend,containerPort=5000
+```
+
+</Accordion>
+
+<Accordion title="Method 3: AWS Lambda (Serverless)">
+Best for serverless deployments with auto-scaling.
+
+### Serverless Framework
+
+```yaml
+# serverless.yml
+service: todo-backend
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    NODE_ENV: production
+    JWT_SECRET_ARN: ${self:custom.secrets.jwt}
+    DB_SECRET_ARN: ${self:custom.secrets.db}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - secretsmanager:GetSecretValue
+      Resource:
+        - arn:aws:secretsmanager:*:*:secret:todoapp/*
+
+functions:
+  api:
+    handler: src/handler.api
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+```
+
+### Deploy
+
+```bash
+# Install serverless
+npm install -g serverless
+
+# Deploy
+serverless deploy
+```
+
+</Accordion>
+</AccordionGroup>
+
+## Frontend Deployment
+
+### Build for Production
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+### Deploy to S3 + CloudFront
+
+```bash
+# Create S3 bucket
+aws s3 mb s3://todo-app-frontend
+
+# Upload build
+aws s3 sync dist/ s3://todo-app-frontend --delete
+
+# Create CloudFront distribution
+aws cloudfront create-distribution \
+  --origin-domain-name todo-app-frontend.s3.amazonaws.com \
+  --default-root-object index.html
+```
+
+### Configure CloudFront
+
+- Enable compression
+- Configure caching policies
+- Set up custom domain with SSL certificate
+- Configure redirects (SPA routing)
+
+## Database Setup
+
+### Option 1: MongoDB Atlas
+
+1. Create MongoDB Atlas cluster
+2. Configure network access (whitelist IPs)
+3. Create database user
+4. Get connection string
+5. Store in AWS Secrets Manager
+
+### Option 2: AWS RDS PostgreSQL
+
+```bash
+# Create RDS instance
+aws rds create-db-instance \
+  --db-instance-identifier todo-db \
+  --db-instance-class db.t3.micro \
+  --engine postgres \
+  --master-username admin \
+  --master-user-password YourSecurePassword \
+  --allocated-storage 20
+```
+
+## CI/CD Pipeline
+
+### Using CodePipeline
+
+Follow the [CodeBuild & CodePipeline Setup Guide](/aws/codebuild-pipeline) to:
+
+1. Set up CodePipeline
+2. Configure build projects
+3. Add deployment stages
+4. Enable automatic deployments
+
+### Pipeline Stages
+
+<Steps>
+  <Step title="Source">
+    Fetch code from GitHub repository
+  </Step>
+  <Step title="Build">
+    Build Docker images and run tests
+  </Step>
+  <Step title="Test">
+    Run E2E tests with QA Wolf
+  </Step>
+  <Step title="Deploy">
+    Deploy to ECS Fargate or Lambda
+  </Step>
+</Steps>
+
+## Monitoring Setup
+
+### CloudWatch Logs
+
+Ensure CloudWatch log groups are created:
+
+```bash
+aws logs create-log-group --log-group-name /ecs/todo-backend
+aws logs create-log-group --log-group-name /ecs/todo-frontend
+```
+
+### X-Ray Tracing
+
+Enable X-Ray in your deployment:
+
+1. X-Ray daemon running (sidecar container in ECS)
+2. Environment variable: `SERVICE_NAME=todo-api`
+3. IAM permissions for X-Ray
+
+### GuardDuty
+
+Enable GuardDuty for security monitoring:
+
+```bash
+aws guardduty create-detector --enable
+```
+
+## Health Checks
+
+### Application Health Endpoint
+
+```javascript
+// GET /health
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+```
+
+### ECS Health Check
+
+Configure in task definition:
+
+```json
+{
+  "healthCheck": {
+    "command": ["CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"],
+    "interval": 30,
+    "timeout": 5,
+    "retries": 3,
+    "startPeriod": 60
+  }
+}
+```
+
+## Post-Deployment
+
+### Verify Deployment
+
+<Steps>
+  <Step title="Check Health">
+    ```bash
+    curl https://api.your-domain.com/health
+    ```
+  </Step>
+  <Step title="Test Authentication">
+    Register a user and login
+  </Step>
+  <Step title="Verify Database">
+    Create a todo and verify it persists
+  </Step>
+  <Step title="Check Logs">
+    Review CloudWatch logs for errors
+  </Step>
+  <Step title="Monitor X-Ray">
+    Check X-Ray console for traces
+  </Step>
+</Steps>
+
+### Rollback Procedure
+
+If deployment fails:
+
+```bash
+# ECS Rollback
+aws ecs update-service \
+  --cluster todo-cluster \
+  --service todo-backend \
+  --task-definition todo-backend:previous-version \
+  --force-new-deployment
+```
+
+## Security Checklist
+
+<CardGroup cols={2}>
+  <Card title="Secrets Management">
+    ✅ All secrets in AWS Secrets Manager
+    ✅ IAM roles with least privilege
+    ✅ Secrets rotation enabled
+  </Card>
+  <Card title="Network Security">
+    ✅ HTTPS/TLS enabled
+    ✅ Security groups configured correctly
+    ✅ VPC isolation for database
+  </Card>
+  <Card title="Application Security">
+    ✅ JWT tokens with secure expiration
+    ✅ Rate limiting enabled
+    ✅ Input validation on all endpoints
+  </Card>
+  <Card title="Monitoring">
+    ✅ CloudWatch alarms configured
+    ✅ X-Ray tracing enabled
+    ✅ GuardDuty enabled
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Service Won't Start">
+**Issue**: ECS tasks failing to start
+
+**Solutions**:
+1. Check CloudWatch logs for errors
+2. Verify environment variables are set
+3. Check IAM role permissions
+4. Verify secrets ARNs are correct
+</Accordion>
+
+<Accordion title="Database Connection Failed">
+**Issue**: Cannot connect to database
+
+**Solutions**:
+1. Verify database security group allows ECS security group
+2. Check database endpoint is correct
+3. Verify credentials in Secrets Manager
+4. Check VPC configuration
+</Accordion>
+
+<Accordion title="Secrets Manager Access Denied">
+**Issue**: Cannot read secrets
+
+**Solutions**:
+1. Verify IAM role has `secretsmanager:GetSecretValue` permission
+2. Check secret ARNs are correct
+3. Verify region matches
+</Accordion>
+</AccordionGroup>
+
+## Additional Resources
+
+- [AWS Secrets Manager Setup](/aws/secrets-manager)
+- [AWS X-Ray Integration](/aws/xray-integration)
+- [CodeBuild & CodePipeline Setup](/aws/codebuild-pipeline)
+- [DEPLOYMENT_GUIDE.md](/../DEPLOYMENT_GUIDE.md)
+

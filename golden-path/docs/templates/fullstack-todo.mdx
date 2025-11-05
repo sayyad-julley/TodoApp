@@ -1,26 +1,98 @@
 ---
 title: Fullstack Todo Template
-description: React + Node.js Todo app template with MongoDB for local development
+description: Production-ready React + Node.js Todo app template with MongoDB, JWT auth, and AWS integration
 ---
 
 # Fullstack Todo Template
 
-The Fullstack Todo template provides a production-ready React + Node.js application. Local development now uses MongoDB via Mongoose.
+The Fullstack Todo template provides a complete, production-ready React + Node.js application with MongoDB, JWT authentication, dark/light mode, and full AWS integration.
 
-## Stack
+![TodoApp Architecture](/assets/todoapp-architecture.svg)
 
-- Frontend: React 18, Vite, Ant Design, Tailwind CSS
-- Backend: Node.js (Express), JWT auth
-- Database (local): MongoDB (Mongoose)
+<CardGroup cols={3}>
+  <Card title="Frontend" icon="react">
+    React 18 + Vite + Ant Design + Tailwind CSS
+  </Card>
+  <Card title="Backend" icon="server">
+    Node.js + Express + JWT Authentication
+  </Card>
+  <Card title="Database" icon="database">
+    MongoDB (local) / MongoDB Atlas / PostgreSQL
+  </Card>
+</CardGroup>
+
+## Tech Stack
+
+### Frontend
+
+- **React 18** - Modern React with hooks
+- **Vite** - Fast build tool and dev server
+- **Ant Design** - UI component library with dark mode
+- **Tailwind CSS** - Utility-first CSS framework
+- **React Router** - Client-side routing
+- **Axios** - HTTP client for API calls
+
+### Backend
+
+- **Node.js** - JavaScript runtime
+- **Express** - Web framework
+- **Mongoose** - MongoDB ODM
+- **JWT** - JSON Web Token authentication
+- **bcrypt** - Password hashing
+- **Joi** - Input validation
+
+### Database
+
+- **MongoDB** - NoSQL database (local development)
+- **MongoDB Atlas** - Managed MongoDB (production option)
+- **PostgreSQL** - SQL database (alternative)
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="user-lock">
+    User registration and login with JWT tokens
+  </Card>
+  <Card title="CRUD Operations" icon="list-check">
+    Complete Create, Read, Update, Delete for todos
+  </Card>
+  <Card title="Dark/Light Mode" icon="moon">
+    Theme toggle with system preference detection
+  </Card>
+  <Card title="User-Specific Todos" icon="user">
+    Each user sees only their own todos
+  </Card>
+  <Card title="Enhanced Todos" icon="star">
+    Priority, due dates, tags, categories, subtasks
+  </Card>
+  <Card title="Statistics" icon="chart-bar">
+    User productivity tracking and completion rates
+  </Card>
+</CardGroup>
+
+## User Interface
+
+The TodoApp features a modern, intuitive interface with comprehensive task management capabilities:
+
+
+
+**Key UI Features:**
+- **Modern Design**: Clean, responsive interface built with Ant Design components
+- **Dark/Light Theme**: Automatic theme switching with system preference detection
+- **Task Organization**: Categorize tasks with tags, priorities, and due dates
+- **Progress Tracking**: Visual progress indicators and completion statistics
+- **Real-time Updates**: Live synchronization across all connected devices
+- **Linear Integration**: Seamless connection to Linear for advanced project management
 
 ## Local Development
 
 ### Prerequisites
 
 - Node.js 18+
-- Docker (to run MongoDB locally) or a local MongoDB server
+- Docker (to run MongoDB locally) or local MongoDB server
+- npm or yarn
 
-### Start MongoDB
+### Start MongoDB with Docker
 
 ```bash
 docker run -d --name todoapp-mongo -p 27017:27017 \
@@ -29,20 +101,33 @@ docker run -d --name todoapp-mongo -p 27017:27017 \
   mongo:7
 ```
 
-### Environment Variables (Backend)
+<Note>
+For a MongoDB server without authentication, use: `MONGO_URI=mongodb://localhost:27017/todoapp`
+</Note>
 
-File: `golden-path/templates/fullstack-todo/backend/.env`
+### Environment Variables
 
-```bash
-JWT_SECRET=dev-secret-change-me
+Create `backend/.env`:
+
+<CodeGroup>
+```bash Development
+JWT_SECRET=dev-secret-change-me-in-production
 PORT=5000
 NODE_ENV=development
 FRONTEND_URL=http://localhost:5174
 MONGO_URI=mongodb://root:example@localhost:27017/todoapp?authSource=admin
 ```
 
-> Note: For a MongoDB server without authentication, you can use:
-> `MONGO_URI=mongodb://localhost:27017/todoapp`
+```bash Production (AWS)
+JWT_SECRET_ARN=arn:aws:secretsmanager:region:account-id:secret:todoapp/jwt/secret-xxxxx
+DB_SECRET_ARN=arn:aws:secretsmanager:region:account-id:secret:todoapp/database/credentials-xxxxx
+AWS_REGION=us-east-1
+PORT=5000
+NODE_ENV=production
+FRONTEND_URL=https://your-domain.com
+SERVICE_NAME=todo-api
+```
+</CodeGroup>
 
 ### Run Backend
 
@@ -52,7 +137,7 @@ npm install
 npm start
 ```
 
-Health endpoint: `http://localhost:5000/health`
+**Health Check**: `http://localhost:5000/health`
 
 ### Run Frontend
 
@@ -62,37 +147,283 @@ npm install
 npm run dev -- --port 5174
 ```
 
-App: `http://localhost:5174`
+**App URL**: `http://localhost:5174`
 
 ### API Proxy
 
-The frontend proxies API requests to the backend via Vite `vite.config.js`:
+The frontend proxies API requests via Vite configuration:
 
-```js
+```javascript
+// vite.config.js
 server: {
   proxy: {
-    '/api': { target: 'http://localhost:5000', changeOrigin: true }
+    '/api': { 
+      target: 'http://localhost:5000', 
+      changeOrigin: true 
+    }
   }
 }
 ```
 
-## Authentication
+## API Reference
 
-- Register: `POST /api/auth/register`
-- Login: `POST /api/auth/login`
+### Authentication Endpoints
 
-Store the returned JWT in `localStorage` (handled by the template). Requests include `Authorization: Bearer <token>`.
+<CodeGroup>
+```http POST /api/auth/register
+POST /api/auth/register
+Content-Type: application/json
 
-## Todos API
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "password123",
+  "firstName": "Test",
+  "lastName": "User"
+}
 
-- GET `/api/todos?filter=all|completed|pending`
-- POST `/api/todos` { title, description? }
-- PUT `/api/todos/:id` { title?, description?, completed? }
-- DELETE `/api/todos/:id`
+Response: 201 Created
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "507f1f77bcf86cd799439011",
+    "username": "testuser",
+    "email": "test@example.com"
+  }
+}
+```
 
-## Production Notes
+```http POST /api/auth/login
+POST /api/auth/login
+Content-Type: application/json
 
-- Use a managed MongoDB (e.g., MongoDB Atlas) or adapt to RDS/PostgreSQL if preferred.
-- Configure secrets via your cloud secret manager.
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+Response: 200 OK
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "507f1f77bcf86cd799439011",
+    "username": "testuser",
+    "email": "test@example.com"
+  }
+}
+```
+</CodeGroup>
+
+### Todo Endpoints
+
+<CodeGroup>
+```http GET /api/todos
+GET /api/todos?filter=all|completed|pending&priority=high&category=work
+Authorization: Bearer <token>
+
+Response: 200 OK
+[
+  {
+    "id": "507f1f77bcf86cd799439011",
+    "title": "Complete project",
+    "description": "Finish the new feature",
+    "completed": false,
+    "priority": "high",
+    "dueDate": "2024-12-31T00:00:00.000Z",
+    "tags": ["work", "important"],
+    "category": "development",
+    "status": "in-progress",
+    "subtasks": []
+  }
+]
+```
+
+```http POST /api/todos
+POST /api/todos
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "New Todo",
+  "description": "Todo description",
+  "priority": "high",
+  "dueDate": "2024-12-31T00:00:00.000Z",
+  "tags": ["work"],
+  "category": "development"
+}
+
+Response: 201 Created
+{
+  "id": "507f1f77bcf86cd799439012",
+  "title": "New Todo",
+  ...
+}
+```
+
+```http PUT /api/todos/:id
+PUT /api/todos/507f1f77bcf86cd799439011
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "Updated Todo",
+  "completed": true
+}
+
+Response: 200 OK
+{
+  "id": "507f1f77bcf86cd799439011",
+  "title": "Updated Todo",
+  "completed": true,
+  ...
+}
+```
+
+```http DELETE /api/todos/:id
+DELETE /api/todos/507f1f77bcf86cd799439011
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+  "message": "Todo deleted successfully"
+}
+```
+</CodeGroup>
+
+## Project Structure
+
+```
+fullstack-todo/
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── database.js          # MongoDB connection
+│   │   │   └── secrets-manager.js    # AWS Secrets Manager
+│   │   ├── middleware/
+│   │   │   ├── auth.js               # JWT authentication
+│   │   │   ├── errorHandler.js       # Error handling
+│   │   │   └── rateLimiter.js        # Rate limiting
+│   │   ├── models/
+│   │   │   ├── User.js               # User schema
+│   │   │   └── Todo.js               # Todo schema
+│   │   ├── routes/
+│   │   │   ├── auth.js                # Auth routes
+│   │   │   └── todos.js               # Todo routes
+│   │   └── utils/
+│   │       └── jwt.js                # JWT utilities
+│   ├── server.js                     # Main server file
+│   └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── TodoList.jsx
+│   │   │   ├── TodoForm.jsx
+│   │   │   └── ThemeToggle.jsx
+│   │   ├── context/
+│   │   │   └── ThemeContext.jsx
+│   │   ├── utils/
+│   │   │   └── api.js
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── index.html
+│   └── vite.config.js
+└── database/
+    └── migrations/                    # SQL migrations (if using PostgreSQL)
+```
+
+## Available Scripts
+
+### Backend Scripts
+
+```bash
+npm start              # Start server
+npm run dev            # Start with nodemon
+npm test               # Run tests
+npm run lint           # Lint code
+```
+
+### Frontend Scripts
+
+```bash
+npm run dev            # Start dev server
+npm run build          # Build for production
+npm run preview        # Preview production build
+npm test               # Run tests
+npm run lint           # Lint code
+```
+
+## Production Deployment
+
+### MongoDB Atlas Setup
+
+1. Create MongoDB Atlas cluster
+2. Configure network access (whitelist IPs)
+3. Get connection string
+4. Store credentials in AWS Secrets Manager
+
+### AWS Deployment
+
+Follow the [Deployment Guide](/development/deployment) for:
+- ECS Fargate deployment
+- RDS or MongoDB Atlas setup
+- CloudFront + S3 for frontend
+- CI/CD pipeline setup
+
+### Environment Configuration
+
+Set production environment variables:
+- `JWT_SECRET_ARN` - AWS Secrets Manager ARN
+- `DB_SECRET_ARN` - AWS Secrets Manager ARN for database
+- `AWS_REGION` - AWS region
+- `SERVICE_NAME` - Service name for X-Ray tracing
+
+## Security Features
+
+<CardGroup cols={2}>
+  <Card title="Authentication">
+    JWT tokens with secure expiration
+  </Card>
+  <Card title="Password Hashing">
+    bcrypt with 12 salt rounds
+  </Card>
+  <Card title="Rate Limiting">
+    API rate limiting to prevent abuse
+  </Card>
+  <Card title="Input Validation">
+    Joi validation for all inputs
+  </Card>
+  <Card title="CORS">
+    Configured CORS policies
+  </Card>
+  <Card title="Secrets Management">
+    AWS Secrets Manager integration
+  </Card>
+</CardGroup>
+
+## Testing
+
+### Run Tests
+
+```bash
+# Backend tests
+cd backend
+npm test
+
+# Frontend tests
+cd frontend
+npm test
+
+# E2E tests
+cd ../QAWolf-tests
+npm test
+```
+
+## Additional Resources
+
+- [Quick Start Guide](/quick-start)
+- [Architecture Overview](/architecture)
+- [Deployment Guide](/development/deployment)
+- [Schema Migration Guide](/development/schema-migration)
+- [AWS X-Ray Integration](/aws/xray-integration)
 
 

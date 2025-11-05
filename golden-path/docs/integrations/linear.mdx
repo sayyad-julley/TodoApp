@@ -1,0 +1,746 @@
+---
+title: Linear Integration
+description: Complete guide to integrating Linear project management and issue tracking
+---
+
+# Linear Integration
+
+Linear is a streamlined project management and issue tracking tool designed for high-performance teams. It provides seamless integration with GitHub, CI/CD pipelines, and development workflows.
+
+## Overview
+
+Linear helps teams:
+
+- **Issue Tracking**: Streamlined issue management aligned with development workflows
+- **GitHub Sync**: Automatic linking of issues to pull requests and commits
+- **Sprint Planning**: Project tracking and team workflow management
+- **Automation**: Webhooks and API integration for custom workflows
+
+<CardGroup cols={2}>
+  <Card title="Issue Management" icon="list-check">
+    Streamlined issue tracking aligned with development
+  </Card>
+  <Card title="GitHub Integration" icon="github">
+    Automatic sync with GitHub issues and PRs
+  </Card>
+  <Card title="API Access" icon="plug">
+    GraphQL API for custom integrations
+  </Card>
+  <Card title="Webhooks" icon="webhook">
+    Real-time updates via webhooks
+  </Card>
+  <Card title="Sprint Planning" icon="calendar">
+    Project tracking and team workflows
+  </Card>
+  <Card title="Automation" icon="robot">
+    Automated workflows and status updates
+  </Card>
+</CardGroup>
+
+## Installation
+
+### Prerequisites
+
+- Linear workspace account ([sign up](https://linear.app/))
+- GitHub account (for GitHub integration)
+- Node.js 18+ (for API integrations)
+
+### Step 1: Create Linear Workspace
+
+1. Visit [Linear.app](https://linear.app/) and sign up
+2. Create a new workspace for your team
+3. Invite team members to the workspace
+
+### Step 2: Generate Personal API Key
+
+To interact with Linear programmatically:
+
+1. Navigate to **Settings** → **API** in Linear
+2. Under **Personal API Keys**, click **Create Key**
+3. Enter a descriptive label (e.g., "Golden Path Integration")
+4. **Copy the API key immediately** (it won't be shown again)
+
+<Warning>
+Store your Linear API key securely. Never commit it to version control. Use environment variables or secrets management.
+</Warning>
+
+### Step 3: Get Team ID
+
+To identify which team to create issues for:
+
+1. In Linear, open your workspace
+2. Go to **Settings** → **Teams**
+3. Note the team ID from the URL or team settings
+4. Alternatively, use the GraphQL API to query teams
+
+<Info>
+You can find your team ID by inspecting the Linear workspace URL or using the GraphQL API to query teams.
+</Info>
+
+## Configuration
+
+### Environment Variables
+
+Set up the following environment variables:
+
+```bash
+# Required
+export LINEAR_API_KEY=lin_api_xxxxxxxxxxxxx
+
+# Optional (for specific integrations)
+export LINEAR_TEAM_ID=your-team-id
+export LINEAR_WORKSPACE_URL=https://your-workspace.linear.app
+```
+
+### Backstage Configuration
+
+Add Linear configuration to `app-config.yaml`:
+
+```yaml
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_TOKEN}
+
+linear:
+  apiKey: ${LINEAR_API_KEY}
+  teamId: ${LINEAR_TEAM_ID:-}
+  workspaceUrl: ${LINEAR_WORKSPACE_URL:-}
+```
+
+### GitHub Integration
+
+Linear offers seamless GitHub integration to sync issues, pull requests, and commits.
+
+#### Setup GitHub Integration
+
+<Steps>
+  <Step title="Authorize Linear">
+    In Linear, navigate to **Settings** → **Integrations** → **GitHub**
+  </Step>
+  <Step title="Connect Repository">
+    Authorize Linear to access your GitHub organization/repositories
+  </Step>
+  <Step title="Configure Sync">
+    Choose repositories to sync and configure sync settings:
+    - Link pull requests to Linear issues
+    - Create Linear issues from GitHub issues
+    - Track commits and deployments
+  </Step>
+</Steps>
+
+#### Linking PRs to Issues
+
+Once connected, you can link GitHub PRs to Linear issues:
+
+- **Automatic**: Linear detects issue keys in PR titles/descriptions (e.g., `PROJ-123`)
+- **Manual**: Use Linear's GitHub integration UI to link PRs
+- **Via API**: Create links programmatically using the GraphQL API
+
+## Linear GraphQL API
+
+Linear provides a GraphQL API for programmatic access to issues, projects, teams, and more.
+
+### API Endpoint
+
+```
+https://api.linear.app/graphql
+```
+
+### Authentication
+
+Include your API key directly in the Authorization header (without "Bearer" prefix for Personal API Keys):
+
+```bash
+Authorization: ${LINEAR_API_KEY}
+```
+
+### Example Queries
+
+#### Query Teams
+
+```graphql
+query {
+  teams {
+    nodes {
+      id
+      name
+      key
+    }
+  }
+}
+```
+
+#### Query Issues
+
+```graphql
+query {
+  issues(
+    filter: { team: { name: { eq: "Engineering" } } }
+    first: 10
+  ) {
+    nodes {
+      id
+      title
+      description
+      state {
+        name
+        type
+      }
+      assignee {
+        name
+        email
+      }
+      url
+    }
+  }
+}
+```
+
+#### Create Issue
+
+```graphql
+mutation {
+  issueCreate(
+    input: {
+      title: "Add user authentication"
+      description: "Implement JWT-based authentication system"
+      teamId: "your-team-id"
+      priority: 1
+      assigneeId: "user-id"
+      stateId: "state-id"
+    }
+  ) {
+    success
+    issue {
+      id
+      title
+      url
+    }
+  }
+}
+```
+
+#### Update Issue Status
+
+```graphql
+mutation {
+  issueUpdate(
+    id: "issue-id"
+    input: {
+      stateId: "completed-state-id"
+    }
+  ) {
+    success
+    issue {
+      id
+      state {
+        name
+      }
+    }
+  }
+}
+```
+
+### Using the API
+
+#### With cURL
+
+```bash
+curl -X POST https://api.linear.app/graphql \
+  -H "Authorization: ${LINEAR_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query { teams { nodes { id name } } }"
+  }'
+```
+
+#### With Node.js
+
+```javascript
+const fetch = require('node-fetch');
+
+async function createLinearIssue(title, description, teamId) {
+  const query = `
+    mutation CreateIssue($input: IssueCreateInput!) {
+      issueCreate(input: $input) {
+        success
+        issue {
+          id
+          title
+          url
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    input: {
+      title,
+      description,
+      teamId,
+      priority: 1,
+    },
+  };
+
+  const response = await fetch('https://api.linear.app/graphql', {
+    method: 'POST',
+    headers: {
+      'Authorization': process.env.LINEAR_API_KEY,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  const result = await response.json();
+  return result.data.issueCreate.issue;
+}
+```
+
+#### With Python
+
+```python
+import requests
+import os
+
+def create_linear_issue(title, description, team_id):
+    query = """
+    mutation CreateIssue($input: IssueCreateInput!) {
+      issueCreate(input: $input) {
+        success
+        issue {
+          id
+          title
+          url
+        }
+      }
+    }
+    """
+    
+    variables = {
+        "input": {
+            "title": title,
+            "description": description,
+            "teamId": team_id,
+            "priority": 1
+        }
+    }
+    
+    headers = {
+        "Authorization": os.environ['LINEAR_API_KEY'],
+        "Content-Type": "application/json"
+    }
+    
+    response = requests.post(
+        "https://api.linear.app/graphql",
+        json={"query": query, "variables": variables},
+        headers=headers
+    )
+    
+    return response.json()["data"]["issueCreate"]["issue"]
+```
+
+## Backstage Integration
+
+Integrate Linear with Backstage to create and manage issues directly from software templates.
+
+### Create Linear Action
+
+Create a custom Backstage action to interact with Linear:
+
+**Location**: `todo-backstage/packages/backend/src/plugins/scaffolder/actions/linear.ts`
+
+```typescript
+import { createTemplateAction } from '@backstage/plugin-scaffolder-backend';
+import fetch from 'node-fetch';
+
+export const createLinearIssueAction = () => {
+  return createTemplateAction<{
+    title: string;
+    description: string;
+    teamId: string;
+    priority?: number;
+  }>({
+    id: 'linear:create-issue',
+    schema: {
+      input: {
+        type: 'object',
+        required: ['title', 'description', 'teamId'],
+        properties: {
+          title: { type: 'string', title: 'Issue Title' },
+          description: { type: 'string', title: 'Issue Description' },
+          teamId: { type: 'string', title: 'Linear Team ID' },
+          priority: { type: 'number', title: 'Priority (0-4)' },
+        },
+      },
+    },
+    async handler(ctx) {
+      const { title, description, teamId, priority = 1 } = ctx.input;
+
+      const query = `
+        mutation CreateIssue($input: IssueCreateInput!) {
+          issueCreate(input: $input) {
+            success
+            issue {
+              id
+              title
+              url
+            }
+          }
+        }
+      `;
+
+      const variables = {
+        input: {
+          title,
+          description,
+          teamId,
+          priority,
+        },
+      };
+
+      const response = await fetch('https://api.linear.app/graphql', {
+        method: 'POST',
+        headers: {
+          Authorization: process.env.LINEAR_API_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query, variables }),
+      });
+
+      const result = await response.json();
+
+      if (!result.data?.issueCreate?.success) {
+        throw new Error('Failed to create Linear issue');
+      }
+
+      ctx.logger.info(`Created Linear issue: ${result.data.issueCreate.issue.url}`);
+      ctx.output('linearIssueUrl', result.data.issueCreate.issue.url);
+      ctx.output('linearIssueId', result.data.issueCreate.issue.id);
+    },
+  });
+};
+```
+
+### Register Action in Backend
+
+Register the Linear action in your Backstage backend:
+
+```typescript
+import { createLinearIssueAction } from './actions/linear';
+
+// In your scaffolder plugin setup
+actions: [
+  // ... other actions
+  createLinearIssueAction(),
+],
+```
+
+### Use in Template
+
+Use the Linear action in your Backstage templates:
+
+```yaml
+steps:
+  - id: create-linear-issue
+    name: Create Linear Issue
+    action: linear:create-issue
+    input:
+      title: ${{ parameters.projectName }} - Initial Setup
+      description: |
+        Project: ${{ parameters.projectName }}
+        Description: ${{ parameters.description }}
+        
+        This issue tracks the initial setup and implementation.
+      teamId: ${LINEAR_TEAM_ID}
+      priority: 2
+    output:
+      linearIssueUrl: ${{ steps.create-linear-issue.output.linearIssueUrl }}
+```
+
+## CI/CD Integration
+
+Integrate Linear with your CI/CD pipelines to automatically update issue statuses on deployments.
+
+### GitHub Actions Example
+
+```yaml
+name: Deploy and Update Linear
+
+on:
+  deployment:
+    types: [created]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Application
+        run: ./deploy.sh
+        
+      - name: Update Linear Issue
+        if: github.event.deployment.status == 'success'
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+        run: |
+          # Extract issue ID from deployment environment
+          ISSUE_ID=$(echo "${{ github.event.deployment.environment }}" | grep -o 'LINEAR-[0-9]*')
+          
+          curl -X POST https://api.linear.app/graphql \
+            -H "Authorization: $LINEAR_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"query\": \"mutation { issueUpdate(id: \\\"$ISSUE_ID\\\", input: { stateId: \\\"completed-state-id\\\" }) { success } }\"
+            }"
+```
+
+### AWS CodePipeline Integration
+
+Add Linear updates to your `buildspec.yml`:
+
+```yaml
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - echo "Building application"
+  build:
+    commands:
+      - npm install
+      - npm run build
+  post_build:
+    commands:
+      - echo "Deployment successful"
+      - |
+        # Update Linear issue status
+        curl -X POST https://api.linear.app/graphql \
+          -H "Authorization: $LINEAR_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d "{
+            \"query\": \"mutation { issueUpdate(id: \\\"$LINEAR_ISSUE_ID\\\", input: { stateId: \\\"$LINEAR_COMPLETED_STATE_ID\\\" }) { success } }\"
+          }"
+```
+
+## Webhooks
+
+Set up Linear webhooks to receive real-time updates when issues change.
+
+### Creating a Webhook
+
+1. In Linear, go to **Settings** → **API** → **Webhooks**
+2. Click **Create new webhook**
+3. Provide:
+   - **Label**: Descriptive name
+   - **URL**: Your webhook endpoint
+   - **Events**: Select events to subscribe to (issues, comments, projects)
+
+### Webhook Payload Example
+
+```json
+{
+  "action": "update",
+  "type": "Issue",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "data": {
+    "id": "issue-id",
+    "title": "Issue Title",
+    "state": {
+      "name": "In Progress",
+      "type": "started"
+    },
+    "assignee": {
+      "name": "John Doe",
+      "email": "john@example.com"
+    }
+  },
+  "url": "https://linear.app/issue-url"
+}
+```
+
+### Handling Webhooks
+
+Example webhook handler:
+
+```javascript
+const express = require('express');
+const router = express.Router();
+
+router.post('/webhooks/linear', async (req, res) => {
+  const { action, type, data } = req.body;
+
+  if (type === 'Issue' && action === 'update') {
+    // Handle issue update
+    console.log(`Issue ${data.id} updated: ${data.title}`);
+    
+    // Update your system based on Linear issue changes
+    // e.g., update deployment status, notify team, etc.
+  }
+
+  res.status(200).json({ received: true });
+});
+```
+
+## Workflow Examples
+
+### Example 1: Creating Issues from Backstage Templates
+
+When creating a new project from a Backstage template, automatically create a Linear issue:
+
+```yaml
+# In template.yaml
+steps:
+  - id: create-project
+    # ... project creation steps
+    
+  - id: create-linear-issue
+    action: linear:create-issue
+    input:
+      title: ${{ parameters.projectName }} - Implementation
+      description: |
+        **Project**: ${{ parameters.projectName }}
+        **Description**: ${{ parameters.description }}
+        
+        **Generated from**: Golden Path Template
+        
+        Track implementation progress here.
+      teamId: ${LINEAR_TEAM_ID}
+```
+
+### Example 2: Linking GitHub PRs
+
+When creating a pull request, include the Linear issue key in the PR title:
+
+```
+feat: Add user authentication [LINEAR-123]
+```
+
+Linear will automatically link the PR to issue LINEAR-123.
+
+### Example 3: Status Updates on Deployment
+
+Update Linear issue status when deployment succeeds:
+
+```bash
+#!/bin/bash
+# deploy.sh
+
+# ... deployment steps ...
+
+if [ $? -eq 0 ]; then
+  # Update Linear issue
+  curl -X POST https://api.linear.app/graphql \
+    -H "Authorization: $LINEAR_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"query\": \"mutation { issueUpdate(id: \\\"$LINEAR_ISSUE_ID\\\", input: { stateId: \\\"$LINEAR_DEPLOYED_STATE_ID\\\" }) { success } }\"
+    }"
+fi
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Secure API Keys">
+    Never commit API keys to version control. Use environment variables or secrets management.
+  </Card>
+  <Card title="Issue Naming">
+    Use clear, descriptive issue titles that indicate the feature or bug.
+  </Card>
+  <Card title="Link PRs">
+    Include Linear issue keys in PR titles for automatic linking.
+  </Card>
+  <Card title="Status Updates">
+    Update issue statuses throughout the development lifecycle.
+  </Card>
+  <Card title="Team Consistency">
+    Use consistent issue labels and priorities across projects.
+  </Card>
+  <Card title="Documentation">
+    Include comprehensive descriptions in Linear issues.
+  </Card>
+</CardGroup>
+
+### Issue Description Template
+
+Use a consistent template for issue descriptions:
+
+```markdown
+## Description
+[Clear description of the issue or feature]
+
+## Acceptance Criteria
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+## Technical Details
+[Technical implementation details]
+
+## Related Issues
+[Links to related Linear issues]
+
+## Resources
+[Links to documentation, designs, etc.]
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="API Authentication Fails">
+**Issue**: 401 Unauthorized errors when calling Linear API
+
+**Solution**:
+- Verify API key is correct and not expired
+- Ensure API key is included in Authorization header: `${LINEAR_API_KEY}` (without "Bearer" prefix for Personal API Keys)
+- Check API key has required permissions
+</Accordion>
+
+<Accordion title="GitHub Integration Not Working">
+**Issue**: GitHub PRs not linking to Linear issues
+
+**Solution**:
+1. Verify GitHub integration is enabled in Linear
+2. Check repository is selected in integration settings
+3. Ensure issue keys are in PR titles/descriptions (e.g., `LINEAR-123`)
+4. Re-authorize GitHub integration if needed
+</Accordion>
+
+<Accordion title="Team ID Not Found">
+**Issue**: Cannot create issues - team ID error
+
+**Solution**:
+```graphql
+# Query available teams
+query {
+  teams {
+    nodes {
+      id
+      name
+      key
+    }
+  }
+}
+```
+Use the returned team `id` (not `key`) when creating issues.
+</Accordion>
+
+<Accordion title="Webhook Not Receiving Events">
+**Issue**: Webhook endpoint not receiving Linear events
+
+**Solution**:
+- Verify webhook URL is publicly accessible
+- Check webhook is enabled in Linear settings
+- Verify selected events match what you're testing
+- Check webhook endpoint logs for errors
+- Test webhook with Linear's test button
+</Accordion>
+</AccordionGroup>
+
+## Additional Resources
+
+- [Linear Documentation](https://linear.app/docs) - Official Linear documentation
+- [Linear API Reference](https://linear.app/docs/api) - GraphQL API reference
+- [Linear GitHub Integration](https://linear.app/docs/integrations/github) - GitHub sync guide
+- [Backstage Integration](/integrations/backstage) - Using Linear with Backstage
+- [Quick Start Guide](/quick-start) - Get started with Golden Path
+

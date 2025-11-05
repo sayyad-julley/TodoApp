@@ -1,0 +1,377 @@
+---
+title: Traycer Integration
+description: Complete guide to integrating Traycer AI development assistant
+---
+
+# Traycer Integration
+
+Traycer is an AI-powered development assistant that provides guided workflows for common development tasks, helping maintain consistency and quality across your projects.
+
+## Overview
+
+Traycer helps developers:
+- Follow standardized development processes
+- Maintain code quality and consistency
+- Accelerate feature development
+- Simplify bug fixing and refactoring
+
+<CardGroup cols={2}>
+  <Card title="Standardized Workflows" icon="route">
+    Consistent development processes across teams
+  </Card>
+  <Card title="AI Assistance" icon="robot">
+    Context-aware suggestions and code generation
+  </Card>
+  <Card title="Quality Assurance" icon="check-circle">
+    Built-in checks for best practices
+  </Card>
+  <Card title="Documentation" icon="file-text">
+    Automatic documentation generation
+  </Card>
+</CardGroup>
+
+## Installation
+
+### Prerequisites
+
+- Node.js 18+ installed
+- Git configured
+- VS Code (recommended)
+
+### Installing Traycer
+
+<CodeGroup>
+```bash Global Install
+npm install -g @traycer/cli
+```
+
+```bash NPX
+npx @traycer/cli init
+```
+</CodeGroup>
+
+## Configuration
+
+Traycer reads specifications from:
+
+**Location**: `/golden-path/traycer/specs/`
+
+Available specs:
+- `feature-development.md` - For adding new features
+- `bug-fix.md` - For debugging and fixing issues
+- `refactoring.md` - For improving code quality
+
+## Using Traycer Specs
+
+### Feature Development Workflow
+
+Use for adding new features to your application:
+
+```bash
+traycer feature \
+  --spec golden-path/traycer/specs/feature-development.md \
+  --name "Add user profile page"
+```
+
+The workflow guides you through:
+1. Understanding existing codebase structure
+2. Creating new routes/endpoints
+3. Building frontend components
+4. Writing tests
+5. Updating documentation
+
+**Key References:**
+- Backend routes: `/golden-path/templates/fullstack-todo/backend/src/routes/`
+- Frontend components: `/golden-path/templates/fullstack-todo/frontend/src/components/`
+
+### Bug Fixing Workflow
+
+Use for debugging and fixing issues:
+
+```bash
+traycer fix \
+  --spec golden-path/traycer/specs/bug-fix.md \
+  --issue "Login fails with 500 error"
+```
+
+Includes:
+1. Root cause analysis
+2. Error log investigation
+3. Test case creation for reproduction
+4. Fix implementation
+5. Regression testing
+
+**Key References:**
+- Error handling: `/golden-path/templates/fullstack-todo/backend/src/middleware/errorHandler.js`
+
+### Refactoring Workflow
+
+Use for improving code quality:
+
+```bash
+traycer refactor \
+  --spec golden-path/traycer/specs/refactoring.md \
+  --target "todoController.js"
+```
+
+Covers:
+1. Code smell detection
+2. Refactoring pattern selection
+3. Test verification
+4. Performance optimization
+
+**Key References:**
+- Controllers: `/golden-path/templates/fullstack-todo/backend/src/controllers/`
+- Components: `/golden-path/templates/fullstack-todo/frontend/src/components/`
+
+## Prompting Best Practices
+
+### Context-Rich Prompts
+
+Provide comprehensive context:
+
+```bash
+# Good: Includes context about the feature
+traycer feature \
+  --name "Add task filtering" \
+  --context "Users need to filter tasks by status (active, completed, all)"
+
+# Bad: Too vague
+traycer feature --name "Add filtering"
+```
+
+### Reference Existing Code
+
+Point Traycer to similar implementations:
+
+```bash
+traycer feature \
+  --name "Add task categories" \
+  --reference "backend/src/routes/todos.js" \
+  --similar-to "existing todo routes"
+```
+
+### Specify Requirements
+
+Clearly state requirements and constraints:
+
+```bash
+traycer feature \
+  --name "Add search" \
+  --requirements "Search by title, description, and tags" \
+  --constraints "Must work with existing filter system" \
+  --performance "Should handle 10k+ tasks"
+```
+
+## Common Commands
+
+<CodeGroup>
+```bash Feature Development
+# Start a new feature
+traycer feature \
+  --spec specs/feature-development.md \
+  --name "Feature name"
+
+# Generate API endpoint
+traycer generate \
+  --type endpoint \
+  --route "/api/users" \
+  --method GET
+
+# Generate React component
+traycer generate \
+  --type component \
+  --name UserProfile \
+  --props "userId, onUpdate"
+```
+
+```bash Bug Fixing
+# Analyze error logs
+traycer analyze \
+  --logs "error.log" \
+  --spec specs/bug-fix.md
+
+# Generate test case
+traycer test \
+  --type reproduction \
+  --issue "Issue description"
+
+# Apply fix
+traycer fix \
+  --target "problematic-file.js" \
+  --spec specs/bug-fix.md
+```
+
+```bash Refactoring
+# Detect code smells
+traycer detect \
+  --target "file.js" \
+  --spec specs/refactoring.md
+
+# Suggest refactoring
+traycer suggest \
+  --target "file.js" \
+  --type "extract-function"
+
+# Apply refactoring
+traycer refactor \
+  --target "file.js" \
+  --pattern "extract-component"
+```
+</CodeGroup>
+
+## Integration with CodeRabbit
+
+Traycer works seamlessly with CodeRabbit:
+
+<Steps>
+  <Step title="Generate Code">
+    Traycer generates code using specifications
+  </Step>
+  <Step title="Code Review">
+    CodeRabbit reviews the generated code
+  </Step>
+  <Step title="Feedback Loop">
+    Feedback improves future generations
+  </Step>
+</Steps>
+
+### Workflow
+
+```bash
+# 1. Generate feature with Traycer
+traycer feature --name "Add authentication"
+
+# 2. Commit changes
+git add .
+git commit -m "feat: add authentication"
+
+# 3. Push to GitHub
+git push origin feature/add-authentication
+
+# 4. CodeRabbit automatically reviews the PR
+# 5. Address feedback and regenerate if needed
+traycer improve \
+  --feedback "CodeRabbit feedback" \
+  --target "auth.js"
+```
+
+## Examples
+
+### Example 1: Adding a New API Endpoint
+
+```bash
+traycer feature \
+  --spec specs/feature-development.md \
+  --name "Add user profile endpoint" \
+  --type endpoint \
+  --route "/api/users/:id" \
+  --method GET \
+  --reference "backend/src/routes/todos.js"
+```
+
+Traycer will:
+- Create route handler
+- Add validation middleware
+- Write tests
+- Update API documentation
+
+### Example 2: Fixing a Bug
+
+```bash
+traycer fix \
+  --spec specs/bug-fix.md \
+  --issue "Users can't delete completed tasks" \
+  --logs "error.log" \
+  --target "backend/src/controllers/todoController.js"
+```
+
+Traycer will:
+- Analyze error logs
+- Identify root cause
+- Create reproduction test
+- Implement fix
+- Verify regression tests pass
+
+### Example 3: Refactoring Component
+
+```bash
+traycer refactor \
+  --spec specs/refactoring.md \
+  --target "frontend/src/components/TodoList.jsx" \
+  --pattern "extract-custom-hook" \
+  --goal "Extract data fetching logic"
+```
+
+Traycer will:
+- Identify code to extract
+- Create custom hook
+- Update component
+- Verify tests still pass
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Use Specifications">
+    Always use the provided specs for consistency
+  </Card>
+  <Card title="Provide Context">
+    Give Traycer as much context as possible
+  </Card>
+  <Card title="Review Generated Code">
+    Always review and test Traycer-generated code
+  </Card>
+  <Card title="Iterate">
+    Use feedback to improve future generations
+  </Card>
+</CardGroup>
+
+## Customizing Specifications
+
+You can customize Traycer specs:
+
+1. Edit spec files in `/golden-path/traycer/specs/`
+2. Add team-specific guidelines
+3. Update code examples
+4. Add custom validation rules
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Traycer Not Finding Specs">
+**Error**: Spec file not found
+
+**Solution**:
+```bash
+# Verify spec path
+ls golden-path/traycer/specs/
+
+# Use absolute path if needed
+traycer feature \
+  --spec /full/path/to/specs/feature-development.md
+```
+</Accordion>
+
+<Accordion title="Generated Code Doesn't Match Style">
+**Solution**:
+1. Update specification file with your team's coding standards
+2. Use `.eslintrc.json` and `.prettierrc.json` configurations
+3. Review generated code and adjust specs
+</Accordion>
+
+<Accordion title="Performance Issues">
+**Solution**:
+- Use `--limit` flag to restrict scope
+- Specify exact files instead of scanning entire codebase
+- Cache Traycer responses for similar requests
+</Accordion>
+</AccordionGroup>
+
+## Additional Resources
+
+- [Backstage Integration](/integrations/backstage) - Using Traycer with Backstage
+- [CodeRabbit Integration](/integrations/coderabbit) - Combining with code review
+- [Feature Development Spec](traycer/specs/feature-development.md)
+- [Bug Fix Spec](traycer/specs/bug-fix.md)
+- [Refactoring Spec](traycer/specs/refactoring.md)
+

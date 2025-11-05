@@ -1,0 +1,384 @@
+---
+title: X-Ray Integration
+description: Complete guide to AWS X-Ray distributed tracing integration
+---
+
+# AWS X-Ray Integration
+
+Complete guide to integrating AWS X-Ray for distributed tracing across all Golden Path components.
+
+## Overview
+
+AWS X-Ray has been integrated into:
+
+<CardGroup cols={4}>
+  <Card title="Express Todo API" icon="server">
+    Backend API with Express middleware
+  </Card>
+  <Card title="React Frontend" icon="browser">
+    Frontend trace context generation
+  </Card>
+  <Card title="Backstage Backend" icon="network">
+    Backstage backend services
+  </Card>
+  <Card title="MCP Servers" icon="plug">
+    MCP Secrets Manager server
+  </Card>
+</CardGroup>
+
+## Features Implemented
+
+### Express Todo API
+
+**Location**: `golden-path/templates/fullstack-todo/backend/`
+
+#### X-Ray SDK Initialization
+
+```javascript
+const AWSXRay = require('aws-xray-sdk-core');
+const captureExpress = require('aws-xray-sdk-express');
+const captureHttps = require('aws-xray-sdk-core').captureHTTPS;
+const captureAWS = require('aws-xray-sdk-core').captureAWS;
+
+// Initialize X-Ray
+AWSXRay.init();
+captureHttps();
+const AWS = captureAWS(require('aws-sdk'));
+
+// Dynamic service naming
+const serviceName = process.env.SERVICE_NAME || 'todo-api';
+process.env.AWS_XRAY_TRACING_NAME = serviceName;
+```
+
+#### Express Middleware
+
+```javascript
+// Enable X-Ray middleware
+app.use(captureExpress.openSegment('TodoApp'));
+
+// Your routes here
+app.use('/api', routes);
+
+// Close segments
+app.use(captureExpress.closeSegment());
+```
+
+#### MongoDB Integration
+
+Manual subsegment creation for MongoDB operations:
+
+```javascript
+const segment = AWSXRay.getSegment();
+const subsegment = segment.addNewSubsegment('mongodb-query');
+
+try {
+  const result = await db.query('SELECT * FROM todos');
+  subsegment.close();
+  return result;
+} catch (error) {
+  subsegment.addError(error);
+  subsegment.close();
+  throw error;
+}
+```
+
+### React Todo Frontend
+
+**Location**: `golden-path/templates/fullstack-todo/frontend/`
+
+#### X-Ray Trace Context Generation
+
+Frontend generates X-Ray-compatible trace IDs and propagates them via HTTP headers:
+
+```javascript
+// src/utils/xray.js
+import xrayContext from './utils/xray.js';
+
+// Automatic trace header generation and injection
+xrayContext.addTraceToRequest(config);
+
+// Trace context continuation from backend
+xrayContext.extractTraceFromResponse(response);
+```
+
+#### Axios Integration
+
+Automatic trace header injection in all API requests:
+
+```javascript
+// src/utils/api.js
+api.interceptors.request.use((config) => {
+  // Add X-Ray trace context to all requests
+  xrayContext.addTraceToRequest(config);
+  return config;
+});
+
+api.interceptors.response.use((response) => {
+  // Continue trace from backend response
+  xrayContext.extractTraceFromResponse(response);
+  return response.data;
+});
+```
+
+#### Trace Header Format
+
+The frontend generates trace headers in X-Ray format:
+```
+X-Amzn-Trace-Id: Root=1-<timestamp>-<random>;Parent=<segment-id>;Sampled=1
+```
+
+The backend automatically continues these traces, creating distributed traces across services.
+
+### Backstage Backend
+
+**Location**: `todo-backstage/packages/backend/src/index.ts`
+
+Process-level X-Ray initialization:
+
+```typescript
+const AWSXRay = require('aws-xray-sdk-core');
+
+// Initialize X-Ray at process level
+AWSXRay.init();
+
+// Set dynamic service name
+const serviceName = process.env.SERVICE_NAME || 'backstage-backend';
+process.env.AWS_XRAY_TRACING_NAME = serviceName;
+
+// Automatic capture of outbound HTTP/AWS SDK calls
+```
+
+### MCP Secrets Manager Server
+
+**Location**: `mcp-secrets-manager/src/mcp-server.js`
+
+Manual segment management:
+
+```javascript
+async handleGetSecret(args) {
+  const segment = AWSXRay.getSegment() || 
+                  AWSXRay.addNewSegment('GetSecret');
+
+  try {
+    const subsegment = segment.addNewSubsegment('GetSecret');
+    subsegment.addAnnotation('operation', 'get_secret');
+    subsegment.addMetadata('args', { secretId, versionStage });
+
+    const result = await this.secretsOps.getSecretValue(
+      secretId, 
+      versionStage
+    );
+
+    subsegment.addAnnotation('success', 'true');
+    return result;
+  } finally {
+    if (segment === AWSXRay.getSegment()) {
+      segment.close();
+    }
+  }
+}
+```
+
+## Configuration
+
+### Environment Variables
+
+<CodeGroup>
+```bash Service Name
+export SERVICE_NAME=todo-api
+export AWS_XRAY_TRACING_NAME=todo-api
+```
+
+```bash Region
+export AWS_REGION=us-east-1
+```
+
+```bash Debug Mode
+export AWS_XRAY_DEBUG_MODE=1
+export AWS_XRAY_LOG_LEVEL=debug
+```
+</CodeGroup>
+
+### AWS X-Ray Daemon
+
+For local development:
+
+<CodeGroup>
+```bash Docker
+docker run -d -p 2000:2000 \
+  --name xray-daemon \
+  amazon/aws-xray-daemon
+```
+
+```bash macOS
+curl https://s3.dualstack.us-east-2.amazonaws.com/aws-xray-assets.us-east-2/xray-daemon/aws-xray-daemon-macos-3.x.zip \
+  -o aws-xray-daemon.zip
+unzip aws-xray-daemon.zip
+sudo ./xray -o
+```
+
+```bash Linux
+wget https://s3.dualstack.us-east-2.amazonaws.com/aws-xray-assets.us-east-2/xray-daemon/aws-xray-daemon-linux-amd64-3.x.zip
+unzip aws-xray-daemon-linux-amd64-3.x.zip
+sudo ./xray -o
+```
+</CodeGroup>
+
+## Tracing Features
+
+<CardGroup cols={2}>
+  <Card title="Request Tracing" icon="arrow-right">
+    Automatic tracing of incoming HTTP requests with metadata
+  </Card>
+  <Card title="Downstream Services" icon="network">
+    AWS SDK v2 calls and HTTP/HTTPS outbound calls traced
+  </Card>
+  <Card title="Custom Annotations" icon="tag">
+    Service operation names and success/failure status
+  </Card>
+  <Card title="Error Handling" icon="exclamation-triangle">
+    Automatic error propagation and fault flagging
+  </Card>
+</CardGroup>
+
+## AWS IAM Permissions
+
+Required IAM permissions for X-Ray:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "xray:PutTraceSegments",
+        "xray:PutTelemetryRecords",
+        "xray:GetSamplingRules",
+        "xray:GetSamplingTargets"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+## Monitoring and Analysis
+
+### X-Ray Console
+
+View traces in the AWS X-Ray Console:
+
+<Steps>
+  <Step title="Access Console">
+    Navigate to AWS X-Ray service in AWS Console
+  </Step>
+  <Step title="View Service Map">
+    See distributed tracing across all services
+  </Step>
+  <Step title="Analyze Traces">
+    Identify performance bottlenecks and errors
+  </Step>
+  <Step title="Set Up Alarms">
+    Configure CloudWatch alarms for metrics
+  </Step>
+</Steps>
+
+### Key Metrics to Monitor
+
+- Request latency by service
+- Error rates and fault detection
+- Downstream service dependency health
+- Database connection performance
+
+### Setting Up Alarms
+
+```bash
+aws cloudwatch put-metric-alarm \
+  --alarm-name todoapp-high-latency \
+  --alarm-description "Alert when API latency exceeds 1 second" \
+  --metric-name Latency \
+  --namespace AWS/XRay \
+  --statistic Average \
+  --period 300 \
+  --threshold 1000 \
+  --comparison-operator GreaterThanThreshold \
+  --evaluation-periods 1
+```
+
+## Development Notes
+
+### Local Development
+
+- X-Ray traces are automatically disabled if no daemon is available
+- Services continue to function normally without X-Ray
+- Use environment variables to configure service names
+
+### Security Considerations
+
+- Sensitive data (passwords, secrets) is masked in X-Ray metadata
+- Only non-sensitive request/response data is captured
+- AWS credentials are not logged or traced
+
+### Performance Impact
+
+- Minimal overhead for trace collection
+- Asynchronous segment submission
+- Automatic sampling to control trace volume
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Traces Not Appearing">
+**Issue**: No traces visible in X-Ray console
+
+**Solutions**:
+1. Verify X-Ray daemon is running
+2. Check IAM permissions
+3. Ensure proper AWS credentials configuration
+4. Verify service name matches in traces
+</Accordion>
+
+<Accordion title="Missing Downstream Service Traces">
+**Issue**: AWS SDK calls not appearing in traces
+
+**Solutions**:
+1. Verify AWS SDK capture is properly configured
+2. Check if service calls are made within X-Ray segments
+3. Ensure `captureAWS()` is called before requiring AWS SDK
+</Accordion>
+
+<Accordion title="High Overhead">
+**Issue**: X-Ray causing performance issues
+
+**Solutions**:
+1. Adjust sampling rules in X-Ray console
+2. Review custom metadata being added to segments
+3. Reduce sampling rate for non-critical operations
+</Accordion>
+</AccordionGroup>
+
+## Future Enhancements
+
+<Steps>
+  <Step title="Advanced Sampling">
+    Configure custom sampling based on request characteristics
+  </Step>
+  <Step title="Custom Metrics">
+    Add business-relevant metrics and annotations
+  </Step>
+  <Step title="CloudWatch Integration">
+    Set up automated alerts and dashboards
+  </Step>
+  <Step title="Distributed Context">
+    Enhance cross-service tracing capabilities
+  </Step>
+</Steps>
+
+## Additional Resources
+
+- [AWS X-Ray Developer Guide](https://docs.aws.amazon.com/xray/)
+- [AWS X-Ray SDK for Node.js](https://github.com/aws/aws-xray-sdk-node)
+- [X-Ray Best Practices](https://docs.aws.amazon.com/xray/latest/devguide/xray-best-practices.html)
+- [X-Ray & GuardDuty Setup](/aws/xray-guardduty)
+

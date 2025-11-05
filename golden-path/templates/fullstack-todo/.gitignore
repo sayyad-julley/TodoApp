@@ -1,0 +1,95 @@
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+# Local test projects (created by create-new-app.sh)
+test-projects/
+new-*/
+
+# Generated files
+*.bak
+*.tmp
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnp
+.pnp.js
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+*.env
+env/
+env
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.nuxt/
+.vite/
+
+# Coverage and testing
+coverage/
+*.lcov
+.nyc_output/
+
+# Cache directories
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# AWS
+.aws/
+*.pem
+
+# Secrets and credentials
+secrets/
+credentials/
+*.key
+*.cert
+*.p12
+*.pfx

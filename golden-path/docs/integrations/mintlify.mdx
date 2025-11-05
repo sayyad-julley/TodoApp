@@ -1,0 +1,494 @@
+Complete guide to setting up and maintaining documentation with Mintlify for your golden path project.
+
+## What is Mintlify?
+
+Mintlify is a modern documentation platform that:
+- Generates beautiful, searchable documentation from Markdown
+- Provides automatic API documentation from OpenAPI specs
+- Supports custom domains and branding
+- Includes built-in analytics and search
+- Offers seamless GitHub integration
+
+## Benefits
+
+<CardGroup cols={2}>
+  <Card title="Developer-Friendly" icon="code">
+    Write docs in Markdown, Mintlify handles the rest
+  </Card>
+  <Card title="API Integration" icon="plug">
+    Automatic API docs from OpenAPI/Swagger specs
+  </Card>
+  <Card title="Built-in Search" icon="magnifying-glass">
+    Full-text search out of the box
+  </Card>
+  <Card title="Customization" icon="paintbrush">
+    Brand your docs with logos and colors
+  </Card>
+  <Card title="GitHub Sync" icon="github">
+    Automatic updates from your repository
+  </Card>
+  <Card title="Analytics" icon="chart-bar">
+    Track page views and user engagement
+  </Card>
+</CardGroup>
+
+## Installation
+
+### Mintlify CLI
+
+Install the Mintlify CLI globally:
+
+```bash
+npm install -g mintlify
+```
+
+### Verify Installation
+
+```bash
+mintlify --version
+```
+
+## Configuration
+
+### Golden Path Docs
+
+The golden path documentation uses Mintlify:
+
+**Location**: `/golden-path/docs/mint.json`
+
+This configuration documents the golden path itself, including:
+- Overview and getting started
+- Guides for AWS services
+- Tool integration guides
+- Template documentation
+
+### Template-Specific Docs
+
+Each template has its own documentation:
+
+**Location**: `/golden-path/templates/fullstack-todo/docs/`
+
+This includes:
+- API reference
+- Architecture overview
+- Development guides
+- User guides
+
+### Mint.json Structure
+
+Basic `mint.json` configuration:
+
+```json
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Project Name",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.png",
+  "colors": {
+    "primary": "#3B82F6",
+    "light": "#60A5FA",
+    "dark": "#1D4ED8"
+  },
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": ["introduction", "quickstart"]
+    }
+  ]
+}
+```
+
+## Writing Documentation
+
+### MDX Format
+
+Mintlify uses MDX (Markdown + JSX) for documentation. All files should have frontmatter:
+
+```markdown
+---
+title: Page Title
+description: Page description
+---
+
+# Page Title
+
+Your content here...
+```
+
+### Using Components
+
+Mintlify provides custom components like CodeGroup, CardGroup, and Steps. Here's an example:
+
+<CodeGroup>
+```bash npm
+npm install @your-package/api
+```
+
+```bash yarn
+yarn add @your-package/api
+```
+</CodeGroup>
+
+### API Reference
+
+Document APIs using OpenAPI/Swagger. Create an `openapi.yaml` file:
+
+```yaml
+openapi: 3.0.0
+info:
+  title: Todo API
+  version: 1.0.0
+paths:
+  /api/todos:
+    get:
+      summary: Get all todos
+      responses:
+        '200':
+          description: Successful response
+```
+
+Then reference it in `mint.json`:
+
+```json
+{
+  "navigation": [
+    {
+      "group": "API Reference",
+      "pages": [
+        {
+          "title": "Todos",
+          "openapi": "openapi.yaml"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Code Blocks
+
+Use code blocks with syntax highlighting:
+
+```javascript
+const response = await fetch('/api/todos');
+const todos = await response.json();
+```
+
+### Components Available
+
+Mintlify provides these components:
+
+- `<Warning>` - Warning messages
+- `<Info>` - Information messages
+- `<Note>` - Notes and tips
+- `<Card>` - Card components
+- `<CardGroup>` - Groups of cards
+- `<Steps>` - Step-by-step instructions
+- `<CodeGroup>` - Multiple code examples
+- `<Accordion>` - Collapsible sections
+
+### Example: Using Callouts
+
+<Warning>
+Make sure to set up environment variables before running the application.
+</Warning>
+
+<Info>
+Mintlify automatically reloads when you save changes to MDX files.
+</Info>
+
+<Note>
+You can customize the colors and branding in mint.json.
+</Note>
+
+## Navigation Structure
+
+Organize documentation in `mint.json`:
+
+```json
+{
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "development-setup"
+      ]
+    },
+    {
+      "group": "Architecture",
+      "pages": [
+        "architecture/overview",
+        "architecture/frontend",
+        "architecture/backend"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        {
+          "title": "Authentication",
+          "openapi": "api-reference/authentication.yaml"
+        },
+        {
+          "title": "Todos",
+          "openapi": "api-reference/todos.yaml"
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Local Development
+
+### Start Local Server
+
+```bash
+cd golden-path/docs
+mintlify dev
+```
+
+Documentation will be available at `http://localhost:3000`
+
+### Preview Changes
+
+Mintlify automatically reloads when you save changes to MDX files.
+
+## Deployment
+
+### Mintlify Hosting
+
+Deploy to Mintlify hosting:
+
+<Steps>
+  <Step title="Login">
+    ```bash
+    mintlify login
+    ```
+  </Step>
+  <Step title="Deploy">
+    ```bash
+    mintlify deploy
+    ```
+  </Step>
+</Steps>
+
+### Custom Domain Setup
+
+1. Go to Mintlify dashboard
+2. Navigate to **Settings > Domains**
+3. Add your custom domain
+4. Update DNS records as instructed
+
+### GitHub Integration
+
+Connect your GitHub repository:
+
+<Steps>
+  <Step title="Access Settings">
+    Go to Mintlify dashboard and navigate to **Settings > GitHub**
+  </Step>
+  <Step title="Connect Repository">
+    Connect your repository
+  </Step>
+  <Step title="Enable Auto-Deploy">
+    Enable automatic deployments
+  </Step>
+</Steps>
+
+## Search Configuration
+
+Mintlify includes built-in search. Configure search behavior in `mint.json`:
+
+```json
+{
+  "mintlify": {
+    "search": {
+      "enabled": true,
+      "maxResults": 10
+    }
+  }
+}
+```
+
+### Custom Search with Algolia
+
+Use Algolia for enhanced search:
+
+```json
+{
+  "mintlify": {
+    "search": {
+      "provider": "algolia",
+      "appId": "your-app-id",
+      "apiKey": "your-api-key",
+      "indexName": "your-index-name"
+    }
+  }
+}
+```
+
+## Analytics Integration
+
+### Mintlify Analytics
+
+Built-in analytics are available in the Mintlify dashboard:
+- Page views
+- Popular pages
+- Search queries
+- User paths
+
+### Google Analytics
+
+Add Google Analytics to your documentation:
+
+```json
+{
+  "mintlify": {
+    "analytics": {
+      "google": "G-XXXXXXXXXX"
+    }
+  }
+}
+```
+
+## Best Practices
+
+### Documentation Structure
+
+<Steps>
+  <Step title="Start with Overview">
+    Provide high-level introduction to your project
+  </Step>
+  <Step title="Quick Start Guide">
+    Get users up and running quickly
+  </Step>
+  <Step title="Detailed Guides">
+    Comprehensive guides for complex topics
+  </Step>
+  <Step title="API Reference">
+    Complete API documentation
+  </Step>
+  <Step title="Examples">
+    Include code examples throughout
+  </Step>
+</Steps>
+
+### Writing Style
+
+<CardGroup cols={2}>
+  <Card title="Clear and Concise">
+    Use simple, straightforward language
+  </Card>
+  <Card title="Action-Oriented">
+    Tell users what to do, not just what is
+  </Card>
+  <Card title="Examples">
+    Include code examples for every feature
+  </Card>
+  <Card title="Visuals">
+    Add diagrams and screenshots where helpful
+  </Card>
+  <Card title="Up-to-Date">
+    Keep documentation current with code changes
+  </Card>
+  <Card title="Searchable">
+    Use descriptive headings and keywords
+  </Card>
+</CardGroup>
+
+### Organization
+
+- **Logical Flow**: Organize from general to specific
+- **Consistent Formatting**: Use consistent heading styles
+- **Cross-References**: Link related topics
+- **Searchability**: Use descriptive headings and keywords
+
+### Code Examples
+
+- **Complete Examples**: Provide working code
+- **Multiple Languages**: Support different languages when possible
+- **Context**: Explain what the code does
+- **Best Practices**: Follow coding standards
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Build Errors">
+**Issue**: Build fails with syntax errors
+
+**Solution**:
+```bash
+# Check for syntax errors
+mintlify check
+
+# Validate mint.json
+mintlify validate
+```
+</Accordion>
+
+<Accordion title="Missing Pages">
+**Issue**: Pages not appearing in navigation
+
+**Solution**:
+- Verify page paths in `mint.json` match file paths
+- Check file extensions (.mdx, .md)
+- Ensure files exist in the docs directory
+- Check for typos in file names
+</Accordion>
+
+<Accordion title="API Documentation Not Appearing">
+**Issue**: OpenAPI documentation not showing
+
+**Solution**:
+- Verify OpenAPI spec is valid YAML/JSON
+- Check file path in `mint.json`
+- Ensure OpenAPI file is in correct location
+- Validate OpenAPI spec using online validators
+</Accordion>
+
+<Accordion title="Deployment Issues">
+**Issue**: Deployment fails
+
+**Solution**:
+- Check Mintlify CLI is logged in
+- Verify repository connection
+- Check build logs in Mintlify dashboard
+- Ensure all referenced files exist
+</Accordion>
+</AccordionGroup>
+
+## Golden Path Integration
+
+The Golden Path project uses Mintlify for documentation:
+
+**Configuration File**: `/golden-path/docs/mint.json`
+
+**Documentation Location**: `/golden-path/docs/`
+
+**Current Structure**:
+- Getting Started pages
+- Templates documentation
+- Integrations guides
+- AWS Services setup guides
+- Development guides
+
+To view the docs locally:
+
+```bash
+cd golden-path/docs
+mintlify dev
+```
+
+## Additional Resources
+
+- [Mintlify Documentation](https://mintlify.com/docs) - Official Mintlify docs
+- [MDX Guide](https://mdxjs.com/) - Learn MDX syntax
+- [OpenAPI Specification](https://swagger.io/specification/) - OpenAPI reference
+- [Golden Path Overview](/overview) - Learn about Golden Path
+- [Quick Start Guide](/quick-start) - Get started with Golden Path

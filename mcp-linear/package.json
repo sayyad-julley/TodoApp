@@ -1,0 +1,36 @@
+{
+  "name": "mcp-linear",
+  "version": "1.0.0",
+  "description": "MCP server for Linear project management and issue tracking integration",
+  "main": "src/index.js",
+    "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node test/test.js",
+    "test:api": "LINEAR_API_KEY=$LINEAR_API_KEY node test/test.js"
+  },
+  "keywords": [
+    "mcp",
+    "linear",
+    "project-management",
+    "issue-tracking",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "aws-xray-sdk-core": "^3.11.0",
+    "chalk": "^4.1.2",
+    "commander": "^12.0.0",
+    "inquirer": "^9.2.0",
+    "node-fetch": "^2.7.0",
+    "table": "^6.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "bin": {
+    "mcp-linear": "./src/cli.js"
+  }
+}

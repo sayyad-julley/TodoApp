@@ -1,0 +1,347 @@
+---
+title: Schema Migration Guide
+description: Guide to migrating to enhanced User-Todo schema with proper relationships
+---
+
+# Schema Migration Guide
+
+Complete guide to migrating from basic schema to enhanced User-Todo schema with proper user ownership tracking and advanced features.
+
+## Overview
+
+This migration implements:
+
+<CardGroup cols={2}>
+  <Card title="Enhanced User Schema" icon="user">
+    Full user profiles with preferences and statistics
+  </Card>
+  <Card title="User-Todo Relationships" icon="link">
+    Proper foreign key relationships
+  </Card>
+  <Card title="Advanced Todo Features" icon="list-check">
+    Priority, due dates, tags, subtasks
+  </Card>
+  <Card title="Statistics Tracking" icon="chart-bar">
+    Automatic user statistics updates
+  </Card>
+</CardGroup>
+
+## What Was Implemented
+
+### Enhanced User Schema
+
+**Location**: `/src/models/User.js`
+
+**New Fields:**
+- `firstName`, `lastName` - User's full name
+- `password` - Auto-hashed password field
+- `avatar` - Profile picture URL
+- `isActive` - Account status
+- `lastLogin` - Last login timestamp
+- `preferences` - User settings (theme, notifications)
+- `statistics` - Todo statistics (created, completed, streaks)
+
+**Features:**
+- Automatic password hashing with bcrypt (12 salt rounds)
+- User statistics tracking (auto-updates when todos change)
+- Virtual methods: `getFullName()`, `getCompletionRate()`, `comparePassword()`
+- Backward compatibility with existing `passwordHash` field
+
+### Enhanced Todo Schema
+
+**Location**: `/src/models/Todo.js`
+
+**User Ownership:**
+- `userId` - Legacy field (backward compatibility)
+- `user` - Standard user reference field
+- **Field Synchronization**: Automatically keeps `userId` and `user` fields in sync
+
+**Enhanced Fields:**
+- `priority` - Low, medium, high, urgent
+- `dueDate` - Due date with overdue detection
+- `tags` - Array of searchable tags
+- `category` - Todo categorization
+- `status` - Pending, in-progress, completed, cancelled, on-hold
+- `completedAt` - Completion timestamp
+- `subtasks` - Nested todo items with progress tracking
+
+**Virtual Fields:**
+- `subtaskProgress` - Percentage of completed subtasks
+- `isOverdue` - Automatic overdue detection
+
+## Database Schema
+
+### MongoDB Schema Structure
+
+```
+Users Collection
+├── _id (ObjectId)
+├── username (String, unique, indexed)
+├── email (String, unique, indexed)
+├── password (String, hashed)
+├── firstName, lastName (String)
+├── preferences (Object)
+│   ├── theme (String)
+│   └── notifications (Object)
+├── statistics (Object)
+│   ├── todosCreated (Number)
+│   ├── todosCompleted (Number)
+│   └── completionRate (Number)
+└── timestamps
+
+Todos Collection
+├── _id (ObjectId)
+├── user (ObjectId, ref: User, indexed) ✅
+├── userId (ObjectId, ref: User, indexed) 🔄 (legacy)
+├── title (String)
+├── description (String)
+├── completed (Boolean, indexed)
+├── priority (String: low|medium|high|urgent)
+├── dueDate (Date, indexed)
+├── tags (Array, indexed)
+├── category (String)
+├── status (String)
+├── subtasks (Array)
+└── timestamps
+```
+
+## Migration Process
+
+### Step 1: Backup Your Data
+
+<Warning>
+Always backup your database before running migrations!
+</Warning>
+
+```bash
+# MongoDB backup
+mongodump --uri="mongodb://localhost:27017/todoapp" --out=./backup
+
+# PostgreSQL backup
+pg_dump todoapp > backup.sql
+```
+
+### Step 2: Run Migration Script
+
+**Location**: `/scripts/migrate-user-todo-schema.js`
+
+```bash
+cd golden-path/templates/fullstack-todo/backend
+node scripts/migrate-user-todo-schema.js
+```
+
+**What it does:**
+1. Creates a default user if none exists
+2. Assigns existing todos to the default user
+3. Synchronizes `userId` and `user` fields
+4. Validates all todos have user references
+
+### Step 3: Test Schema Validation
+
+**Location**: `/simple-schema-test.js`
+
+```bash
+cd golden-path/templates/fullstack-todo/backend
+node simple-schema-test.js
+```
+
+**Validates:**
+- User creation with authentication
+- Todo creation with user references
+- Field synchronization
+- Filtering and sorting
+- Statistics tracking
+
+## API Changes
+
+### User Model Methods
+
+```javascript
+// Enhanced user creation
+const user = await createUser({
+  username: 'testuser',
+  email: 'test@example.com',
+  password: 'password123',
+  firstName: 'Test',
+  lastName: 'User',
+  preferences: {
+    theme: 'dark',
+    notifications: { email: true, push: false }
+  }
+});
+
+// Find by email or username
+const user = await findByIdentifier('testuser');
+
+// Password comparison
+const isValid = await user.comparePassword('password123');
+
+// Update statistics
+await user.incrementStats('created');
+await user.incrementStats('completed');
+```
+
+### Todo Model Methods
+
+```javascript
+// Enhanced todo creation
+const todo = await createTodo({
+  user: userId,
+  title: 'Complete project',
+  description: 'Finish the new feature',
+  priority: 'high',
+  dueDate: new Date(),
+  tags: ['work', 'important'],
+  category: 'development'
+});
+
+// Advanced filtering
+const todos = await findByUserId(userId, 'all', {
+  priority: 'high',
+  category: 'work',
+  tags: ['urgent'],
+  sortBy: 'dueDate',
+  sortOrder: 'asc'
+});
+
+// Statistics
+const stats = await getStatistics(userId);
+// Returns: { total, completed, pending, inProgress, overdue }
+
+// Subtask management
+await addSubtask(todoId, userId, 'Research topic');
+await updateSubtask(todoId, userId, subtaskId, { completed: true });
+await deleteSubtask(todoId, userId, subtaskId);
+```
+
+## Security Enhancements
+
+### Password Hashing
+
+- Uses bcrypt with 12 salt rounds
+- Automatic hashing on user creation/update
+- Secure password comparison methods
+
+### User Statistics
+
+- Automatic tracking of todo creation/completion
+- Completion rate calculations
+- Streak tracking capabilities
+
+## Benefits
+
+<CardGroup cols={2}>
+  <Card title="For Users">
+    - Personal experience with user-specific todos
+    - Rich features: priority, due dates, tags, categories
+    - Statistics: Track productivity and completion rates
+    - Preferences: Customizable themes and notifications
+  </Card>
+  <Card title="For Developers">
+    - Clean architecture with proper separation
+    - Scalable: Efficient database indexes and queries
+    - Backward compatible: Existing code continues to work
+    - Type safety: Enhanced validation and error handling
+  </Card>
+  <Card title="For the Application">
+    - Multi-tenant ready: Supports multiple users
+    - Performance: Optimized queries with proper indexing
+    - Extensible: Easy to add new features
+    - Data integrity: Proper foreign key relationships
+  </Card>
+</CardGroup>
+
+## Database Indexes
+
+**User Indexes:**
+- `username` (unique)
+- `email` (unique)
+- `isActive`
+- `created_at`
+
+**Todo Indexes:**
+- `user, created_at` (compound)
+- `user, completed` (compound)
+- `user, status` (compound)
+- `userId, created_at` (legacy)
+- `tags`
+- `dueDate`
+- `priority`
+
+## Migration Checklist
+
+<Steps>
+  <Step title="Backup Database">
+    Create a full backup of your database
+  </Step>
+  <Step title="Review Changes">
+    Review schema changes and ensure compatibility
+  </Step>
+  <Step title="Run Migration">
+    Execute the migration script
+  </Step>
+  <Step title="Validate Data">
+    Run validation tests to ensure data integrity
+  </Step>
+  <Step title="Update API Endpoints">
+    Modify routes to use new user-todo relationships
+  </Step>
+  <Step title="Update Frontend">
+    Update frontend to handle user authentication and filtering
+  </Step>
+  <Step title="Test Thoroughly">
+    Write comprehensive tests for API endpoints
+  </Step>
+  <Step title="Update Documentation">
+    Update API documentation with new parameters
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Authentication Errors">
+**Issue**: User authentication fails after migration
+
+**Solutions**:
+1. Ensure AWS credentials are properly configured
+2. Check password hashing is working correctly
+3. Verify user model methods are called correctly
+4. Check error logs for specific issues
+</Accordion>
+
+<Accordion title="Missing User References">
+**Issue**: Todos without user references
+
+**Solutions**:
+1. Run migration script again
+2. Manually assign todos to users
+3. Check orphaned todos query
+</Accordion>
+
+<Accordion title="Index Warnings">
+**Issue**: MongoDB index warnings during development
+
+**Solutions**:
+1. Can be ignored during development
+2. Resolved automatically in production
+3. Create indexes manually if needed
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+After migration:
+
+1. **Update API Endpoints**: Modify routes to use new relationships
+2. **Frontend Updates**: Update UI to handle user filtering
+3. **Testing**: Write comprehensive tests for new features
+4. **Documentation**: Update API docs with new parameters
+5. **Performance**: Monitor query performance with new indexes
+
+## Additional Resources
+
+- [SCHEMA_MIGRATION_GUIDE.md](/../SCHEMA_MIGRATION_GUIDE.md)
+- [MongoDB Documentation](https://docs.mongodb.com/)
+- [Mongoose Documentation](https://mongoosejs.com/)
+

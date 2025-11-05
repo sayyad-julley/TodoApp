@@ -1,0 +1,509 @@
+---
+title: MCP Linear Integration
+description: Model Context Protocol server for Linear project management and issue tracking
+---
+
+# MCP Linear Integration
+
+A comprehensive Model Context Protocol (MCP) server for Linear project management, enabling seamless integration between Linear and AI assistants through the MCP protocol.
+
+![TodoApp Architecture](/assets/todoapp-architecture.svg)
+
+## Overview
+
+Linear MCP provides AI assistants with the ability to:
+
+- **Issue Management**: Create, read, update, and search Linear issues
+- **Team Operations**: Query teams, members, and project structures
+- **Workflow Integration**: Automate issue creation and status updates
+- **Project Tracking**: Access project information and team states
+- **X-Ray Integration**: Built-in AWS XRay tracing for monitoring
+
+![Linear MCP Integration Flow](/assets/linear-mcp-flow.svg)
+
+## TodoApp Integration
+
+The Linear MCP server seamlessly integrates with the TodoApp project, enabling automated issue tracking and project management:
+
+![TodoApp Linear Integration](/assets/todoapp-linear-integration.svg)
+
+**Integration Benefits:**
+- **Automated Issue Creation**: TodoApp tasks automatically create Linear issues
+- **Real-time Status Sync**: Issue status changes reflect in TodoApp
+- **Enhanced Project Management**: Linear's advanced features complement TodoApp
+- **AI Assistant Integration**: Claude Desktop can manage both TodoApp and Linear tasks
+
+<CardGroup cols={2}>
+  <Card title="Full MCP Support" icon="check-circle">
+    Complete Model Context Protocol implementation
+  </Card>
+  <Card title="Linear GraphQL API" icon="plug">
+    Direct integration with Linear's GraphQL API
+  </Card>
+  <Card title="AI Assistant Ready" icon="robot">
+    Optimized for Claude and other AI assistants
+  </Card>
+  <Card title="XRay Tracing" icon="target">
+    Built-in AWS XRay monitoring and tracing
+  </Card>
+  <Card title="CLI Tools" icon="terminal">
+    Command-line interface for setup and testing
+  </Card>
+  <Card title="Secure" icon="shield">
+    Secure API key management and validation
+  </Card>
+</CardGroup>
+
+## Installation
+
+### Prerequisites
+
+- Linear workspace account ([sign up](https://linear.app/))
+- Linear Personal API Key
+- Node.js 18+
+- Claude Desktop (optional, for AI assistant integration)
+
+### Step 1: Install the MCP Server
+
+```bash
+cd mcp-linear
+npm install
+```
+
+### Step 2: Get Linear API Key
+
+1. Navigate to **Settings** → **API** in Linear
+2. Under **Personal API Keys**, click **Create Key**
+3. Enter a descriptive label (e.g., "MCP Integration")
+4. **Copy the API key immediately** (it won't be shown again)
+
+<Warning>
+Store your Linear API key securely. Never commit it to version control. Use environment variables or secure configuration.
+</Warning>
+
+### Step 3: Configure Claude Desktop (Optional)
+
+To use with Claude Desktop, add this to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "linear": {
+      "command": "node",
+      "args": ["/path/to/mcp-linear/src/index.js"],
+      "env": {
+        "LINEAR_API_KEY": "your-linear-api-key-here"
+      }
+    }
+  }
+}
+```
+
+### Step 4: Test the Connection
+
+```bash
+# Using CLI
+npx mcp-linear test --api-key your-api-key
+
+# Or using environment variable
+export LINEAR_API_KEY=your-api-key
+npx mcp-linear test
+```
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# Required for operation
+export LINEAR_API_KEY=lin_api_xxxxxxxxxxxxx
+
+# Optional: AWS XRay service name
+export SERVICE_NAME=mcp-linear
+```
+
+### CLI Commands
+
+<CodeGroup>
+```bash Setup Command
+npx mcp-linear setup
+```
+Interactive setup wizard for API key configuration
+
+```bash Test Command
+npx mcp-linear test --api-key YOUR_API_KEY
+```
+Test API connection and basic operations
+
+```bash Demo Command
+npx mcp-linear demo --api-key YOUR_API_KEY
+```
+Run a demonstration of all operations
+
+```bash Start Command
+npx mcp-linear start
+```
+Start the MCP server in stdio mode
+</CodeGroup>
+
+## Available Tools
+
+### Core Operations
+
+#### `init_linear`
+Initialize the Linear API connection.
+
+**Parameters:**
+- `apiKey` (required): Linear Personal API Key
+
+```json
+{
+  "name": "init_linear",
+  "parameters": {
+    "apiKey": "lin_api_your-api-key-here"
+  }
+}
+```
+
+#### `query_teams`
+Query all teams in your Linear workspace.
+
+**Parameters:** None
+
+**Response:** Array of teams with IDs, names, and keys
+
+#### `query_issues`
+Query issues with optional filtering.
+
+**Parameters:**
+- `teamId` (optional): Team ID to filter issues
+- `first` (optional): Number of issues to return (default: 50)
+- `filter` (optional): Filter criteria object
+
+```json
+{
+  "name": "query_issues",
+  "parameters": {
+    "teamId": "team-id-here",
+    "first": 20,
+    "filter": {
+      "state": { "type": "started" },
+      "priority": { "gte": 2 }
+    }
+  }
+}
+```
+
+#### `create_issue`
+Create a new Linear issue.
+
+**Parameters:**
+- `title` (required): Issue title
+- `teamId` (required): Team ID where issue should be created
+- `description` (optional): Issue description (Markdown supported)
+- `priority` (optional): Priority 0-4 (default: 3)
+- `assigneeId` (optional): User ID to assign to
+- `stateId` (optional): State ID to set
+- `projectId` (optional): Project ID to associate with
+- `dueDate` (optional): Due date in ISO format
+
+```json
+{
+  "name": "create_issue",
+  "parameters": {
+    "title": "Implement user authentication",
+    "description": "Add JWT-based authentication system with refresh tokens",
+    "teamId": "team-id-here",
+    "priority": 1,
+    "assigneeId": "user-id-here"
+  }
+}
+```
+
+#### `get_issue`
+Get detailed information about a specific issue.
+
+**Parameters:**
+- `issueId` (required): Issue ID or identifier (e.g., "ENG-123")
+
+#### `update_issue`
+Update an existing issue.
+
+**Parameters:**
+- `issueId` (required): Issue ID or identifier
+- `title` (optional): New title
+- `description` (optional): New description
+- `stateId` (optional): New state ID
+- `assigneeId` (optional): New assignee ID (null to unassign)
+- `priority` (optional): New priority (0-4)
+- `dueDate` (optional): New due date
+
+### Supporting Operations
+
+#### `search_issues`
+Search issues by title or description.
+
+**Parameters:**
+- `searchTerm` (required): Search term
+- `teamId` (optional): Team ID to limit search
+
+#### `get_team_states`
+Get all available states for a team.
+
+**Parameters:**
+- `teamId` (required): Team ID
+
+#### `get_projects`
+Get projects with optional team filtering.
+
+**Parameters:**
+- `teamId` (optional): Team ID to filter
+
+#### `get_team_members`
+Get all members of a team.
+
+**Parameters:**
+- `teamId` (required): Team ID
+
+## Usage Examples
+
+### Example 1: Creating Issues from AI Assistant
+
+When discussing features with an AI assistant, it can automatically create Linear issues:
+
+```bash
+# Assistant can automatically call:
+create_issue(
+  title="Add user authentication system",
+  description="Implement JWT-based authentication with:\n- Login/logout functionality\n- Token refresh\n- Password reset",
+  teamId="engineering-team-id",
+  priority=1
+)
+```
+
+### Example 2: Querying Team Status
+
+Get an overview of current work:
+
+```bash
+# Assistant can query current issues
+query_issues(
+  teamId="engineering-team-id",
+  filter={
+    "state": { "type": "started" }
+  }
+)
+```
+
+### Example 3: Updating Issue Status
+
+When deployment is complete:
+
+```bash
+# Update issue to completed
+update_issue(
+  issueId="ENG-123",
+  stateId="completed-state-id"
+)
+```
+
+### Example 4: Team Overview
+
+Get comprehensive team information:
+
+```bash
+# Get team members and their current assignments
+get_team_members(teamId="engineering-team-id")
+query_issues(teamId="engineering-team-id", filter={"assignee": {"id": "user-id"}})
+```
+
+## Integration with Backstage Templates
+
+Use the Linear MCP server in Backstage templates to automatically create issues:
+
+```yaml
+# template.yaml
+steps:
+  - id: create-linear-issue
+    name: Create Linear Issue
+    action: custom:linear-call
+    input:
+      tool: "create_issue"
+      arguments:
+        title: ${{ parameters.projectName }} - Implementation
+        description: |
+          **Project**: ${{ parameters.projectName }}
+          **Description**: ${{ parameters.description }}
+
+          **Generated from**: Golden Path Template
+
+          Track implementation progress here.
+        teamId: ${{ parameters.linearTeamId }}
+        priority: 2
+```
+
+## Monitoring and Tracing
+
+The Linear MCP server includes AWS XRay integration for monitoring:
+
+- **Request Tracing**: All API calls are traced
+- **Performance Metrics**: Response times and success rates
+- **Error Tracking**: Detailed error information and stack traces
+- **Operation Metadata**: Request/response metadata for debugging
+
+### Viewing Traces
+
+```bash
+# Enable XRay daemon
+aws xray daemon
+
+# Check traces in AWS Console
+# Navigate to XRay -> Service Map
+```
+
+## Security Best Practices
+
+<CardGroup cols={2}>
+  <Card title="API Key Security">
+    Store API keys in environment variables or secure secret management systems
+  </Card>
+  <Card title="Principle of Least Privilege">
+    Use API keys with minimal required permissions
+  </Card>
+  <Card title="Rate Limiting">
+    Implement client-side rate limiting to avoid API quota issues
+  </Card>
+  <Card title="Input Validation">
+    Validate all inputs before making API calls
+  </Card>
+</CardGroup>
+
+### Secure API Key Management
+
+```bash
+# Method 1: Environment variables (recommended)
+export LINEAR_API_KEY=lin_api_your-key-here
+
+# Method 2: AWS Secrets Manager
+aws secretsmanager get-secret-value --secret-id linear-api-key
+
+# Method 3: .env file (development only)
+echo "LINEAR_API_KEY=lin_api_your-key-here" >> .env
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="API Authentication Fails">
+**Issue**: 401 Unauthorized errors when calling Linear API
+
+**Solution**:
+1. Verify API key is correct and starts with `lin_api_`
+2. Check API key has required permissions in Linear
+3. Ensure API key hasn't expired or been revoked
+4. Test with CLI: `npx mcp-linear test --api-key YOUR_KEY`
+</Accordion>
+
+<Accordion title="MCP Server Won't Start">
+**Issue**: Server fails to start or connect
+
+**Solution**:
+1. Check Node.js version is 18+
+2. Verify all dependencies are installed: `npm install`
+3. Check XRay daemon is running if tracing is enabled
+4. Test with CLI first: `npx mcp-linear test`
+</Accordion>
+
+<Accordion title="Claude Desktop Integration Not Working">
+**Issue**: Tools not available in Claude Desktop
+
+**Solution**:
+1. Verify Claude Desktop config file is correct
+2. Check file paths are absolute and correct
+3. Ensure API key is properly set in environment
+4. Restart Claude Desktop after configuration changes
+5. Check Claude Desktop logs for connection errors
+</Accordion>
+
+<Accordion title="Rate Limiting Issues">
+**Issue**: Too many requests or rate limit errors
+
+**Solution**:
+1. Implement exponential backoff in your code
+2. Cache frequently accessed data
+3. Use pagination for large result sets
+4. Monitor Linear API quota usage
+</Accordion>
+
+<Accordion title="Team ID Not Found">
+**Issue**: Cannot find teams or create issues
+
+**Solution**:
+```bash
+# Query available teams
+npx mcp-linear demo --api-key YOUR_KEY
+
+# Or use GraphQL directly
+curl -X POST https://api.linear.app/graphql \
+  -H "Authorization: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "query { teams { nodes { id name key } } }"}'
+```
+</Accordion>
+</AccordionGroup>
+
+## Development
+
+### Local Development
+
+```bash
+# Clone and install
+git clone <repository>
+cd mcp-linear
+npm install
+
+# Run tests
+npm test
+
+# Start development server
+npm run dev
+
+# Run CLI locally
+node src/cli.js setup
+```
+
+### Adding New Tools
+
+1. **Add tool to list** in `src/mcp-server.js` (`ListToolsRequestSchema`)
+2. **Implement handler** in `src/mcp-server.js` (`CallToolRequestSchema`)
+3. **Add Linear API method** in `src/linear-operations.js`
+4. **Update CLI** with new functionality in `src/cli.js`
+5. **Add documentation** in this file
+
+### Testing
+
+```bash
+# Run unit tests
+npm test
+
+# Test API connection
+npm run test:api
+
+# Run integration tests
+npm run test:integration
+
+# Test with Claude Desktop
+npm run test:claude
+```
+
+## Additional Resources
+
+- [Linear Documentation](https://linear.app/docs) - Official Linear documentation
+- [Linear API Reference](https://linear.app/docs/api) - GraphQL API reference
+- [MCP Protocol Specification](https://modelcontextprotocol.io/) - MCP protocol docs
+- [Claude Desktop Integration](https://claude.ai/desktop) - Claude desktop setup
+- [AWS XRay Documentation](https://docs.aws.amazon.com/xray/) - XRay tracing docs
+
+## License
+
+MIT License - see LICENSE file for details.

@@ -27,18 +27,11 @@
   ],
   "navigation": [
     {
-      "group": "Overview",
+      "group": "Getting Started",
       "pages": [
-        "overview"
-      ]
-    },
-    {
-      "group": "Get Started",
-      "pages": [
-        "GOLDEN_PATH",
-        "guides/setup-secrets-manager",
-        "guides/setup-xray-and-guardduty",
-        "guides/setup-codebuild-pipeline"
+        "overview",
+        "quick-start",
+        "architecture"
       ]
     },
     {
@@ -48,12 +41,38 @@
       ]
     },
     {
-      "group": "Tool Integration",
+      "group": "Integrations",
       "pages": [
-        "guides/traycer-integration",
-        "guides/mintlify-documentation",
-        "guides/coderabbit-setup",
-        "guides/qa-wolf-testing"
+        "integrations/backstage",
+        "integrations/mcp-secrets-manager",
+        "integrations/mcp-context7",
+        "integrations/traycer",
+        "integrations/qa-wolf",
+        "integrations/coderabbit",
+        "integrations/mintlify",
+        "integrations/linear"
+      ]
+    },
+    {
+      "group": "AWS Services",
+      "pages": [
+        "aws/secrets-manager",
+        "aws/xray-guardduty",
+        "aws/codebuild-pipeline",
+        "aws/xray-integration"
+      ]
+    },
+    {
+      "group": "Development",
+      "pages": [
+        "development/schema-migration",
+        "development/deployment"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "guides/GOLDEN_PATH"
       ]
     }
   ],

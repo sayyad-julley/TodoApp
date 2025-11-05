@@ -1,0 +1,270 @@
+---
+title: MCP Context7
+description: Model Context Protocol server for Context7 integration
+---
+
+# MCP Context7 Integration
+
+A lightweight Model Context Protocol (MCP) server scaffold for Context7 integration, ready to be expanded as needed.
+
+## Overview
+
+This MCP server provides a minimal JSON-RPC over HTTP interface with placeholder methods that can be extended for domain-specific functionality.
+
+<CardGroup cols={2}>
+  <Card title="MCP Protocol" icon="network">
+    JSON-RPC over HTTP implementation
+  </Card>
+  <Card title="Extensible" icon="puzzle-piece">
+    Easy to expand with new methods
+  </Card>
+  <Card title="Lightweight" icon="feather">
+    Minimal scaffold for future development
+  </Card>
+  <Card title="Configurable" icon="gear">
+    Environment-based configuration
+  </Card>
+</CardGroup>
+
+## Installation
+
+```bash
+cd mcp-context7
+npm install
+```
+
+## Usage
+
+### Start Server
+
+```bash
+node ./src/cli.js
+```
+
+Server starts on `http://127.0.0.1:7337` by default.
+
+### Configuration
+
+Environment variables:
+
+```bash
+export MCP_HOST=127.0.0.1  # Default: 127.0.0.1
+export MCP_PORT=7337      # Default: 7337
+```
+
+### Call RPC Endpoint
+
+<CodeGroup>
+```bash Ping Method
+curl -s -X POST \
+  -H 'content-type: application/json' \
+  http://127.0.0.1:7337/rpc \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "context7.ping",
+    "params": {}
+  }'
+```
+
+```bash Search Method (Stub)
+curl -s -X POST \
+  -H 'content-type: application/json' \
+  http://127.0.0.1:7337/rpc \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "context7.search",
+    "params": {
+      "query": "example query"
+    }
+  }'
+```
+</CodeGroup>
+
+### Expected Response
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "ok": true,
+    "message": "pong",
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+## Available Methods
+
+### `context7.ping`
+
+Health check endpoint that returns a pong response.
+
+**Request:**
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "context7.ping",
+  "params": {}
+}
+```
+
+**Response:**
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "ok": true,
+    "message": "pong",
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+### `context7.search`
+
+Placeholder method for search functionality (not yet implemented).
+
+**Request:**
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "context7.search",
+  "params": {
+    "query": "search term"
+  }
+}
+```
+
+**Response (Current):**
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "error": {
+    "code": -32601,
+    "message": "Method not found"
+  }
+}
+```
+
+## Project Structure
+
+```
+mcp-context7/
+├── src/
+│   ├── cli.js        # CLI entry point
+│   ├── index.js      # Main server logic
+│   └── mcp-server.js # MCP server implementation
+├── package.json
+└── README.md
+```
+
+## Extending the Server
+
+### Adding New Methods
+
+1. **Update Method Handler**
+
+Edit `src/mcp-server.js`:
+
+```javascript
+// Add new method handler
+case 'context7.search':
+  return handleSearch(params);
+```
+
+2. **Implement Handler Function**
+
+```javascript
+function handleSearch(params) {
+  const { query } = params;
+  // Implement search logic
+  return {
+    results: [],
+    query: query
+  };
+}
+```
+
+3. **Register Method**
+
+Update method registry:
+
+```javascript
+const methods = {
+  'context7.ping': handlePing,
+  'context7.search': handleSearch,  // Add here
+};
+```
+
+## Next Steps
+
+<Steps>
+  <Step title="Replace HTTP Transport">
+    Replace HTTP stub with full MCP transport if/when needed
+  </Step>
+  <Step title="Implement Search">
+    Implement `context7.search` and other domain-specific tools
+  </Step>
+  <Step title="Add Authentication">
+    Add authentication and access control as requirements evolve
+  </Step>
+  <Step title="Expand Functionality">
+    Add more methods based on Context7 API capabilities
+  </Step>
+</Steps>
+
+## Integration with Claude Desktop
+
+To integrate with Claude Desktop, add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "node",
+      "args": ["/path/to/mcp-context7/src/cli.js"],
+      "env": {
+        "MCP_HOST": "127.0.0.1",
+        "MCP_PORT": "7337"
+      }
+    }
+  }
+}
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Port Already in Use">
+**Error**: `Port 7337 already in use`
+
+**Solution**:
+```bash
+# Change port
+export MCP_PORT=7338
+node ./src/cli.js
+```
+</Accordion>
+
+<Accordion title="Connection Refused">
+**Error**: `Connection refused`
+
+**Solution**:
+1. Verify server is running
+2. Check host/port configuration
+3. Ensure firewall allows connections
+</Accordion>
+</AccordionGroup>
+
+## Additional Resources
+
+- [MCP Protocol Specification](https://modelcontextprotocol.io/)
+- [Context7 Documentation](https://context7.io/)
+

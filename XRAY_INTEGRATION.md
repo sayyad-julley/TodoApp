@@ -7,8 +7,9 @@ This document describes the AWS X-Ray integration implemented across the TodoApp
 AWS X-Ray has been integrated into the following components:
 
 1. **Express Todo API** (`golden-path/templates/fullstack-todo/backend/`)
-2. **Backstage Backend** (`todo-backstage/packages/backend/`)
-3. **MCP Secrets Manager Server** (`mcp-secrets-manager/`)
+2. **React Todo Frontend** (`golden-path/templates/fullstack-todo/frontend/`)
+3. **Backstage Backend** (`todo-backstage/packages/backend/`)
+4. **MCP Secrets Manager Server** (`mcp-secrets-manager/`)
 
 ## Features Implemented
 
@@ -53,7 +54,47 @@ process.env.AWS_XRAY_TRACING_NAME = serviceName;
   - AWS SDK v2 automatically captured by X-Ray
   - Secrets Manager calls traced as downstream service calls
 
-### 2. Backstage Backend (`todo-backstage/packages/backend/`)
+### 2. React Todo Frontend (`golden-path/templates/fullstack-todo/frontend/`)
+
+#### X-Ray Trace Context Generation
+- **File**: `src/utils/xray.js`
+- **Features**:
+  - Manual trace ID generation following X-Ray format
+  - Trace context propagation via HTTP headers
+  - Automatic trace header injection in all API requests
+  - Trace context continuation from backend responses
+
+#### Key Components
+```javascript
+// X-Ray trace context manager
+import xrayContext from './utils/xray.js';
+
+// Generate trace ID: 1-<timestamp>-<random>
+const traceId = generateTraceId();
+
+// Add trace headers to requests
+xrayContext.addTraceToRequest(config);
+
+// Continue trace from backend response
+xrayContext.extractTraceFromResponse(response);
+```
+
+#### Axios Integration
+- **File**: `src/utils/api.js`
+- **Features**:
+  - Automatic trace header injection in request interceptors
+  - Trace context extraction from response interceptors
+  - Seamless integration with existing API calls
+
+#### Trace Header Format
+The frontend generates and propagates X-Ray trace headers in the format:
+```
+X-Amzn-Trace-Id: Root=1-<timestamp>-<random>;Parent=<segment-id>;Sampled=1
+```
+
+The backend automatically continues the trace using these headers, creating a distributed trace across frontend and backend services.
+
+### 3. Backstage Backend (`todo-backstage/packages/backend/`)
 
 #### Process-level X-Ray Initialization
 - **File**: `src/index.ts`
@@ -74,7 +115,7 @@ const serviceName = process.env.SERVICE_NAME || 'backstage-backend';
 process.env.AWS_XRAY_TRACING_NAME = serviceName;
 ```
 
-### 3. MCP Secrets Manager Server (`mcp-secrets-manager/`)
+### 4. MCP Secrets Manager Server (`mcp-secrets-manager/`)
 
 #### Manual Segment Management
 - **File**: `src/mcp-server.js`
@@ -117,11 +158,22 @@ async handleGetSecret(args) {
 
 ### Environment Variables
 
+#### Backend Variables
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `SERVICE_NAME` | X-Ray service name for dynamic naming | Component-specific defaults |
+| `SERVICE_NAME` | X-Ray service name for dynamic naming | `todo-api` |
+| `ENABLE_XRAY` | Enable X-Ray tracing (set to `true` in dev) | `false` (dev), `true` (prod) |
 | `AWS_XRAY_TRACING_NAME` | X-Ray segment name override | Set from `SERVICE_NAME` |
+| `AWS_XRAY_DAEMON_ADDRESS` | X-Ray daemon address | `localhost:2000` (dev), auto-detect (AWS) |
+| `AWS_XRAY_DEBUG_MODE` | Enable X-Ray debug logging | `0` |
 | `AWS_REGION` | AWS region for X-Ray daemon | `us-east-1` |
+
+#### Frontend Variables
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `VITE_ENABLE_XRAY` | Enable X-Ray tracing in frontend | `false` (dev), `true` (prod) |
+| `VITE_SERVICE_NAME` | Frontend service name for X-Ray | `todo-frontend` |
+| `VITE_XRAY_DEBUG` | Enable X-Ray debug logging in frontend | `false` |
 
 ### AWS X-Ray Daemon
 
@@ -165,17 +217,25 @@ Ensure the following AWS IAM permissions are available for X-Ray:
 - Request/response metadata captured
 - Error and exception tracking
 
-### 2. Downstream Service Calls
+### 2. Frontend-to-Backend Tracing
+- Frontend API calls automatically traced with trace headers
+- Backend continues traces from frontend headers
+- Distributed tracing across frontend and backend services
+- Trace context propagation via `X-Amzn-Trace-Id` header
+
+### 3. Downstream Service Calls
 - AWS SDK v2 calls to Secrets Manager
 - HTTP/HTTPS outbound calls
 - MongoDB connection operations
 
-### 3. Custom Annotations
+### 4. Custom Annotations
 - Service operation names
 - Success/failure status
 - Request counts and metadata
+- Upstream service identification (frontend → backend)
+- Trace origin tracking
 
-### 4. Error Handling
+### 5. Error Handling
 - Automatic error propagation
 - Exception details captured
 - Fault flagging for failed operations
@@ -190,10 +250,12 @@ View traces in the AWS X-Ray Console:
 4. Set up alarms and notifications
 
 ### Key Metrics to Monitor
-- Request latency by service
-- Error rates and fault detection
+- Request latency by service (frontend and backend)
+- End-to-end request latency (frontend → backend)
+- Error rates and fault detection across services
 - Downstream service dependency health
 - Database connection performance
+- Frontend API call patterns and performance
 
 ## Development Notes
 
@@ -221,11 +283,16 @@ View traces in the AWS X-Ray Console:
    - Check IAM permissions
    - Ensure proper AWS credentials configuration
 
-2. **Missing downstream service traces**
+2. **Missing frontend traces**
+   - Verify `VITE_ENABLE_XRAY=true` is set in frontend environment
+   - Check browser console for X-Ray initialization messages
+   - Ensure trace headers are being sent (check Network tab in browser dev tools)
+
+3. **Missing downstream service traces**
    - Verify AWS SDK capture is properly configured
    - Check if service calls are made within X-Ray segments
 
-3. **High overhead**
+4. **High overhead**
    - Adjust sampling rules in X-Ray console
    - Review custom metadata being added to segments
 
@@ -237,12 +304,49 @@ export AWS_XRAY_DEBUG_MODE=1
 export AWS_XRAY_LOG_LEVEL=debug
 ```
 
+## Frontend X-Ray Integration Details
+
+### How It Works
+
+1. **Trace Generation**: Frontend generates X-Ray-compatible trace IDs on initialization
+2. **Header Injection**: All API requests automatically include `X-Amzn-Trace-Id` header
+3. **Backend Continuation**: Backend Express middleware automatically continues traces from headers
+4. **Response Propagation**: Backend includes trace context in response headers for frontend continuation
+
+### Browser Compatibility
+
+The frontend X-Ray integration uses manual instrumentation since AWS X-Ray SDK for JavaScript is primarily designed for Node.js. The implementation:
+- Generates trace IDs following X-Ray format
+- Propagates trace context via standard HTTP headers
+- Works in all modern browsers
+- No additional dependencies required
+
+### Enabling Frontend Tracing
+
+To enable X-Ray tracing in the frontend:
+
+```bash
+# Development
+VITE_ENABLE_XRAY=true npm run dev
+
+# Production (default enabled)
+npm run build
+```
+
+Or set in `.env` file:
+```bash
+VITE_ENABLE_XRAY=true
+VITE_SERVICE_NAME=todo-frontend
+VITE_XRAY_DEBUG=true
+```
+
 ## Future Enhancements
 
 1. **Advanced Sampling Rules**: Configure custom sampling based on request characteristics
 2. **Custom Metrics**: Add business-relevant metrics and annotations
 3. **Integration with CloudWatch**: Set up automated alerts and dashboards
-4. **Distributed Context Propagation**: Enhance cross-service tracing capabilities
+4. **OpenTelemetry Migration**: Consider migrating to AWS Distro for OpenTelemetry for enhanced browser support
+5. **Real User Monitoring (RUM)**: Integrate X-Ray with CloudWatch RUM for frontend performance monitoring
 
 ## References
 

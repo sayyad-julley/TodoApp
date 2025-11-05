@@ -1,0 +1,104 @@
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f8fafc"/>
+
+  <!-- Browser Window -->
+  <rect x="50" y="50" width="700" height="400" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+
+  <!-- Browser Header -->
+  <rect x="50" y="50" width="700" height="30" rx="8" fill="#f1f5f9"/>
+  <rect x="50" y="70" width="700" height="10" fill="#f1f5f9"/>
+
+  <!-- Browser Controls -->
+  <circle cx="70" cy="65" r="5" fill="#ef4444"/>
+  <circle cx="85" cy="65" r="5" fill="#f59e0b"/>
+  <circle cx="100" cy="65" r="5" fill="#10b981"/>
+
+  <!-- URL Bar -->
+  <rect x="120" y="58" width="400" height="14" rx="7" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="130" y="68" font-family="Arial, sans-serif" font-size="9" fill="#64748b">http://localhost:3000</text>
+
+  <!-- App Header -->
+  <rect x="50" y="80" width="700" height="60" fill="#1e293b"/>
+
+  <!-- Logo and Title -->
+  <rect x="70" y="95" width="30" height="30" rx="5" fill="#3b82f6"/>
+  <text x="110" y="108" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#ffffff">TodoApp</text>
+  <text x="110" y="125" font-family="Arial, sans-serif" font-size="11" fill="#94a3b8">Productivity Task Manager</text>
+
+  <!-- User Menu -->
+  <circle cx="700" cy="110" r="15" fill="#475569"/>
+  <text x="700" y="115" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#ffffff">U</text>
+
+  <!-- Theme Toggle -->
+  <rect x="640" y="100" width="40" height="20" rx="10" fill="#374151"/>
+  <circle cx="670" cy="110" r="8" fill="#fbbf24"/>
+
+  <!-- Main Content Area -->
+  <rect x="50" y="140" width="700" height="310" fill="#ffffff"/>
+
+  <!-- Sidebar -->
+  <rect x="50" y="140" width="200" height="310" fill="#f8fafc"/>
+
+  <!-- Sidebar Menu -->
+  <text x="70" y="165" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1e293b">📋 All Tasks</text>
+  <text x="70" y="190" font-family="Arial, sans-serif" font-size="14" fill="#64748b">⭐ Important</text>
+  <text x="70" y="215" font-family="Arial, sans-serif" font-size="14" fill="#64748b">📅 Today</text>
+  <text x="70" y="240" font-family="Arial, sans-serif" font-size="14" fill="#64748b">🏷️ Tags</text>
+
+  <!-- Stats Section -->
+  <rect x="70" y="270" width="160" height="80" rx="5" fill="#e0e7ff"/>
+  <text x="150" y="290" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#4338ca">Today's Progress</text>
+  <text x="150" y="310" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#64748b">8 of 12 completed</text>
+  <rect x="90" y="320" width="120" height="8" rx="4" fill="#c7d2fe"/>
+  <rect x="90" y="320" width="80" height="8" rx="4" fill="#6366f1"/>
+  <text x="150" y="345" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748b">67% Complete</text>
+
+  <!-- Todo List -->
+  <g id="todo-items">
+    <!-- Todo Item 1 -->
+    <rect x="270" y="160" width="460" height="40" rx="5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <circle cx="285" cy="180" r="8" fill="#10b981"/>
+    <polyline points="280,180 284,184 292,176" stroke="#ffffff" stroke-width="2" fill="none"/>
+    <text x="305" y="178" font-family="Arial, sans-serif" font-size="12" fill="#94a3b8">Complete API documentation</text>
+    <text x="305" y="192" font-family="Arial, sans-serif" font-size="10" fill="#94a3b8">Linear integration ✅ • High priority</text>
+
+    <!-- Todo Item 2 -->
+    <rect x="270" y="210" width="460" height="40" rx="5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <circle cx="285" cy="230" r="8" fill="#10b981"/>
+    <polyline points="280,230 284,234 292,226" stroke="#ffffff" stroke-width="2" fill="none"/>
+    <text x="305" y="228" font-family="Arial, sans-serif" font-size="12" fill="#94a3b8">Review and test MCP Linear integration</text>
+    <text x="305" y="242" font-family="Arial, sans-serif" font-size="10" fill="#94a3b8">All tests passed ✅ • Completed</text>
+
+    <!-- Todo Item 3 -->
+    <rect x="270" y="260" width="460" height="40" rx="5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <circle cx="285" cy="280" r="8" fill="#ffffff" stroke="#64748b" stroke-width="2"/>
+    <text x="305" y="278" font-family="Arial, sans-serif" font-size="12" fill="#1e293b">Add comprehensive error handling</text>
+    <text x="305" y="292" font-family="Arial, sans-serif" font-size="10" fill="#64748b">Backend development • In progress</text>
+
+    <!-- Todo Item 4 -->
+    <rect x="270" y="310" width="460" height="40" rx="5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <circle cx="285" cy="330" r="8" fill="#ffffff" stroke="#64748b" stroke-width="2"/>
+    <text x="305" y="328" font-family="Arial, sans-serif" font-size="12" fill="#1e293b">Implement real-time collaboration</text>
+    <text x="305" y="342" font-family="Arial, sans-serif" font-size="10" fill="#64748b">Frontend • Low priority</text>
+
+    <!-- Todo Item 5 -->
+    <rect x="270" y="360" width="460" height="40" rx="5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <circle cx="285" cy="380" r="8" fill="#ffffff" stroke="#64748b" stroke-width="2"/>
+    <text x="305" y="378" font-family="Arial, sans-serif" font-size="12" fill="#1e293b">Set up automated deployment pipeline</text>
+    <text x="305" y="392" font-family="Arial, sans-serif" font-size="10" fill="#64748b">DevOps • Medium priority</text>
+  </g>
+
+  <!-- Add Task Button -->
+  <rect x="640" y="410" width="100" height="30" rx="15" fill="#3b82f6"/>
+  <text x="690" y="428" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#ffffff">+ Add Task</text>
+
+  <!-- Footer Status -->
+  <rect x="50" y="450" width="700" height="1" fill="#e2e8f0"/>
+  <text x="60" y="470" font-family="Arial, sans-serif" font-size="10" fill="#64748b">Last sync: 2 minutes ago • Linear connected • 5 active tasks</text>
+  <text x="720" y="470" font-family="Arial, sans-serif" font-size="10" fill="#64748b">v2.1.0</text>
+
+  <!-- Floating Action Button -->
+  <circle cx="720" cy="380" r="20" fill="#10b981"/>
+  <text x="720" y="385" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" fill="#ffffff">+</text>
+</svg>
