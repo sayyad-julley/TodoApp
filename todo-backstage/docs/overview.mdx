@@ -1,0 +1,193 @@
+---
+title: Overview
+description: Introduction to the Golden Path Backstage template
+---
+
+# Backstage Template Overview
+
+The Golden Path Backstage template provides a comprehensive, production-ready Backstage instance with pre-configured templates, integrations, and documentation.
+
+## What's Included
+
+<CardGroup cols={2}>
+  <Card title="Backstage Platform" icon="box">
+    Full Backstage instance with catalog, scaffolder, and plugins
+  </Card>
+  <Card title="Golden Path Templates" icon="template">
+    Pre-built templates following development best practices
+  </Card>
+  <Card title="Traycer Integration" icon="robot">
+    AI-powered implementation plan generation
+  </Card>
+  <Card title="Mintlify Documentation" icon="book">
+    Beautiful, searchable documentation out of the box
+  </Card>
+</CardGroup>
+
+## Key Features
+
+### 🎯 Software Templates
+- **Golden Path Todo Template**: Complete fullstack application template
+- **Custom Template Support**: Easily add your own templates
+- **Parameterized Generation**: Flexible template configurations
+- **GitHub Integration**: Automatic repository creation
+
+### 🔧 Integrations
+- **Traycer AI**: Automatic implementation plan generation
+- **GitHub**: Repository management and publishing
+- **Mintlify**: Documentation generation and hosting
+- **AWS Services**: Ready-to-use AWS integrations
+
+### 📚 Documentation
+- **Developer Docs**: Comprehensive development guides
+- **API Reference**: Auto-generated API documentation
+- **Architecture Guides**: System design and patterns
+- **Integration Guides**: Step-by-step setup instructions
+
+## Architecture
+
+```
+┌─────────────────────────────────────┐
+│           Backstage UI              │
+│  (Frontend - React + Material-UI)   │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│         Backstage Backend           │
+│  (Node.js + Express + Plugins)      │
+│                                     │
+│  • Catalog Service                  │
+│  • Scaffolder Service               │
+│  • Plugin System                    │
+│  • Authentication                   │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│        External Services            │
+│                                     │
+│  • GitHub                           │
+│  • Traycer AI                       │
+│  • Mintlify                         │
+│  • AWS Services                     │
+└─────────────────────────────────────┘
+```
+
+## Quick Start
+
+<Steps>
+  <Step title="Clone Repository">
+    ```bash
+    git clone https://github.com/sayyad-julley/TodoApp
+    cd TodoApp/todo-backstage
+    ```
+  </Step>
+  <Step title="Install Dependencies">
+    ```bash
+    yarn install
+    ```
+  </Step>
+  <Step title="Configure Environment">
+    ```bash
+    cp app-config.example.yaml app-config.local.yaml
+    # Edit app-config.local.yaml with your settings
+    ```
+  </Step>
+  <Step title="Start Development">
+    ```bash
+    yarn start
+    ```
+  </Step>
+</Steps>
+
+## Project Structure
+
+```
+todo-backstage/
+├── docs/                           # Mintlify documentation
+│   ├── mint.json                   # Mintlify configuration
+│   └── *.mdx                       # Documentation pages
+├── examples/
+│   └── template/
+│       └── golden-path-todo/       # Software template
+│           ├── template.yaml       # Template definition
+│           └── content/            # Template content
+├── packages/
+│   ├── app/                        # Frontend application
+│   ├── backend/                    # Backend application
+│   └── plugins/                    # Custom plugins
+├── app-config.yaml                 # Main configuration
+├── app-config.local.yaml.example   # Local config template
+└── package.json                    # Dependencies and scripts
+```
+
+## Development Workflow
+
+1. **Local Development**: Use `yarn start` for local development
+2. **Template Development**: Create and test templates in `examples/template/`
+3. **Plugin Development**: Extend functionality with custom plugins
+4. **Documentation**: Update docs in the `docs/` directory
+5. **Testing**: Run tests with `yarn test`
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# GitHub Integration (required)
+GITHUB_TOKEN=your-github-personal-access-token
+
+# Traycer AI (optional)
+TRAYCER_API_URL=https://api.traycer.ai
+TRAYCER_API_KEY=your-traycer-api-key
+
+# Database (default: SQLite)
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+```
+
+### App Configuration
+
+Main configuration in `app-config.yaml`:
+
+```yaml
+# Core configuration
+app:
+  title: Backstage Template
+
+# Database configuration
+database:
+  client: better-sqlite3
+  connection: ':memory:'
+
+# GitHub integration
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_TOKEN}
+
+# Catalog locations
+catalog:
+  locations:
+    - type: file
+      target: ../../examples/template/golden-path-todo/template.yaml
+      rules:
+        - allow: [Template]
+```
+
+## Next Steps
+
+- [Installation Guide](/installation) - Detailed setup instructions
+- [Quick Start](/quick-start) - Get up and running quickly
+- [Development Guide](/development/setup) - Development workflows
+- [Templates](/templates/overview) - Working with templates
+- [Integrations](/integrations/overview) - External service integrations
+
+## Support
+
+- **GitHub Issues**: [Report bugs](https://github.com/sayyad-julley/TodoApp/issues)
+- **Documentation**: [View full docs](https://docs.goldenpath.dev)
+- **Golden Path**: [Learn about Golden Path](https://goldenpath.dev)

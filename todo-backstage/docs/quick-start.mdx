@@ -1,0 +1,300 @@
+---
+title: Quick Start
+description: Get up and running with the Backstage template in minutes
+---
+
+# Quick Start
+
+This guide will help you get your Backstage template running and create your first project in just a few minutes.
+
+## Before You Start
+
+Make sure you have completed the [Installation](/installation) guide and have:
+
+- ✅ Node.js 18+ installed
+- ✅ Yarn package manager
+- ✅ GitHub personal access token
+- ✅ Cloned repository and installed dependencies
+
+## Start Backstage
+
+If you haven't already, start your Backstage instance:
+
+```bash
+cd todo-backstage
+yarn start
+```
+
+<Info>
+This command starts both the frontend (port 3000) and backend (port 7007) in development mode.
+</Info>
+
+Open your browser to **http://localhost:3000**. You should see the Backstage login page.
+
+## Create Your First Project
+
+<Steps>
+  <Step title="Navigate to Create Page">
+    Click **"Create"** in the navigation sidebar, or go directly to **http://localhost:3000/create**
+  </Step>
+  <Step title="Select Template">
+    Choose **"Golden Path Fullstack Todo"** from the available templates
+  </Step>
+  <Step title="Fill Project Details">
+    Complete the form with your project information:
+
+    **Required Fields:**
+    - **Project Name**: `my-first-todo-app` (lowercase, hyphens)
+    - **Description**: `My first golden path todo application`
+    - **Repository Location**: `https://github.com/your-username/my-first-todo-app`
+
+    **Optional Fields:**
+    - **Feature Type**: `feature`
+    - **Feature Description**: `A simple todo app with user authentication`
+  </Step>
+  <Step title="Execute Template">
+    Click **"Create"** to start the project generation process
+  </Step>
+  <Step title="Monitor Progress">
+    Watch the progress as the template:
+    - Fetches the base template
+    - Generates an AI implementation plan
+    - Creates the implementation guide
+    - Publishes to GitHub
+    - Registers in Backstage catalog
+  </Step>
+</Steps>
+
+## What Gets Created
+
+Your generated project includes:
+
+<CardGroup cols={2}>
+  <Card title="Fullstack Application" icon="layers">
+    React frontend + Node.js backend + MongoDB
+  </Card>
+  <Card title="GitHub Repository" icon="github">
+    Auto-created with all project files
+  </Card>
+  <Card title="Implementation Guide" icon="book">
+    AI-generated development plan
+  </Card>
+  <Card title="Backstage Component" icon="catalog">
+    Auto-registered in your catalog
+  </Card>
+</CardGroup>
+
+### Project Structure
+
+The generated project follows the Golden Path structure:
+
+```
+my-first-todo-app/
+├── IMPLEMENTATION_GUIDE.md          # AI-generated development plan
+├── catalog-info.yaml               # Backstage catalog registration
+├── README.md                       # Project documentation
+├── docker-compose.yml              # Local development setup
+├── .github/                        # GitHub workflows
+│   └── workflows/
+│       ├── ci.yml                  # Continuous integration
+│       └── deploy.yml              # Deployment pipeline
+├── backend/                        # Node.js backend
+│   ├── src/
+│   │   ├── controllers/            # API controllers
+│   │   ├── models/                 # Data models
+│   │   ├── routes/                 # API routes
+│   │   ├── middleware/             # Custom middleware
+│   │   └── server.js               # Server entry point
+│   ├── package.json
+│   └── Dockerfile
+├── frontend/                       # React frontend
+│   ├── src/
+│   │   ├── components/             # React components
+│   │   ├── pages/                  # Page components
+│   │   ├── hooks/                  # Custom hooks
+│   │   ├── utils/                  # Utility functions
+│   │   └── App.jsx                 # App entry point
+│   ├── public/
+│   ├── package.json
+│   └── Dockerfile
+└── aws/                            # AWS infrastructure
+    ├── cloudformation/             # CFN templates
+    ├── scripts/                    # Deployment scripts
+    └── infrastructure.yml          # Infrastructure as code
+```
+
+## Next Steps
+
+### 1. Clone Your New Project
+
+```bash
+git clone https://github.com/your-username/my-first-todo-app
+cd my-first-todo-app
+```
+
+### 2. Start Local Development
+
+<CodeGroup>
+```bash Docker Compose
+# Using Docker Compose (recommended)
+docker-compose up -d
+```
+
+```bash Manual
+# Manual setup
+cd backend && npm install && npm start
+cd frontend && npm install && npm start
+```
+</CodeGroup>
+
+### 3. Follow Implementation Guide
+
+Open `IMPLEMENTATION_GUIDE.md` to see your AI-generated development plan:
+
+```markdown
+# Development Plan for my-first-todo-app
+
+## Project Context
+- Template: Golden Path fullstack-todo
+- Tech Stack: React 18 + Node.js + MongoDB + AWS
+
+## Feature Description
+A simple todo app with user authentication
+
+## Implementation Plan
+[Detailed steps based on your feature description]
+
+## Golden Path Compliance Checklist
+[Requirements for backend, frontend, testing, and docs]
+```
+
+### 4. View in Backstage Catalog
+
+Go back to **http://localhost:3000** and:
+
+1. Click **"Catalog"** in the sidebar
+2. Find your new component **"my-first-todo-app"**
+3. View the component details, dependencies, and documentation
+
+## Explore Your Backstage Instance
+
+### Navigation
+
+- **🏠 Home**: Dashboard and overview
+- **📚 Catalog**: Browse components and systems
+- **🔧 Create**: Create new projects from templates
+- **📖 Documentation**: Built-in Mintlify docs
+- **⚙️ Settings**: Configuration and administration
+
+### Key Features
+
+<CardGroup cols={2}>
+  <Card title="Software Catalog" icon="catalog">
+    Discover and track all your software components
+  </Card>
+  <Card title="Software Templates" icon="template">
+    Create projects with standardized templates
+  </Card>
+  <Card title="Documentation" icon="book">
+    Beautiful, searchable documentation with Mintlify
+  </Card>
+  <Card title="Tech Docs" icon="docs">
+    Auto-generated technical documentation
+  </Card>
+</CardGroup>
+
+## Customize Your Experience
+
+### Add Your Logo
+
+1. Create a `docs/logo/` directory
+2. Add your logo files:
+   - `light.svg` for light theme
+   - `dark.svg` for dark theme
+3. Update `docs/mint.json` logo paths
+
+### Configure Integrations
+
+Edit `app-config.local.yaml` to add:
+
+```yaml
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_TOKEN}
+  bitbucket:
+    - host: bitbucket.org
+      username: ${BITBUCKET_USERNAME}
+      appPassword: ${BITBUCKET_PASSWORD}
+```
+
+### Add Custom Templates
+
+1. Create template in `examples/template/`
+2. Update `app-config.yaml` catalog locations
+3. Restart Backstage to see new templates
+
+## Common Tasks
+
+### Create Another Project
+
+Repeat the **Create Project** steps with different parameters:
+- Different feature types (`bugfix`, `refactoring`)
+- Different templates (add your own)
+- Different repositories
+
+### View Component Details
+
+1. Go to **Catalog**
+2. Click on any component
+3. View:
+   - Component metadata
+   - Dependencies
+   - Related components
+   - Documentation
+   - CI/CD status
+
+### Search Documentation
+
+1. Click **Documentation** in sidebar
+2. Use the search bar to find:
+   - Integration guides
+   - API reference
+   - Development tutorials
+   - Troubleshooting help
+
+## Get Help
+
+<AccordionGroup>
+<Accordion title="Template Not Showing">
+**Solution**: Check that your template is registered in `app-config.yaml` and restart Backstage.
+</Accordion>
+
+<Accordion title="GitHub Publishing Fails">
+**Solution**: Verify your GitHub token has `repo` scope and check repository permissions.
+</Accordion>
+
+<Accordion title="Component Not in Catalog">
+**Solution**: Wait a few minutes for catalog refresh, or manually add catalog location.
+</Accordion>
+
+<Accordion title="Documentation Not Loading">
+**Solution**: Check the Mintlify configuration and ensure docs are properly formatted.
+</Accordion>
+</AccordionGroup>
+
+## What's Next?
+
+Now that you have your first project, explore these guides:
+
+- [Development Setup](/development/setup) - Configure your development environment
+- [Template Overview](/templates/overview) - Learn about available templates
+- [Integrations Guide](/integrations/overview) - Set up external services
+- [Deployment Guide](/deployment/overview) - Deploy to production
+
+## Resources
+
+- [Backstage Documentation](https://backstage.io/docs)
+- [Golden Path Guide](https://docs.goldenpath.dev)
+- [GitHub Repository](https://github.com/sayyad-julley/TodoApp)
+- [Community Forum](https://discord.gg/backstage)

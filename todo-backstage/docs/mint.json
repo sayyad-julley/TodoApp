@@ -1,0 +1,106 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Backstage Template",
+  "description": "Complete documentation for the Golden Path Backstage template",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.png",
+  "colors": {
+    "primary": "#3B82F6",
+    "light": "#60A5FA",
+    "dark": "#1D4ED8",
+    "anchors": {
+      "from": "#3B82F6",
+      "to": "#1D4ED8"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/sayyad-julley/TodoApp"
+    },
+    {
+      "name": "Golden Path Docs",
+      "url": "https://docs.goldenpath.dev"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "overview",
+        "project-overview",
+        "golden-path",
+        "installation",
+        "quick-start",
+        "architecture"
+      ]
+    },
+    {
+      "group": "Developer Guide",
+      "pages": [
+        "development/setup",
+        "development/plugins",
+        "development/templates",
+        "development/configuration"
+      ]
+    },
+    {
+      "group": "Templates",
+      "pages": [
+        "templates/overview",
+        "templates/todo-template",
+        "templates/custom-templates"
+      ]
+    },
+    {
+      "group": "Integrations",
+      "pages": [
+        "integrations/traycer",
+        "integrations/github",
+        "integrations/mintlify"
+      ]
+    },
+    {
+      "group": "Deployment",
+      "pages": [
+        "deployment/local",
+        "deployment/docker",
+        "deployment/production"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        {
+          "group": "Backend APIs",
+          "pages": [
+            {
+              "title": "Scaffolder",
+              "openapi": "api-reference/scaffolder.yaml"
+            },
+            {
+              "title": "Catalog",
+              "openapi": "api-reference/catalog.yaml"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/sayyad-julley/TodoApp",
+    "twitter": "https://twitter.com/backstageio"
+  },
+  "analytics": {
+    "posthog": {
+      "apiKey": "phc_YOUR_POSTHOG_API_KEY",
+      "apiHost": "https://app.posthog.com"
+    }
+  },
+  "background": {
+    "pattern": "dots"
+  }
+}

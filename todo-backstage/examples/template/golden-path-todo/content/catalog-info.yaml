@@ -1,0 +1,16 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name }}
+  description: ${{ values.description }}
+  tags:
+    - react
+    - nodejs
+    - postgresql
+    - aws
+    - golden-path
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+

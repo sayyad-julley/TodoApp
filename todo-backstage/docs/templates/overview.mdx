@@ -1,0 +1,482 @@
+---
+title: Template Overview
+description: Understanding and working with Backstage software templates
+---
+
+# Template Overview
+
+Backstage templates enable standardized project creation with pre-configured structures, tools, and best practices.
+
+## What are Templates?
+
+Templates are blueprints for creating new projects that follow your organization's standards. They include:
+
+<CardGroup cols={2}>
+  <Card title="Project Structure" icon="folder">
+    Consistent directory layouts and file organization
+  </Card>
+  <Card title="Configuration" icon="settings">
+    Pre-configured build tools, linters, and CI/CD
+  </Card>
+  <Card title="Documentation" icon="book">
+    Project READMEs, API docs, and guides
+  </Card>
+  <Card title="Integration" icon="plug">
+    GitHub workflows, monitoring, and deployment configs
+  </Card>
+</CardGroup>
+
+## Golden Path Todo Template
+
+The included **Golden Path Fullstack Todo** template creates a production-ready fullstack application with:
+
+### Technology Stack
+
+- **Frontend**: React 18 + Vite + Tailwind CSS
+- **Backend**: Node.js + Express + MongoDB
+- **Testing**: Jest + Cypress
+- **Deployment**: Docker + AWS CloudFormation
+- **Documentation**: Mintlify integration
+
+### Generated Structure
+
+```
+my-todo-app/
+├── IMPLEMENTATION_GUIDE.md      # AI-generated development plan
+├── catalog-info.yaml            # Backstage component registration
+├── README.md                    # Project documentation
+├── docker-compose.yml           # Local development setup
+├── .github/workflows/           # GitHub Actions
+│   ├── ci.yml                   # Continuous integration
+│   └── deploy.yml               # Deployment pipeline
+├── backend/                     # Node.js backend
+│   ├── src/
+│   │   ├── controllers/         # API controllers
+│   │   ├── models/              # Data models
+│   │   ├── routes/              # API routes
+│   │   ├── middleware/          # Custom middleware
+│   │   ├── config/              # Configuration
+│   │   └── server.js            # Server entry point
+│   ├── tests/                   # Backend tests
+│   ├── package.json
+│   └── Dockerfile
+├── frontend/                    # React frontend
+│   ├── src/
+│   │   ├── components/          # React components
+│   │   ├── pages/               # Page components
+│   │   ├── hooks/               # Custom hooks
+│   │   ├── utils/               # Utilities
+│   │   ├── styles/              # CSS/Tailwind
+│   │   └── App.jsx              # App entry point
+│   ├── public/                  # Static assets
+│   ├── tests/                   # Frontend tests
+│   ├── package.json
+│   └── Dockerfile
+└── aws/                         # AWS infrastructure
+    ├── cloudformation/          # CloudFormation templates
+    ├── scripts/                 # Deployment scripts
+    └── infrastructure.yml       # Infrastructure as code
+```
+
+## Template Parameters
+
+### Required Parameters
+
+- **Project Name**: `my-todo-app` (lowercase, hyphens)
+- **Description**: Brief project description
+- **Repository Location**: GitHub repository URL
+
+### Optional Parameters
+
+- **Feature Type**: `feature`, `bugfix`, or `refactoring`
+- **Feature Description**: Detailed description for AI planning
+
+## Template Configuration
+
+### Template Definition
+
+The template is defined in `template.yaml`:
+
+```yaml
+apiVersion: scaffolding.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: golden-path-todo
+  title: Golden Path Fullstack Todo
+  description: Fullstack todo application with AI-generated implementation plan
+spec:
+  type: service
+  parameters:
+    - title: Project Information
+      required: ['name', 'description', 'repoUrl']
+      properties:
+        name:
+          title: Project Name
+          type: string
+          pattern: '^[a-z][a-z0-9-]*$'
+          description: Lowercase, alphanumeric with hyphens
+        description:
+          title: Description
+          type: string
+          description: Brief project description
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+```
+
+### Template Steps
+
+<Steps>
+  <Step title="Fetch Base Template">
+    Downloads the base template structure and files
+  </Step>
+  <Step title="Generate AI Plan">
+    Calls Traycer AI to generate implementation guide
+  </Step>
+  <Step title="Create Implementation Guide">
+    Writes detailed development plan as IMPLEMENTATION_GUIDE.md
+  </Step>
+  <Step title="Publish to GitHub">
+    Creates repository and pushes all files
+  </Step>
+  <Step title="Register Component">
+    Adds component to Backstage catalog
+  </Step>
+</Steps>
+
+## AI Implementation Plans
+
+Each template generates an AI-powered implementation plan that includes:
+
+### Plan Structure
+
+```markdown
+# Development Plan for {project-name}
+
+## Project Context
+- Template: Golden Path fullstack-todo
+- Tech Stack: React 18 + Node.js + MongoDB + AWS
+
+## Feature Description
+{User-provided feature description}
+
+## Specification Reference
+{Technical specifications from Traycer}
+
+## Implementation Plan
+{Detailed step-by-step implementation guide}
+
+## Golden Path Compliance Checklist
+
+### Backend Implementation
+- [ ] Follow RESTful conventions
+- [ ] Use authentication patterns
+- [ ] Implement error handling
+- [ ] Add input validation
+- [ ] Add comprehensive testing
+
+### Frontend Implementation
+- [ ] Follow component patterns
+- [ ] Use Tailwind CSS for styling
+- [ ] Implement proper state management
+- [ ] Add loading and error states
+- [ ] Ensure responsive design
+
+### Testing Requirements
+- [ ] Unit tests for all functions
+- [ ] Integration tests for API endpoints
+- [ ] E2E tests for user flows
+- [ ] Performance tests for critical paths
+
+### Documentation
+- [ ] Update API documentation
+- [ ] Add component documentation
+- [ ] Update architecture diagrams
+- [ ] Create deployment guides
+```
+
+### Feature Type Templates
+
+Different feature types generate specialized plans:
+
+<AccordionGroup>
+<Accordion title="Feature Templates">
+Focus on new functionality:
+- User interface components
+- API endpoints
+- Database schema changes
+- Integration patterns
+</Accordion>
+
+<Accordion title="Bugfix Templates">
+Focus on resolving issues:
+- Root cause analysis
+- Fix implementation
+- Regression testing
+- Documentation updates
+</Accordion>
+
+<Accordion title="Refactoring Templates">
+Focus on code improvement:
+- Code restructuring
+- Performance optimization
+- Technical debt reduction
+- Modernization updates
+</Accordion>
+</AccordionGroup>
+
+## Using Templates
+
+### Step-by-Step Guide
+
+<Steps>
+  <Step title="Access Template">
+    Go to http://localhost:3000/create
+  </Step>
+  <Step title="Select Template">
+    Choose "Golden Path Fullstack Todo"
+  </Step>
+  <Step title="Fill Parameters">
+    Complete the form with project details
+  </Step>
+  <Step title="Execute Template">
+    Click "Create" to generate project
+  </Step>
+  <Step title="Monitor Progress">
+    Track template execution progress
+  </Step>
+  <Step title="Clone Generated Project">
+    Clone the newly created repository
+  </Step>
+  <Step title="Follow Implementation Guide">
+    Use the generated IMPLEMENTATION_GUIDE.md
+  </Step>
+</Steps>
+
+### Template Best Practices
+
+<Warning>
+Always review the generated implementation guide before starting development.
+</Warning>
+
+<CardGroup cols={2}>
+  <Card title="Parameter Validation">
+    • Use descriptive project names
+    • Provide clear descriptions
+    • Ensure repository URLs are correct
+    • Review all parameters before execution
+  </Card>
+  <Card title="After Generation">
+    • Clone the repository immediately
+    • Read the implementation guide
+    • Set up local development
+    • Follow the compliance checklist
+  </Card>
+</CardGroup>
+
+## Custom Templates
+
+### Creating Custom Templates
+
+1. **Create Template Directory**
+   ```bash
+   mkdir examples/template/my-custom-template
+   cd examples/template/my-custom-template
+   ```
+
+2. **Define Template**
+   Create `template.yaml` with metadata and parameters
+
+3. **Add Skeleton Files**
+   Create base project structure in `skeleton/`
+
+4. **Test Template**
+   Use Backstage UI to test template functionality
+
+### Template Directory Structure
+
+```
+my-custom-template/
+├── template.yaml              # Template definition
+├── skeleton/                  # Base project files
+│   ├── package.json
+│   ├── README.md
+│   ├── src/
+│   └── config/
+└── content/                   # Generated content
+    └── catalog-info.yaml
+```
+
+### Template Configuration
+
+```yaml
+apiVersion: scaffolding.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: my-custom-template
+  title: My Custom Template
+  description: Custom template for our organization
+spec:
+  type: service
+  parameters:
+    - title: Project Information
+      required: ['name', 'owner']
+      properties:
+        name:
+          title: Project Name
+          type: string
+          pattern: '^[a-z][a-z0-9-]*$'
+        owner:
+          title: Owner
+          type: string
+          description: Team or individual responsible
+  steps:
+    - id: fetch-base
+      action: fetch:template
+      input:
+        url: ./skeleton
+
+    - id: publish-github
+      action: publish:github
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+```
+
+## Template Actions
+
+### Built-in Actions
+
+- **fetch:template**: Download template skeleton
+- **fetch:plain**: Download plain files
+- **publish:github**: Create GitHub repository
+- **catalog:register**: Register in Backstage catalog
+
+### Custom Actions
+
+The template includes custom Traycer integration:
+
+```typescript
+// packages/backend/src/plugins/scaffolder/actions/traycer-integration.ts
+export const traycerGeneratePlanAction = () => ({
+  action: 'traycer:generate-plan',
+  handler: async (ctx) => {
+    // Generate AI implementation plan
+    const plan = await generateImplementationPlan(
+      ctx.input.spec,
+      ctx.input.featureDescription
+    );
+
+    // Write implementation guide
+    await ctx.output('implementationGuide', plan);
+  }
+});
+```
+
+## Template Examples
+
+### Microservice Template
+
+```yaml
+metadata:
+  name: microservice-template
+  title: Microservice Template
+spec:
+  parameters:
+    - title: Service Configuration
+      properties:
+        serviceName:
+          title: Service Name
+          type: string
+        port:
+          title: Service Port
+          type: number
+          default: 3000
+        database:
+          title: Database Type
+          enum: [postgresql, mongodb, none]
+```
+
+### Frontend Component Template
+
+```yaml
+metadata:
+  name: component-template
+  title: React Component Template
+spec:
+  parameters:
+    - title: Component Information
+      properties:
+        componentName:
+          title: Component Name
+          type: string
+        componentType:
+          title: Component Type
+          enum: [page, layout, ui, form]
+        withTests:
+          title: Include Tests
+          type: boolean
+          default: true
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Template Execution Fails">
+**Common Issues**:
+- Invalid template YAML syntax
+- Missing required parameters
+- Network connectivity issues
+- GitHub authentication problems
+
+**Solutions**:
+- Validate YAML syntax
+- Check parameter requirements
+- Verify network connection
+- Confirm GitHub token permissions
+</Accordion>
+
+<Accordion title="Generated Project Issues">
+**Common Issues**:
+- Invalid file permissions
+- Missing dependencies
+- Configuration errors
+- Build failures
+
+**Solutions**:
+- Check file permissions
+- Run `npm install` or `yarn install`
+- Verify configuration files
+- Review build logs
+</Accordion>
+
+<Accordion title="AI Plan Generation Fails">
+**Common Issues**:
+- Traycer API unavailable
+- Invalid feature specifications
+- Network timeouts
+
+**Solutions**:
+- Check API connectivity
+- Verify feature descriptions
+- Try manual plan generation
+- Use fallback local generation
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+- [Development Setup](/development/setup) - Configure development environment
+- [Template Development](/development/templates) - Create custom templates
+- [Integration Guide](/integrations/overview) - Set up external integrations
+- [Deployment Guide](/deployment/overview) - Deploy generated projects
+
+## Additional Resources
+
+- [Backstage Template Documentation](https://backstage.io/docs/features/software-templates/)
+- [Template API Reference](https://backstage.io/docs/features/software-templates/writing-templates)
+- [Scaffolder Actions](https://backstage.io/docs/features/software-templates/writing-custom-actions)
+- [Template Examples](https://github.com/backstage/backstage/tree/master/plugins/scaffolder-backend/sample-templates)

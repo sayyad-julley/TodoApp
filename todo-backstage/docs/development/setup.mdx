@@ -1,0 +1,424 @@
+---
+title: Development Setup
+description: Configure your development environment for Backstage template development
+---
+
+# Development Setup
+
+This guide covers setting up your development environment for working with the Backstage template.
+
+## Prerequisites
+
+- Completed [Installation](/installation)
+- Node.js 18+ and Yarn installed
+- Git configured
+- VS Code (recommended) or your preferred IDE
+
+## Development Workflow
+
+### Local Development
+
+<Steps>
+  <Step title="Start Development Server">
+    ```bash
+    cd todo-backstage
+    yarn start
+    ```
+  </Step>
+  <Step title="Open Browser">
+    Navigate to http://localhost:3000
+  </Step>
+  <Step title="Login as Guest">
+    Click "Enter" to use guest authentication
+  </Step>
+</Steps>
+
+### Code Structure Understanding
+
+```
+todo-backstage/
+├── packages/
+│   ├── app/           # Frontend React application
+│   └── backend/       # Node.js backend application
+├── examples/
+│   └── template/      # Software templates
+├── docs/              # Mintlify documentation
+└── plugins/           # Custom plugins (if any)
+```
+
+## Frontend Development
+
+### Directory Structure
+
+```
+packages/app/src/
+├── components/        # Reusable React components
+├── pages/            # Page components
+├── hooks/            # Custom React hooks
+├── themes/           # Material-UI themes
+├── utilities/        # Helper functions
+└── App.tsx           # Main application component
+```
+
+### Adding New Pages
+
+1. Create page component in `packages/app/src/pages/`
+2. Add route in `packages/app/src/App.tsx`
+3. Add navigation item in `packages/app/src/components/Root/`
+
+```typescript
+// packages/app/src/pages/MyPage.tsx
+import React from 'react';
+
+export const MyPage = () => (
+  <div>
+    <h1>My Custom Page</h1>
+    <p>Welcome to my custom Backstage page!</p>
+  </div>
+);
+```
+
+### Creating Components
+
+```typescript
+// packages/app/src/components/MyComponent.tsx
+import React from 'react';
+
+interface MyComponentProps {
+  title: string;
+  description?: string;
+}
+
+export const MyComponent: React.FC<MyComponentProps> = ({
+  title,
+  description
+}) => (
+  <div>
+    <h2>{title}</h2>
+    {description && <p>{description}</p>}
+  </div>
+);
+```
+
+### Styling
+
+The template uses Material-UI for styling:
+
+```typescript
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    padding: theme.spacing(2),
+    backgroundColor: theme.palette.background.paper,
+  },
+}));
+```
+
+## Backend Development
+
+### Directory Structure
+
+```
+packages/backend/src/
+├── plugins/          # Custom backend plugins
+├── services/         # Core services
+├── database/         # Database configurations
+├── config/          # Configuration files
+└── index.ts         # Backend entry point
+```
+
+### Creating Custom Plugins
+
+1. Create plugin directory in `packages/backend/src/plugins/`
+2. Implement plugin interface
+3. Register plugin in `packages/backend/src/index.ts`
+
+```typescript
+// packages/backend/src/plugins/my-plugin/plugin.ts
+import { createRouter } from '@backstage/plugin-permission-node';
+import { Router } from 'express';
+
+export default async function createPlugin(): Promise<Router> {
+  return await createRouter({
+    config: {},
+  });
+}
+```
+
+### Custom API Endpoints
+
+```typescript
+// packages/backend/src/plugins/my-plugin/router.ts
+import { Router } from 'express';
+import { errorHandler } from '@backstage/backend-common';
+
+export async function createRouter(): Promise<Router> {
+  const router = Router();
+
+  router.get('/health', (_, res) => {
+    res.json({ status: 'ok' });
+  });
+
+  router.use(errorHandler());
+  return router;
+}
+```
+
+## Template Development
+
+### Creating New Templates
+
+1. Create template in `examples/template/`
+2. Define `template.yaml`
+3. Add skeleton files
+4. Test with Backstage scaffolder
+
+```yaml
+# examples/template/my-template/template.yaml
+apiVersion: scaffolding.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: my-template
+  title: My Custom Template
+spec:
+  type: service
+  parameters:
+    - title: Project Information
+      required: ['name', 'description']
+      properties:
+        name:
+          title: Name
+          type: string
+        description:
+          title: Description
+          type: string
+  steps:
+    - id: fetch
+      action: fetch:template
+      input:
+        url: ./skeleton
+```
+
+### Testing Templates
+
+<Steps>
+  <Step title="Start Backstage">
+    ```bash
+    yarn start
+    ```
+  </Step>
+  <Step title="Navigate to Create">
+    Go to http://localhost:3000/create
+  </Step>
+  <Step title="Select Template">
+    Choose your template from the list
+  </Step>
+  <Step title="Test Parameters">
+    Fill in form and test template execution
+  </Step>
+</Steps>
+
+## Database Development
+
+### Local Development
+
+For development, the template uses SQLite by default:
+
+```yaml
+# app-config.local.yaml
+database:
+  client: better-sqlite3
+  connection: ':memory:'
+```
+
+### PostgreSQL Setup
+
+For production-like development:
+
+```yaml
+# app-config.local.yaml
+database:
+  client: pg
+  connection:
+    host: localhost
+    port: 5432
+    user: postgres
+    password: password
+    database: backstage_dev
+```
+
+### Migrations
+
+Database migrations are handled automatically by Backstage.
+
+```bash
+# Run migrations manually (if needed)
+yarn workspace backend start
+```
+
+## Testing
+
+### Frontend Testing
+
+```bash
+# Run frontend tests
+yarn workspace app test
+
+# Run tests in watch mode
+yarn workspace app test --watch
+
+# Run with coverage
+yarn workspace app test --coverage
+```
+
+### Backend Testing
+
+```bash
+# Run backend tests
+yarn workspace backend test
+
+# Run integration tests
+yarn test
+```
+
+### E2E Testing
+
+```bash
+# Run E2E tests with Playwright
+yarn test:e2e
+
+# Run specific E2E test
+yarn test:e2e -- tests/create-template.spec.ts
+```
+
+## Debugging
+
+### Frontend Debugging
+
+1. Open browser developer tools
+2. Use React Developer Tools extension
+3. Check Network tab for API calls
+4. Console logs for errors
+
+### Backend Debugging
+
+<CodeGroup>
+```bash VS Code
+# Create .vscode/launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Backend",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/packages/backend/src/index.ts",
+      "outFiles": ["${workspaceFolder}/packages/backend/dist/**/*.js"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "runtimeArgs": ["-r", "ts-node/register"]
+    }
+  ]
+}
+```
+
+```bash Chrome
+# Debug with Chrome DevTools
+node --inspect packages/backend/src/index.ts
+# Then open chrome://inspect
+```
+
+```bash Terminal
+# Enable debug logging
+DEBUG=backstage:* yarn start
+```
+</CodeGroup>
+
+### Common Issues
+
+<AccordionGroup>
+<Accordion title="Hot Reloading Not Working">
+**Solution**: Check that file watching is enabled and files are being saved properly.
+</Accordion>
+
+<Accordion title="Template Not Showing">
+**Solution**: Verify template YAML syntax and restart backend.
+</Accordion>
+
+<Accordion title="Database Connection Errors">
+**Solution**: Check database configuration and ensure database server is running.
+</Accordion>
+
+<Accordion title="CORS Errors">
+**Solution**: Check backend CORS configuration in `app-config.yaml`.
+</Accordion>
+</AccordionGroup>
+
+## IDE Configuration
+
+### VS Code Extensions
+
+Recommended VS Code extensions for development:
+
+```json
+{
+  "recommendations": [
+    "ms-vscode.vscode-typescript-next",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-json",
+    "redhat.vscode-yaml",
+    "ms-vscode.vscode-eslint"
+  ]
+}
+```
+
+### VS Code Settings
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.organizeImports": true
+  },
+  "typescript.preferences.importModuleSpecifier": "relative"
+}
+```
+
+## Git Hooks
+
+The template includes pre-commit hooks for code quality:
+
+```bash
+# Install husky hooks
+yarn install
+
+# Hooks will run automatically on commit
+git commit -m "feat: add new feature"
+```
+
+## Performance Tips
+
+### Frontend Performance
+
+- Use React.memo for component optimization
+- Implement proper loading states
+- Use code splitting for large components
+- Optimize bundle size with tree shaking
+
+### Backend Performance
+
+- Use database connection pooling
+- Implement proper caching strategies
+- Monitor API response times
+- Use appropriate HTTP caching headers
+
+## Next Steps
+
+- [Template Development](/development/templates) - Create custom templates
+- [Plugin Development](/development/plugins) - Build custom plugins
+- [Deployment Guide](/deployment/overview) - Deploy to production
+- [API Reference](/api-reference/overview) - API documentation

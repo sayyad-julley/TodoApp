@@ -1,0 +1,491 @@
+---
+title: TodoApp Golden Path Project
+description: Complete overview of the TodoApp Golden Path project and its components
+---
+
+# TodoApp Golden Path Project
+
+This document provides a comprehensive overview of the TodoApp Golden Path project, its architecture, components, and how to work with it.
+
+## Project Overview
+
+The TodoApp Golden Path project is a comprehensive, production-ready fullstack application that demonstrates modern development practices, infrastructure as code, and continuous integration/deployment (CI/CD) patterns.
+
+![TodoApp Architecture](https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/c6c586c5-be6d-45ec-b3b7-e8393697b90d/d3718e8e61943ae0658ebb8138c6779b.png?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1762235180&Signature=HERAqKFTO/U67iXskaAAQKorYoc=)
+
+### Key Features
+
+<CardGroup cols={2}>
+  <Card title="Fullstack Architecture" icon="layers">
+    React 18 frontend + Node.js backend + MongoDB database
+  </Card>
+  <Card title="Cloud Native" icon="cloud">
+    AWS infrastructure with CloudFormation and serverless components
+  </Card>
+  <Card title="Golden Path Compliance" icon="path">
+    Follows established patterns and best practices
+  </Card>
+  <Card title="DevOps Ready" icon="pipeline">
+    Complete CI/CD pipeline with automated testing and deployment
+  </Card>
+  <Card title="Developer Experience" icon="code">
+    Hot reloading, debugging tools, and comprehensive docs
+  </Card>
+  <Card title="Production Ready" icon="shield">
+    Monitoring, logging, error handling, and security best practices
+  </Card>
+</CardGroup>
+
+## Project Structure
+
+```
+TodoApp-GoldenPath/
+├── golden-path/                    # Golden path templates and configurations
+│   ├── docs/                       # Mintlify documentation
+│   ├── templates/                  # Project templates
+│   │   └── fullstack-todo/         # Fullstack todo template
+│   ├── scripts/                    # Utility scripts
+│   └── traycer/                    # Traycer AI integration
+├── todo-backstage/                 # Backstage instance
+│   ├── packages/                   # Frontend and backend applications
+│   ├── examples/template/          # Software templates
+│   └── docs/                       # Backstage documentation
+├── todo-template/                  # Generated template example
+├── scripts/                        # Project-level scripts
+└── docker-compose.yml              # Local development setup
+```
+
+## Architecture Components
+
+### Frontend Layer
+
+**Technology Stack:**
+- **React 18**: Modern React with hooks and concurrent features
+- **Vite**: Fast development server and optimized builds
+- **Tailwind CSS**: Utility-first CSS framework
+- **React Query**: Server state management and caching
+- **React Router**: Client-side routing
+
+**Key Features:**
+- Component-based architecture
+- Responsive design with mobile-first approach
+- Real-time updates and notifications
+- Error boundaries and graceful error handling
+- Performance optimization with code splitting
+
+### Backend Layer
+
+**Technology Stack:**
+- **Node.js**: Server runtime environment
+- **Express.js**: Web framework
+- **MongoDB**: NoSQL database
+- **Mongoose**: MongoDB object modeling
+- **JWT**: Authentication and authorization
+
+**Key Features:**
+- RESTful API design
+- Middleware for logging, error handling, and security
+- Database connection pooling and optimization
+- Comprehensive input validation and sanitization
+- Rate limiting and DDoS protection
+
+### Infrastructure Layer
+
+**AWS Services:**
+- **CloudFormation**: Infrastructure as Code (IaC)
+- **Lambda**: Serverless compute functions
+- **API Gateway**: API management and routing
+- **DynamoDB**: Serverless database
+- **S3**: Object storage and static assets
+- **CloudFront**: CDN and content delivery
+
+**DevOps Components:**
+- **GitHub Actions**: CI/CD pipeline automation
+- **Docker**: Containerization and deployment
+- **Monitoring**: CloudWatch and custom metrics
+- **Logging**: Structured logging with correlation IDs
+- **Security**: AWS WAF, IAM roles, and encryption
+
+## Golden Path Patterns
+
+### Development Workflow
+
+<Steps>
+  <Step title="Feature Development">
+    Create feature branches following GitFlow patterns
+  </Step>
+  <Step title="Code Quality">
+    Automated linting, testing, and code reviews
+  </Step>
+  <Step title="Testing Strategy">
+    Unit tests, integration tests, and E2E testing
+  </Step>
+  <Step title="Continuous Integration">
+    Automated builds, tests, and security scans
+  </Step>
+  <Step title="Deployment">
+    Zero-downtime deployments with rollbacks
+  </Step>
+  <Step title="Monitoring">
+    Application performance monitoring and alerting
+  </Step>
+</Steps>
+
+### Code Organization
+
+```javascript
+// Component pattern example
+import React, { useState, useEffect } from 'react';
+import { useQuery } from 'react-query';
+
+const TodoList = () => {
+  const [todos, setTodos] = useState([]);
+
+  const { data, isLoading, error } = useQuery(
+    'todos',
+    async () => {
+      const response = await fetch('/api/todos');
+      return response.json();
+    }
+  );
+
+  // Error handling with boundaries
+  if (error) {
+    return <ErrorBoundary error={error} />;
+  }
+
+  // Loading states
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  return (
+    <div className="todo-list">
+      {data?.map(todo => (
+        <TodoItem key={todo.id} todo={todo} />
+      ))}
+    </div>
+  );
+};
+```
+
+### API Design Patterns
+
+```javascript
+// RESTful API pattern with proper error handling
+const router = express.Router();
+
+// Input validation middleware
+router.post('/todos',
+  validateTodoInput,
+  async (req, res, next) => {
+    try {
+      const todo = await TodoService.create(req.body);
+      res.status(201).json({
+        success: true,
+        data: todo,
+        message: 'Todo created successfully'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Error handling middleware
+const errorHandler = (error, req, res, next) => {
+  const status = error.status || 500;
+  const message = error.message || 'Internal server error';
+
+  res.status(status).json({
+    success: false,
+    error: {
+      message,
+      ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+    }
+  });
+};
+```
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- Docker and Docker Compose
+- MongoDB (local or Atlas)
+- AWS CLI (for infrastructure management)
+
+### Setup Instructions
+
+<Steps>
+  <Step title="Clone Repository">
+    ```bash
+    git clone https://github.com/sayyad-julley/TodoApp
+    cd TodoApp-GoldenPath
+    ```
+  </Step>
+  <Step title="Start Local Services">
+    ```bash
+    # Start MongoDB and other services
+    docker-compose up -d
+
+    # Install dependencies
+    npm install
+    ```
+  </Step>
+  <Step title="Configure Environment">
+    ```bash
+    cp .env.example .env
+    # Edit .env with your configuration
+    ```
+  </Step>
+  <Step title="Start Development Servers">
+    ```bash
+    # Start backend (port 7007)
+    npm run dev:backend
+
+    # Start frontend (port 3000)
+    npm run dev:frontend
+    ```
+  </Step>
+</Steps>
+
+### Development Features
+
+- **Hot Reloading**: Automatic browser refresh on code changes
+- **Error Boundaries**: Graceful error handling in React components
+- **API Mocking**: Mock API responses for frontend development
+- **Database Seeding**: Sample data for development and testing
+- **Debug Support**: Source maps and debugging configurations
+
+## Testing Strategy
+
+### Test Types
+
+<CardGroup cols={2}>
+  <Card title="Unit Tests" icon="test-tube">
+    Jest and React Testing Library for component logic
+  </Card>
+  <Card title="Integration Tests" icon="link">
+    API endpoint testing with realistic data flows
+  </Card>
+  <Card title="E2E Tests" icon="browser">
+    Cypress for full user journey testing
+  </Card>
+  <Card title="Performance Tests" icon="speed">
+    Lighthouse CI and load testing
+  </Card>
+</CardGroup>
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run with coverage
+npm run test:coverage
+
+# Run E2E tests
+npm run test:e2e
+
+# Run specific test file
+npm test -- TodoList.test.js
+```
+
+## Deployment
+
+### Deployment Pipeline
+
+The project includes a comprehensive CI/CD pipeline using GitHub Actions:
+
+<AccordionGroup>
+<Accordion title="Build Stage">
+- Code compilation and bundling
+- Asset optimization and minification
+- Security vulnerability scanning
+- Dependency vulnerability checks
+</Accordion>
+
+<Accordion title="Test Stage">
+- Automated test execution
+- Code quality checks
+- Performance testing
+- Security scanning
+</Accordion>
+
+<Accordion title="Deploy Stage">
+- Infrastructure provisioning with CloudFormation
+- Application deployment with zero downtime
+- Health checks and monitoring setup
+- Rollback capabilities
+</Accordion>
+</AccordionGroup>
+
+### Environments
+
+- **Development**: Local development with hot reloading
+- **Staging**: Production-like environment for testing
+- **Production**: Live environment with monitoring and alerts
+
+### Deployment Commands
+
+```bash
+# Deploy to staging
+npm run deploy:staging
+
+# Deploy to production
+npm run deploy:production
+
+# Infrastructure update
+npm run deploy:infrastructure
+```
+
+## Monitoring and Observability
+
+### Application Monitoring
+
+- **Health Checks**: `/health` endpoint for service status
+- **Metrics**: Custom business and performance metrics
+- **Logging**: Structured JSON logging with correlation IDs
+- **Error Tracking**: Sentry integration for error monitoring
+
+### Infrastructure Monitoring
+
+- **CloudWatch**: AWS service monitoring and alerting
+- **Application Insights**: Deep application performance monitoring
+- **Custom Dashboards**: Grafana dashboards for business metrics
+
+## Security Considerations
+
+### Application Security
+
+- **Authentication**: JWT-based authentication with refresh tokens
+- **Authorization**: Role-based access control (RBAC)
+- **Input Validation**: Comprehensive input sanitization
+- **CORS**: Proper cross-origin resource sharing configuration
+- **Rate Limiting**: API endpoint protection
+
+### Infrastructure Security
+
+- **IAM Roles**: Principle of least privilege
+- **VPC**: Network isolation and security groups
+- **Encryption**: Data at rest and in transit encryption
+- **Secrets Management**: AWS Secrets Manager for sensitive data
+- **Compliance**: SOC2 and GDPR compliance considerations
+
+## Performance Optimization
+
+### Frontend Optimization
+
+- **Code Splitting**: Lazy loading of components and routes
+- **Bundle Analysis**: Webpack bundle analyzer integration
+- **Image Optimization**: Automatic image compression and CDN delivery
+- **Caching**: Browser and CDN caching strategies
+
+### Backend Optimization
+
+- **Database Indexing**: Optimized database queries
+- **Connection Pooling**: Database connection management
+- **Caching Layer**: Redis for frequently accessed data
+- **API Optimization**: Response compression and pagination
+
+## Contributing Guidelines
+
+### Development Workflow
+
+1. **Fork** the repository
+2. **Create** a feature branch from `develop`
+3. **Implement** your changes with tests
+4. **Run** the test suite and ensure all tests pass
+5. **Submit** a pull request with detailed description
+
+### Code Standards
+
+- **ESLint**: JavaScript/TypeScript linting rules
+- **Prettier**: Code formatting standards
+- **Husky**: Pre-commit hooks for code quality
+- **Conventional Commits**: Standardized commit message format
+
+### Review Process
+
+- **Code Review**: Required for all changes
+- **Automated Checks**: CI/CD pipeline validation
+- **Security Review**: Required for security-related changes
+- **Documentation**: Updated documentation for new features
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+<Accordion title="Development Server Issues">
+**Problem**: Development server fails to start
+**Solution**: Check port availability and environment variables
+</Accordion>
+
+<Accordion title="Database Connection Errors">
+**Problem**: Cannot connect to MongoDB
+**Solution**: Verify connection string and database availability
+</Accordion>
+
+<Accordion title="Build Failures">
+**Problem**: Production build fails
+**Solution**: Check for missing dependencies and configuration errors
+</Accordion>
+
+<Accordion title="Deployment Issues">
+**Problem**: Deployment fails in CI/CD
+**Solution**: Check logs and environment configuration
+</Accordion>
+</AccordionGroup>
+
+### Debugging Tips
+
+- Use browser developer tools for frontend debugging
+- Check browser console for JavaScript errors
+- Use network tab to inspect API calls and responses
+- Review server logs for backend issues
+- Use AWS CloudWatch logs for infrastructure problems
+
+## Roadmap
+
+### Upcoming Features
+
+- **Real-time Collaboration**: WebSocket-based real-time updates
+- **Mobile App**: React Native mobile application
+- **Advanced Analytics**: Machine learning-powered insights
+- **Multi-tenant Support**: SaaS architecture capabilities
+- **API Gateway**: Enhanced API management and security
+
+### Technology Updates
+
+- **React 19**: Latest React features and optimizations
+- **Node.js 22**: Latest Node.js performance improvements
+- **GraphQL**: GraphQL API for advanced querying
+- **Microservices**: Microservices architecture migration
+- **Edge Computing**: CDN edge functions for better performance
+
+## Resources
+
+### Documentation
+
+- [API Reference](/api-reference/overview)
+- [Development Guide](/development/setup)
+- [Deployment Guide](/deployment/overview)
+- [Architecture Overview](/architecture)
+
+### External Links
+
+- [GitHub Repository](https://github.com/sayyad-julley/TodoApp)
+- [Project Dashboard](https://dashboard.todoapp.goldenpath.dev)
+- [Monitoring Dashboard](https://monitoring.todoapp.goldenpath.dev)
+- [API Documentation](https://api.todoapp.goldenpath.dev/docs)
+
+### Support
+
+- **Issues**: [GitHub Issues](https://github.com/sayyad-julley/TodoApp/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/sayyad-julley/TodoApp/discussions)
+- **Email**: support@todoapp.goldenpath.dev
+- **Documentation**: [docs.todoapp.goldenpath.dev](https://docs.todoapp.goldenpath.dev)

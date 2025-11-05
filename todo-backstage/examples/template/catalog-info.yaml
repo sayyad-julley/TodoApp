@@ -1,0 +1,22 @@
+apiVersion: backstage.io/v1alpha1
+kind: Template
+metadata:
+  name: fullstack-todo-template
+  title: Full-Stack Todo Application Template
+  description: A comprehensive, production-ready todo application template with React frontend, Node.js backend, MongoDB database, JWT authentication, and Docker support
+  tags:
+    - todo
+    - react
+    - nodejs
+    - mongodb
+    - jwt
+    - docker
+    - fullstack
+    - template
+spec:
+  type: template
+  lifecycle: production
+  owner: user:guest
+  system: templates
+  dependsOn: []
+  

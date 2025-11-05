@@ -1,0 +1,104 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: fullstack-todo-template
+  title: Full-Stack Todo Application Template
+  links:
+    - url: https://github.com/sayyad-julley/todo-template/blob/main/todo-template/examples/template/template.yaml
+      title: Git template
+      icon: template
+  description: A comprehensive, production-ready todo application template with React frontend, Node.js backend, MongoDB database, JWT authentication, and Docker support
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+    # Uncomment and update if you want VIEW SOURCE to link to a GitHub repository:
+    # backstage.io/source-location: url:https://github.com/your-org/your-repo/tree/main/path/to/template
+spec:
+  owner: user:guest
+  type: service
+
+  # These parameters are used to generate the input form in the frontend, and are
+  # used to gather input data for the execution of the template.
+  parameters:
+    - title: Application Information
+      required:
+        - name
+        - description
+      properties:
+        name:
+          title: Application Name
+          type: string
+          description: Unique name of your todo application (e.g., my-awesome-todo)
+          ui:autofocus: true
+          ui:options:
+            rows: 1
+        description:
+          title: Description
+          type: string
+          description: Brief description of your todo application
+          ui:options:
+            rows: 2
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  # These steps are executed in the scaffolder backend, using data that we gathered
+  # via the parameters above.
+  steps:
+    # Each step executes an action, in this case one templates files into the working directory.
+    - id: fetch-base
+      name: Create Todo Application
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+
+    # This step publishes the contents of the working directory to GitHub.
+    # If you or your organization prefer another default branch name over 'main'
+    # you can change that here.
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        description: ${{ parameters.description }}
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: 'main'
+
+    # The final step is to register our new component in the catalog.
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+    # Let's notify the user that the template has completed using the Notification action
+    - id: notify
+      name: Notify
+      action: notification:send
+      input:
+        recipients: entity
+        entityRefs:
+          - user:default/guest
+        title: 'Todo Application Created Successfully!'
+        info: 'Your full-stack todo application "${{ parameters.name }}" has been created and is ready for development.'
+        severity: 'normal'
+
+  # Outputs are displayed to the user after a successful execution of the template.
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

@@ -1,0 +1,737 @@
+---
+title: Golden Path Templates
+description: Comprehensive guide to the Golden Path templates and development patterns
+---
+
+# Golden Path Templates
+
+Golden Path templates provide standardized, opinionated patterns for building modern web applications. This project demonstrates a complete implementation of Golden Path principles.
+
+## What is Golden Path?
+
+Golden Path represents the recommended, most efficient way to build and deploy applications within an organization. It encompasses:
+
+<CardGroup cols={2}>
+  <Card title="Standardized Patterns" icon="pattern">
+    Consistent approaches to common development challenges
+  </Card>
+  <Card title="Best Practices" icon="star">
+    Industry-proven techniques and methodologies
+  </Card>
+  <Card title="Developer Experience" icon="developer">
+    Optimized workflows and tooling for developers
+  </Card>
+  <Card title="Operational Excellence" icon="ops">
+    Production-ready deployment and monitoring patterns
+  </Card>
+</CardGroup>
+
+## Golden Path Template Structure
+
+### Fullstack Todo Template
+
+The project includes a comprehensive fullstack template that serves as the foundation for building modern web applications.
+
+```
+golden-path/templates/fullstack-todo/
+├── template.yaml                    # Backstage template definition
+├── backend/                         # Node.js backend application
+│   ├── src/
+│   │   ├── controllers/             # API route handlers
+│   │   │   ├── todoController.js
+│   │   │   └── userController.js
+│   │   ├── models/                  # Data models and schemas
+│   │   │   ├── Todo.js
+│   │   │   └── User.js
+│   │   ├── routes/                  # API route definitions
+│   │   │   ├── todos.js
+│   │   │   └── users.js
+│   │   ├── middleware/              # Custom middleware
+│   │   │   ├── auth.js
+│   │   │   ├── validation.js
+│   │   │   └── errorHandler.js
+│   │   ├── config/                  # Configuration files
+│   │   │   ├── database.js
+│   │   │   └── server.js
+│   │   ├── tests/                   # Backend tests
+│   │   └── server.js                # Application entry point
+│   ├── package.json
+│   ├── Dockerfile
+│   └── .env.example
+├── frontend/                        # React frontend application
+│   ├── src/
+│   │   ├── components/              # Reusable React components
+│   │   │   ├── common/              # Shared components
+│   │   │   │   ├── Header.jsx
+│   │   │   │   ├── Footer.jsx
+│   │   │   │   └── LoadingSpinner.jsx
+│   │   │   ├── todo/                # Todo-specific components
+│   │   │   │   ├── TodoList.jsx
+│   │   │   │   ├── TodoItem.jsx
+│   │   │   │   └── TodoForm.jsx
+│   │   │   └── user/                # User-related components
+│   │   │       ├── LoginForm.jsx
+│   │   │       └── UserProfile.jsx
+│   │   ├── pages/                   # Page-level components
+│   │   │   ├── HomePage.jsx
+│   │   │   ├── TodoPage.jsx
+│   │   │   └── SettingsPage.jsx
+│   │   ├── hooks/                   # Custom React hooks
+│   │   │   ├── useAuth.js
+│   │   │   ├── useTodos.js
+│   │   │   └── useLocalStorage.js
+│   │   ├── utils/                   # Utility functions
+│   │   │   ├── api.js
+│   │   │   ├── validation.js
+│   │   │   └── helpers.js
+│   │   ├── styles/                  # CSS and styling
+│   │   │   ├── globals.css
+│   │   │   └── components.css
+│   │   └── App.jsx                  # Main application component
+│   ├── public/
+│   │   ├── index.html
+│   │   └── favicon.ico
+│   ├── tests/                       # Frontend tests
+│   ├── package.json
+│   ├── vite.config.js               # Vite configuration
+│   ├── Dockerfile
+│   └── tailwind.config.js           # Tailwind CSS configuration
+├── aws/                             # AWS infrastructure
+│   ├── cloudformation/
+│   │   ├── infrastructure.yml       # Main CloudFormation template
+│   │   ├── lambda-functions.yml     # Lambda function definitions
+│   │   └── networking.yml           # VPC and security groups
+│   ├── scripts/
+│   │   ├── deploy.sh                # Deployment script
+│   │   └── setup-infrastructure.sh  # Infrastructure setup
+│   └── sam-template.yaml            # Serverless Application Model
+├── .github/                         # GitHub workflows
+│   └── workflows/
+│       ├── ci.yml                   # Continuous Integration
+│       ├── deploy-staging.yml       # Staging deployment
+│       ├── deploy-production.yml    # Production deployment
+│       └── security-scan.yml        # Security scanning
+├── docker-compose.yml               # Local development setup
+├── docker-compose.prod.yml          # Production docker setup
+├── package.json                     # Root package dependencies
+├── README.md                        # Project documentation
+├── IMPLEMENTATION_GUIDE.md          # AI-generated implementation guide
+└── catalog-info.yaml                # Backstage catalog registration
+```
+
+## Golden Path Patterns
+
+### 1. Development Patterns
+
+#### Code Organization
+
+```javascript
+// Consistent file naming and structure
+// Component files use PascalCase
+// Utility files use camelCase
+// Constants use UPPER_SNAKE_CASE
+
+// Example: TodoList.jsx
+import React, { useState, useEffect } from 'react';
+import { useTodos } from '../hooks/useTodos';
+import { TodoItem } from './TodoItem';
+import { LoadingSpinner } from '../common/LoadingSpinner';
+
+export const TodoList = ({ userId }) => {
+  const { todos, loading, error, createTodo, updateTodo, deleteTodo } = useTodos(userId);
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
+
+  return (
+    <div className="todo-list">
+      <h2>My Todos</h2>
+      {todos.map(todo => (
+        <TodoItem
+          key={todo.id}
+          todo={todo}
+          onUpdate={updateTodo}
+          onDelete={deleteTodo}
+        />
+      ))}
+    </div>
+  );
+};
+```
+
+#### State Management
+
+```javascript
+// Custom hooks for state management
+// Separation of concerns
+// Reusable logic
+
+// Example: useTodos.js
+import { useState, useEffect, useCallback } from 'react';
+import { todoApi } from '../utils/api';
+
+export const useTodos = (userId) => {
+  const [todos, setTodos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchTodos = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await todoApi.getTodos(userId);
+      setTodos(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId]);
+
+  const createTodo = useCallback(async (todoData) => {
+    try {
+      const newTodo = await todoApi.createTodo(userId, todoData);
+      setTodos(prev => [...prev, newTodo]);
+      return newTodo;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    fetchTodos();
+  }, [fetchTodos]);
+
+  return {
+    todos,
+    loading,
+    error,
+    createTodo,
+    refetch: fetchTodos
+  };
+};
+```
+
+### 2. API Design Patterns
+
+#### RESTful API Structure
+
+```javascript
+// Consistent API patterns
+// Proper HTTP methods and status codes
+// Input validation and error handling
+
+// Example: todoController.js
+const todoController = {
+  // GET /api/todos
+  getAllTodos: async (req, res) => {
+    try {
+      const { userId } = req.auth;
+      const { page = 1, limit = 10, status } = req.query;
+
+      const todos = await TodoService.getTodos(userId, {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        status
+      });
+
+      res.json({
+        success: true,
+        data: todos,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total: todos.length
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // POST /api/todos
+  createTodo: async (req, res, next) => {
+    try {
+      const { userId } = req.auth;
+      const todoData = req.body;
+
+      // Input validation
+      const validatedData = validateTodoInput(todoData);
+
+      const todo = await TodoService.createTodo(userId, validatedData);
+
+      res.status(201).json({
+        success: true,
+        data: todo,
+        message: 'Todo created successfully'
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // PUT /api/todos/:id
+  updateTodo: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { userId } = req.auth;
+      const updateData = req.body;
+
+      const todo = await TodoService.updateTodo(id, userId, updateData);
+
+      res.json({
+        success: true,
+        data: todo,
+        message: 'Todo updated successfully'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+};
+```
+
+#### Middleware Patterns
+
+```javascript
+// Consistent middleware for cross-cutting concerns
+// Authentication, authorization, logging, validation
+
+// Example: auth.js
+const jwt = require('jsonwebtoken');
+const { User } = require('../models/User');
+
+const authenticateToken = async (req, res, next) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'Access token required' }
+      });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'Invalid token' }
+      });
+    }
+
+    req.auth = { userId: user._id, email: user.email };
+    next();
+  } catch (error) {
+    return res.status(403).json({
+      success: false,
+      error: { message: 'Invalid token' }
+    });
+  }
+};
+
+module.exports = { authenticateToken };
+```
+
+### 3. Testing Patterns
+
+#### Unit Testing
+
+```javascript
+// Jest and React Testing Library patterns
+// Test components in isolation
+// Focus on behavior, not implementation
+
+// Example: TodoList.test.js
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { TodoList } from '../TodoList';
+import { todoApi } from '../../utils/api';
+
+// Mock the API
+jest.mock('../../utils/api');
+
+describe('TodoList', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('displays loading spinner initially', () => {
+    todoApi.getTodos.mockResolvedValue([]);
+
+    render(<TodoList userId="123" />);
+
+    expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+  });
+
+  it('displays todos when loaded', async () => {
+    const mockTodos = [
+      { id: '1', title: 'Test Todo 1', completed: false },
+      { id: '2', title: 'Test Todo 2', completed: true }
+    ];
+
+    todoApi.getTodos.mockResolvedValue(mockTodos);
+
+    render(<TodoList userId="123" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Todo 1')).toBeInTheDocument();
+      expect(screen.getByText('Test Todo 2')).toBeInTheDocument();
+    });
+  });
+
+  it('creates new todo when form is submitted', async () => {
+    const mockNewTodo = { id: '3', title: 'New Todo', completed: false };
+    todoApi.getTodos.mockResolvedValue([]);
+    todoApi.createTodo.mockResolvedValue(mockNewTodo);
+
+    render(<TodoList userId="123" />);
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Add new todo')).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByPlaceholderText('Add new todo'), {
+      target: { value: 'New Todo' }
+    });
+
+    fireEvent.click(screen.getByText('Add Todo'));
+
+    await waitFor(() => {
+      expect(todoApi.createTodo).toHaveBeenCalledWith('123', {
+        title: 'New Todo',
+        completed: false
+      });
+    });
+  });
+});
+```
+
+#### Integration Testing
+
+```javascript
+// API endpoint testing
+// Test the complete request-response cycle
+// Database integration
+
+// Example: todo.test.js
+const request = require('supertest');
+const app = require('../server');
+const { Todo } = require('../models/Todo');
+
+describe('Todo API', () => {
+  beforeEach(async () => {
+    await Todo.deleteMany({});
+  });
+
+  describe('GET /api/todos', () => {
+    it('should return user todos', async () => {
+      // Create test user and todos
+      const user = await User.create({ email: 'test@example.com' });
+      await Todo.create([
+        { title: 'Todo 1', userId: user._id },
+        { title: 'Todo 2', userId: user._id }
+      ]);
+
+      const response = await request(app)
+        .get('/api/todos')
+        .set('Authorization', `Bearer ${generateToken(user._id)}`)
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data).toHaveLength(2);
+      expect(response.body.data[0].title).toBe('Todo 1');
+    });
+  });
+
+  describe('POST /api/todos', () => {
+    it('should create a new todo', async () => {
+      const user = await User.create({ email: 'test@example.com' });
+      const todoData = { title: 'New Todo', description: 'Test description' };
+
+      const response = await request(app)
+        .post('/api/todos')
+        .set('Authorization', `Bearer ${generateToken(user._id)}`)
+        .send(todoData)
+        .expect(201);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.title).toBe('New Todo');
+      expect(response.body.data.userId).toBe(user._id.toString());
+    });
+  });
+});
+```
+
+### 4. Deployment Patterns
+
+#### Infrastructure as Code
+
+```yaml
+# CloudFormation template for AWS infrastructure
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Golden Path Todo Application Infrastructure'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: 'staging'
+    AllowedValues: ['staging', 'production']
+
+Resources:
+  # VPC and Networking
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-todo-app-vpc'
+
+  # Application Load Balancer
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      Type: application
+      Subnets:
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
+
+  # ECS Cluster
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub '${Environment}-todo-app-cluster'
+      CapacityProviders:
+        - FARGATE
+        - FARGATE_SPOT
+
+  # ECS Task Definition
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Cpu: '256'
+      Memory: '512'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+      TaskRoleArn: !GetAtt ECSTaskRole.Arn
+      ContainerDefinitions:
+        - Name: todo-app
+          Image: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/todo-app:${Environment}'
+          PortMappings:
+            - ContainerPort: 3000
+          Environment:
+            - Name: NODE_ENV
+              Value: !Ref Environment
+            - Name: DATABASE_URL
+              Value: !Ref DatabaseConnectionString
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: todo-app
+```
+
+#### CI/CD Pipeline
+
+```yaml
+# GitHub Actions workflow
+name: Deploy Golden Path Application
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        run: |
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/todo-app:${{ github.sha }} .
+          docker push ${{ steps.login-ecr.outputs.registry }}/todo-app:${{ github.sha }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to production
+        run: |
+          aws cloudformation deploy \
+            --template-file infrastructure.yml \
+            --stack-name todo-app-production \
+            --parameter-overrides Environment=production \
+            --capabilities CAPABILITY_IAM
+```
+
+## Using Golden Path Templates
+
+### Template Selection
+
+The Golden Path provides templates for different use cases:
+
+<AccordionGroup>
+<Accordion title="Fullstack Application">
+Best for:
+- Complete web applications
+- CRUD operations
+- User authentication
+- Real-time features
+
+Includes: React frontend, Node.js backend, MongoDB database
+</Accordion>
+
+<Accordion title="Microservice">
+Best for:
+- API-only services
+- Background processing
+- Event-driven architectures
+- Independent deployments
+
+Includes: Node.js/Express API, Docker containerization, AWS Lambda
+</Accordion>
+
+<Accordion title="Static Site">
+Best for:
+- Marketing websites
+- Documentation sites
+- Landing pages
+- Blogs
+
+Includes: React/Vue frontend, static hosting, CDN optimization
+</Accordion>
+<Accordion title="Mobile Application">
+Best for:
+- iOS/Android apps
+- React Native applications
+- Offline-first features
+- Push notifications
+
+Includes: React Native, mobile-specific patterns, app store deployment
+</Accordion>
+</AccordionGroup>
+
+### Template Customization
+
+Templates can be customized for specific organizational needs:
+
+```yaml
+# Custom template parameters
+parameters:
+  - title: Customization Options
+    properties:
+      database:
+        title: Database Type
+        type: string
+        enum: [mongodb, postgresql, mysql]
+      authentication:
+        title: Authentication Method
+        type: string
+        enum: [jwt, oauth, saml]
+      hosting:
+        title: Hosting Platform
+        type: string
+        enum: [aws, gcp, azure, on-premise]
+      monitoring:
+        title: Monitoring Solution
+        type: string
+        enum: [cloudwatch, datadog, prometheus]
+```
+
+### Template Updates
+
+Golden Path templates are regularly updated with:
+
+- Latest security patches
+- Performance improvements
+- New feature support
+- Bug fixes and optimizations
+
+## Benefits of Golden Path
+
+### For Developers
+
+- **Faster Development**: Pre-configured templates reduce setup time
+- **Consistent Quality**: Standardized patterns ensure code quality
+- **Best Practices**: Industry-leading practices built-in
+- **Reduced Cognitive Load**: Fewer decisions to make
+- **Better Onboarding**: New developers can quickly get started
+
+### For Organizations
+
+- **Reduced Risk**: Proven patterns and practices
+- **Faster Time to Market**: Accelerated development cycles
+- **Cost Efficiency**: Optimized infrastructure and processes
+- **Security Compliance**: Built-in security best practices
+- **Scalability**: Designed for growth and scale
+
+### For Operations
+
+- **Standardized Deployment**: Consistent deployment patterns
+- **Automated Monitoring**: Built-in observability
+- **Disaster Recovery**: Resilient infrastructure patterns
+- **Cost Management**: Optimized resource usage
+- **Compliance**: Regulatory requirements built-in
+
+## Getting Started
+
+1. **Review Templates**: Explore available templates and patterns
+2. **Select Template**: Choose the appropriate template for your use case
+3. **Customize**: Adapt template to your specific requirements
+4. **Develop**: Build your application using Golden Path patterns
+5. **Deploy**: Use automated deployment pipelines
+6. **Monitor**: Leverage built-in monitoring and alerting
+
+## Resources
+
+- [Template Documentation](/templates/overview)
+- [Development Guide](/development/setup)
+- [Deployment Guide](/deployment/overview)
+- [Best Practices Guide](/best-practices)
+- [Security Guidelines](/security/overview)

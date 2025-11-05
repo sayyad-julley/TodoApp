@@ -1,0 +1,386 @@
+---
+title: Installation
+description: Complete guide to installing and configuring the Backstage template
+---
+
+# Installation
+
+This guide will walk you through installing the Golden Path Backstage template on your local machine.
+
+## Prerequisites
+
+<CardGroup cols={2}>
+  <Card title="Node.js" icon="code">
+    Node.js 18.x or 22.x with npm
+  </Card>
+  <Card title="Yarn" icon="package">
+    Yarn package manager (v1.22+)
+  </Card>
+  <Card title="Git" icon="git">
+    Git version control
+  </Card>
+  <Card title="GitHub Account" icon="github">
+    GitHub account with access token
+  </Card>
+</CardGroup>
+
+### System Requirements
+
+- **Operating System**: macOS, Linux, or Windows (with WSL2)
+- **Memory**: Minimum 4GB RAM (8GB recommended)
+- **Storage**: 2GB free disk space
+
+### Verify Dependencies
+
+<CodeGroup>
+```bash node
+# Check Node.js version
+node --version
+# Should output v18.x.x or v22.x.x
+```
+
+```bash npm
+# Check npm version
+npm --version
+# Should output 8.x.x or higher
+```
+
+```bash yarn
+# Check yarn version
+yarn --version
+# Should output 1.22.x or higher
+```
+
+```bash git
+# Check git version
+git --version
+# Should output git version 2.x.x
+```
+</CodeGroup>
+
+## Installation Steps
+
+### Step 1: Clone the Repository
+
+<Steps>
+  <Step title="Clone Repository">
+    ```bash
+    git clone https://github.com/sayyad-julley/TodoApp
+    cd TodoApp
+    ```
+  </Step>
+  <Step title="Navigate to Backstage Template">
+    ```bash
+    cd todo-backstage
+    ```
+  </Step>
+  <Step title="Verify Structure">
+    ```bash
+    ls -la
+    # You should see: packages/, examples/, app-config.yaml, etc.
+    ```
+  </Step>
+</Steps>
+
+### Step 2: Install Dependencies
+
+```bash
+# Install all dependencies
+yarn install
+
+# This will:
+# - Install root dependencies
+# - Install app dependencies
+# - Install backend dependencies
+# - Build packages
+```
+
+<Info>
+The installation process may take 5-10 minutes on first run as it needs to download and compile all dependencies.
+</Info>
+
+### Step 3: Configure Environment
+
+<Steps>
+  <Step title="Create Local Configuration">
+    ```bash
+    cp app-config.local.yaml.example app-config.local.yaml
+    ```
+  </Step>
+  <Step title="Set GitHub Token">
+    Create a GitHub personal access token:
+
+    1. Go to [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
+    2. Click "Generate new token (classic)"
+    3. Select the `repo` scope
+    4. Generate and copy the token
+    5. Set environment variable:
+
+    ```bash
+    export GITHUB_TOKEN=your-github-token-here
+    ```
+
+    <Warning>
+    Keep your GitHub token secure. Never commit it to version control.
+    </Warning>
+  </Step>
+  <Step title="Optional: Configure Traycer AI">
+    ```bash
+    # Optional: Set Traycer API key for AI-powered planning
+    export TRAYCER_API_KEY=your-traycer-api-key
+    export TRAYCER_API_URL=https://api.traycer.ai
+    ```
+  </Step>
+</Steps>
+
+### Step 4: Database Setup
+
+The template defaults to SQLite for simplicity, but you can configure PostgreSQL for production:
+
+<AccordionGroup>
+<Accordion title="SQLite (Default - Development)">
+No additional setup required. Uses in-memory database by default.
+
+To persist data locally, edit `app-config.local.yaml`:
+
+```yaml
+database:
+  client: better-sqlite3
+  connection:
+    database: './backstage.db'
+```
+</Accordion>
+
+<Accordion title="PostgreSQL (Production Recommended)">
+<Steps>
+  <Step title="Install PostgreSQL">
+    ```bash
+    # macOS with Homebrew
+    brew install postgresql
+    brew services start postgresql
+
+    # Ubuntu/Debian
+    sudo apt-get install postgresql postgresql-contrib
+    sudo systemctl start postgresql
+
+    # Create database
+    createdb backstage
+    ```
+  </Step>
+  <Step title="Configure Connection">
+    Add to `app-config.local.yaml`:
+
+    ```yaml
+    database:
+      client: pg
+      connection:
+        host: localhost
+        port: 5432
+        user: postgres
+        password: your-password
+        database: backstage
+    ```
+  </Step>
+  <Step title="Install Dependencies">
+    ```bash
+    yarn add pg pg-pool
+    ```
+  </Step>
+</Steps>
+</Accordion>
+</AccordionGroup>
+
+### Step 5: Verify Installation
+
+<Steps>
+  <Step title="Build Packages">
+    ```bash
+    yarn tsc
+    yarn build:backend
+    ```
+  </Step>
+  <Step title="Start Development Server">
+    ```bash
+    yarn start
+    ```
+  </Step>
+  <Step title="Verify Access">
+    Open your browser and navigate to:
+
+    - **Frontend**: http://localhost:3000
+    - **Backend Health**: http://localhost:7007/health
+
+    You should see the Backstage login page.
+  </Step>
+</Steps>
+
+## Configuration Options
+
+### Basic Configuration
+
+Edit `app-config.local.yaml` to customize your instance:
+
+```yaml
+app:
+  title: My Backstage Instance
+  baseUrl: http://localhost:3000
+
+organization:
+  name: My Organization
+
+backend:
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_TOKEN}
+
+catalog:
+  locations:
+    - type: file
+      target: ../../examples/template/golden-path-todo/template.yaml
+      rules:
+        - allow: [Template]
+```
+
+### Authentication Configuration
+
+<Warning>
+Authentication configuration is optional for development. Guest access is enabled by default.
+</Warning>
+
+```yaml
+auth:
+  environment: development
+  providers:
+    guest: {}
+
+# Example: GitHub OAuth (for production)
+# auth:
+#   providers:
+#     github:
+#       development:
+#         clientId: ${GITHUB_CLIENT_ID}
+#         clientSecret: ${GITHUB_CLIENT_SECRET}
+```
+
+### Template Configuration
+
+```yaml
+scaffolder:
+  github:
+    host: github.com
+    owner: your-github-username
+    visibility: public
+
+traycer:
+  apiUrl: ${TRAYCER_API_URL:-https://api.traycer.ai}
+  apiKey: ${TRAYCER_API_KEY:-}
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Node.js Version Errors">
+**Error**: "Unsupported Node.js version"
+
+**Solution**:
+1. Install Node.js 18.x or 22.x
+2. Use nvm (Node Version Manager):
+   ```bash
+   nvm install 18
+   nvm use 18
+   ```
+3. Verify with `node --version`
+</Accordion>
+
+<Accordion title="Yarn Installation Fails">
+**Error**: "EACCES: permission denied"
+
+**Solution**:
+1. Clear yarn cache:
+   ```bash
+   yarn cache clean
+   ```
+2. Use npm instead:
+   ```bash
+   npm install
+   npm run build
+   ```
+3. Check file permissions:
+   ```bash
+   sudo chown -R $(whoami) ~/.npm
+   sudo chown -R $(whoami) ~/.config/yarn
+   ```
+</Accordion>
+
+<Accordion title="Port Already in Use">
+**Error**: "Port 3000/7007 already in use"
+
+**Solution**:
+1. Kill existing processes:
+   ```bash
+   lsof -ti:3000 | xargs kill -9
+   lsof -ti:7007 | xargs kill -9
+   ```
+2. Or change ports in `app-config.local.yaml`:
+   ```yaml
+   app:
+    baseUrl: http://localhost:3001
+
+   backend:
+    listen:
+      port: 7008
+   ```
+</Accordion>
+
+<Accordion title="GitHub Authentication Issues">
+**Error**: Template creation fails with GitHub errors
+
+**Solution**:
+1. Verify GitHub token has `repo` scope
+2. Check token expiration
+3. Test token manually:
+   ```bash
+   curl -H "Authorization: token $GITHUB_TOKEN" \
+        https://api.github.com/user
+   ```
+4. Check GitHub integration in `app-config.yaml`
+</Accordion>
+
+<Accordion title="Database Connection Errors">
+**Error**: "Database connection failed"
+
+**Solution**:
+1. For PostgreSQL, verify database is running:
+   ```bash
+   pg_isready -h localhost -p 5432
+   ```
+2. Check connection credentials
+3. Verify database exists:
+   ```bash
+   psql -h localhost -U postgres -l
+   ```
+4. Fall back to SQLite for development
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+After successful installation:
+
+1. [Quick Start Guide](/quick-start) - Create your first project
+2. [Development Setup](/development/setup) - Configure development environment
+3. [Template Overview](/templates/overview) - Learn about templates
+4. [Integrations](/integrations/overview) - Set up external services
+
+## Additional Resources
+
+- [Backstage Documentation](https://backstage.io/docs)
+- [Node.js Documentation](https://nodejs.org/docs)
+- [Yarn Documentation](https://yarnpkg.com/getting-started)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [GitHub Token Guide](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)

@@ -1,0 +1,436 @@
+---
+title: Architecture
+description: Understanding the Backstage template architecture and components
+---
+
+# Architecture
+
+The Golden Path Backstage template follows a modular, extensible architecture that separates concerns while maintaining simplicity.
+
+## System Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Frontend Layer                           │
+│  (React + Material-UI + React Router + React Query)        │
+│                                                             │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
+│  │   Pages     │ │ Components  │ │   Hooks     │           │
+│  │             │ │             │ │             │           │
+│  │ • Catalog   │ │ • Forms     │ │ • API       │           │
+│  │ • Create    │ │ • Cards     │ │ • Auth      │           │
+│  │ • Docs      │ │ • Layout    │ │ • Storage   │           │
+│  │ • Settings  │ │ • Search    │ │ • Theme     │           │
+│  └─────────────┘ └─────────────┘ └─────────────┘           │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Backend Layer                            │
+│           (Express + TypeScript + Plugin System)           │
+│                                                             │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
+│  │   Plugins   │ │ Services    │ │ Middleware  │           │
+│  │             │ │             │ │             │           │
+│  │ • Catalog   │ │ • Database  │ │ • Auth      │           │
+│  │ • Scaffolder│ │ • Storage   │ │ • CORS      │           │
+│  │ • Proxy     │ │ • Logger    │ │ • Error     │           │
+│  │ • TechDocs  │ │ • Config    │ │ • Logging   │           │
+│  └─────────────┘ └─────────────┘ └─────────────┘           │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  External Services                          │
+│                                                             │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
+│  │   GitHub    │ │   Traycer   │ │   Mintlify  │           │
+│  │             │ │             │ │             │           │
+│  │ • Repos     │ │ • AI Plans  │ │ • Docs      │           │
+│  │ • Auth      │ │ • Templates │ │ • Search    │           │
+│  │ • Actions   │ │ • APIs      │ │ • Analytics │           │
+│  └─────────────┘ └─────────────┘ └─────────────┘           │
+│                                                             │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
+│  │   Database  │ │   Storage   │ │   Search    │           │
+│  │             │ │             │ │             │           │
+│  │ • SQLite    │ │ • Local FS  │ │ • Built-in  │           │
+│  │ • PostgreSQL│ │ • S3        │ │ • Algolia   │           │
+│  │ • MongoDB   │ │ • GCS       │ │ • Elastic   │           │
+│  └─────────────┘ └─────────────┘ └─────────────┘           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Frontend Architecture
+
+### Directory Structure
+
+```
+packages/app/
+├── src/
+│   ├── components/              # Reusable UI components
+│   │   ├── catalog/            # Catalog-specific components
+│   │   ├── scaffolder/         # Template creation components
+│   │   └── common/             # Shared components
+│   ├── pages/                  # Page-level components
+│   │   ├── catalog/            # Catalog pages
+│   │   ├── create/             # Template creation pages
+│   │   └── techdocs/           # Documentation pages
+│   ├── hooks/                  # Custom React hooks
+│   ├── themes/                 # Material-UI themes
+│   ├── utilities/              # Utility functions
+│   ├── api/                    # API client configurations
+│   └── App.tsx                 # Main app component
+├── public/                     # Static assets
+└── package.json
+```
+
+### Key Components
+
+#### App Component
+- **Location**: `packages/app/src/App.tsx`
+- **Purpose**: Main application router and theme provider
+- **Features**: Route definitions, layout structure, theme switching
+
+#### Page Components
+- **Catalog**: Browse and discover software components
+- **Create**: Template-based project creation
+- **TechDocs**: Integrated documentation viewer
+- **Search**: Global search functionality
+
+#### Custom Hooks
+- **useApi**: API client with error handling
+- **useAuth**: Authentication state management
+- **useTheme**: Theme switching and persistence
+- **useLocalStorage**: Local storage operations
+
+### UI Framework
+
+**Material-UI (MUI) v5**
+- Consistent design system
+- Built-in accessibility
+- Theme customization
+- Component library
+
+**State Management**
+- React Query for server state
+- React Context for app state
+- Local state with useState/useReducer
+
+## Backend Architecture
+
+### Directory Structure
+
+```
+packages/backend/
+├── src/
+│   ├── plugins/                # Custom plugins
+│   │   ├── scaffolder/         # Template creation
+│   │   └── catalog/            # Custom catalog logic
+│   ├── services/               # Core services
+│   ├── database/               # Database configurations
+│   ├── config/                 # Configuration files
+│   ├── middleware/             # Custom middleware
+│   └── index.ts                # Backend entry point
+├── docker/                     # Docker configurations
+├── scripts/                    # Utility scripts
+└── package.json
+```
+
+### Plugin System
+
+Backstage uses a plugin-based architecture where each feature is implemented as a separate plugin:
+
+#### Core Plugins
+
+<CardGroup cols={2}>
+  <Card title="Catalog Plugin" icon="catalog">
+    Manages software component metadata and relationships
+  </Card>
+  <Card title="Scaffolder Plugin" icon="template">
+    Template-based project creation
+  </Card>
+  <Card title="TechDocs Plugin" icon="docs">
+    Markdown-based documentation generation
+  </Card>
+  <Card title="Proxy Plugin" icon="proxy">
+    Backend service proxy and aggregation
+  </Card>
+</CardGroup>
+
+#### Custom Plugins
+
+**Traycer Integration Plugin**
+- **Location**: `packages/backend/src/plugins/scaffolder/actions/traycer-integration.ts`
+- **Purpose**: AI-powered implementation plan generation
+- **Features**:
+  - Template processing
+  - AI API integration
+  - Plan generation
+  - GitHub publishing
+
+### Service Architecture
+
+#### Database Layer
+- **Default**: SQLite (in-memory for development)
+- **Production**: PostgreSQL support
+- **ORM**: Knex.js query builder
+- **Migrations**: Automatic schema management
+
+#### Authentication Layer
+- **Guest Access**: Default for development
+- **OAuth**: GitHub, Google, etc.
+- **JWT**: Token-based authentication
+- **Permissions**: Role-based access control
+
+#### API Layer
+- **Express.js**: HTTP server framework
+- **OpenAPI**: Automatic API documentation
+- **Validation**: Request/response validation
+- **Error Handling**: Centralized error management
+
+## Template System
+
+### Template Structure
+
+```
+examples/template/golden-path-todo/
+├── template.yaml               # Template definition
+├── skeleton/                   # Base template files
+└── content/                    # Generated content
+    └── catalog-info.yaml       # Backstage catalog info
+```
+
+### Template Processing
+
+<Steps>
+  <Step title="Template Definition">
+    `template.yaml` defines parameters, steps, and actions
+  </Step>
+  <Step title="Parameter Collection">
+    User input collected via Backstage UI forms
+  </Step>
+  <Step title="Step Execution">
+    Sequential execution of template actions
+  </Step>
+  <Step title="Custom Actions">
+    Traycer integration for AI plan generation
+  </Step>
+  <Step title="Output Generation">
+    Project files, documentation, and catalog registration
+  </Step>
+</Steps>
+
+### Template Actions
+
+```yaml
+steps:
+  - id: fetch-base
+    action: fetch:template
+    input:
+      url: ./skeleton
+
+  - id: generate-traycer-plan
+    action: traycer:generate-plan
+    input:
+      spec: ${{ parameters.featureType }}
+
+  - id: publish-github
+    action: publish:github
+    input:
+      repoUrl: ${{ parameters.repoUrl }}
+```
+
+## Integration Architecture
+
+### GitHub Integration
+
+- **Authentication**: Personal access tokens
+- **Repository Management**: Create, update, and manage repos
+- **Actions**: GitHub Actions workflows
+- **Webhooks**: Automated updates and notifications
+
+### Traycer AI Integration
+
+- **Template Processing**: Extract requirements from template parameters
+- **API Communication**: RESTful API calls to Traycer service
+- **Plan Generation**: AI-powered implementation plans
+- **Fallback**: Local plan generation if API unavailable
+
+### Mintlify Integration
+
+- **Documentation**: Beautiful, searchable docs
+- **API Reference**: Auto-generated from OpenAPI specs
+- **Search**: Built-in full-text search
+- **Analytics**: Usage tracking and insights
+
+## Data Flow
+
+### Template Creation Flow
+
+```
+┌─────────┐      ┌─────────────┐      ┌─────────────┐
+│   User  │───▶ │ Frontend UI │───▶ │ Backend API │
+│ Input   │      │             │      │             │
+└─────────┘      └─────────────┘      └─────────────┘
+                                              │
+                                              ▼
+                                    ┌─────────────┐
+                                    │ Scaffolder  │
+                                    │   Plugin    │
+                                    └─────────────┘
+                                              │
+                                              ▼
+                                    ┌─────────────┐
+                                    │   Custom    │
+                                    │  Actions    │
+                                    └─────────────┘
+                                              │
+                    ┌─────────────────────────┼─────────────────┐
+                    ▼                         ▼                 ▼
+            ┌─────────────┐        ┌─────────────┐  ┌─────────────┐
+            │    GitHub   │        │   Traycer   │  │   Catalog   │
+            │ Integration │        │ Integration │  │ Integration │
+            └─────────────┘        └─────────────┘  └─────────────┘
+```
+
+### Catalog Management Flow
+
+```
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│   Entity    │───▶ │   Catalog   │───▶ │   Storage   │
+│ Creation    │      │   Plugin    │      │   Layer     │
+└─────────────┘      └─────────────┘      └─────────────┘
+                                              │
+                                              ▼
+                                    ┌─────────────┐
+                                    │  Indexing   │
+                                    │   Service   │
+                                    └─────────────┘
+                                              │
+                                              ▼
+                                    ┌─────────────┐
+                                    │  Search &   │
+                                    │ Discovery   │
+                                    └─────────────┘
+```
+
+## Configuration Architecture
+
+### Configuration Files
+
+<AccordionGroup>
+<Accordion title="app-config.yaml">
+Main configuration file:
+- Application settings
+- Integration configurations
+- Database connections
+- Authentication providers
+</Accordion>
+
+<Accordion title="app-config.local.yaml">
+Local overrides:
+- Development secrets
+- Personal settings
+- Local database configs
+- Feature flags
+</Accordion>
+
+<Accordion title="app-config.production.yaml">
+Production-specific:
+- Production databases
+- Security settings
+- Performance configs
+- Monitoring settings
+</Accordion>
+</AccordionGroup>
+
+### Environment Variables
+
+```bash
+# Core Configuration
+APP_CONFIG=app-config.yaml
+NODE_ENV=development
+PORT=7007
+
+# Integrations
+GITHUB_TOKEN=ghp_*
+TRAYCER_API_KEY=tk_*
+
+# Database
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=backstage
+POSTGRES_PASSWORD=password
+```
+
+## Security Architecture
+
+### Authentication
+
+- **Multi-provider**: Guest, OAuth, SAML
+- **Token-based**: JWT tokens for API access
+- **Session management**: Secure session storage
+- **Permission model**: Role-based access control
+
+### Authorization
+
+- **Resource-based**: Fine-grained permissions
+- **Policy engine**: Configurable permission rules
+- **Integration aware**: GitHub, service account permissions
+- **Catalog permissions**: Entity-level access control
+
+### Data Protection
+
+- **Encryption**: Data at rest and in transit
+- **Secrets management**: Secure credential storage
+- **Input validation**: Request/response sanitization
+- **CORS protection**: Cross-origin request security
+
+## Scalability Architecture
+
+### Horizontal Scaling
+
+- **Stateless design**: Backend can be horizontally scaled
+- **Database scaling**: Read replicas and connection pooling
+- **Caching**: Redis for session and data caching
+- **Load balancing**: Multiple backend instances
+
+### Performance Optimization
+
+- **Bundle optimization**: Frontend code splitting
+- **API optimization**: Response caching and pagination
+- **Database optimization**: Query optimization and indexing
+- **CDN integration**: Static asset delivery
+
+## Monitoring Architecture
+
+### Observability
+
+- **Logging**: Structured logging with correlation IDs
+- **Metrics**: Performance and business metrics
+- **Tracing**: Distributed request tracing
+- **Health checks**: Service availability monitoring
+
+### Error Handling
+
+- **Centralized**: Global error handling
+- **Contextual**: Error context and correlation
+- **Recovery**: Automatic retry mechanisms
+- **Alerting**: Error notification systems
+
+## This Architecture Enables
+
+✅ **Modularity**: Independent components and plugins
+✅ **Extensibility**: Easy to add new features
+✅ **Maintainability**: Clear separation of concerns
+✅ **Scalability**: Designed for growth
+✅ **Security**: Multiple layers of protection
+✅ **Performance**: Optimized for user experience
+
+## Next Steps
+
+- [Development Setup](/development/setup) - Configure development environment
+- [Template Development](/development/templates) - Create custom templates
+- [Plugin Development](/development/plugins) - Build custom plugins
+- [Deployment Guide](/deployment/overview) - Production deployment strategies

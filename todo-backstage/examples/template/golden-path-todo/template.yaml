@@ -1,0 +1,125 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: golden-path-todo
+  title: Golden Path Fullstack Todo
+  description: A complete full-stack todo application with Traycer AI integration, following golden path patterns
+  tags:
+    - react
+    - nodejs
+    - postgresql
+    - aws
+    - traycer
+    - golden-path
+spec:
+  owner: platform-team
+  type: service
+
+  parameters:
+    - title: Project Details
+      required:
+        - name
+        - description
+      properties:
+        name:
+          title: Project Name
+          type: string
+          description: Name of the project (lowercase, hyphens allowed)
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+          ui:autofocus: true
+        description:
+          title: Description
+          type: string
+          description: Brief description of the project
+        featureType:
+          title: Feature Type
+          type: string
+          description: Type of feature to implement (for Traycer plan generation)
+          enum: [feature, bugfix, refactoring]
+          default: feature
+          ui:enum: [feature, bugfix, refactoring]
+          ui:enumDeprecated: []
+        featureDescription:
+          title: Feature Description
+          type: string
+          description: Detailed description of the feature/change for Traycer plan generation
+          ui:widget: textarea
+          ui:options:
+            rows: 5
+
+    - title: Repository Location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+              - gitlab.com
+
+  steps:
+    - id: fetch-base
+      name: Fetch Base Template
+      action: fetch:template
+      input:
+        # Using local template content
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          __APP_NAME__: ${{ parameters.name }}
+
+    - id: generate-traycer-plan
+      name: Generate Traycer Plan
+      action: traycer:generate-plan
+      input:
+        spec: ${{ parameters.featureType }}
+        projectName: ${{ parameters.name }}
+        description: ${{ parameters.featureDescription || parameters.description }}
+        template: backstage-golden-path
+        goldenPathTemplate: fullstack-todo
+
+    - id: create-implementation-guide
+      name: Create Implementation Guide
+      action: write:file
+      input:
+        path: ./IMPLEMENTATION_GUIDE.md
+        content: |
+          # Implementation Guide for ${{ parameters.name }}
+          
+          ${{ steps.generate-traycer-plan.output.plan }}
+          
+          ## Next Steps
+          1. Review the generated plan above
+          2. Follow the golden path patterns
+          3. Implement the changes
+          4. Run tests and submit for review
+
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        description: ${{ parameters.description }}
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
+      - title: Implementation Guide
+        url: ${{ steps.publish.output.remoteUrl }}/blob/main/IMPLEMENTATION_GUIDE.md
+
