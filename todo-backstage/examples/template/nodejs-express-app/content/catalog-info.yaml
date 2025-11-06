@@ -1,0 +1,22 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: {{ name }}
+  description: {{ description }}
+  annotations:
+    github.com/project-slug: {{ repoUrl | parseRepoUrl | pick('owner') }}/{{ repoUrl | parseRepoUrl | pick('repo') }}
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: service
+  lifecycle: production
+  owner: {{ owner }}
+  providesApis:
+    - {{ name }}-api
+  consumesApis:
+    {{#if (ne databaseType 'none')}}
+    - resource:{{ name }}-database
+    {{/if}}
+  api:
+    baseUrl: http://localhost:{{ port }}/{{ apiVersion }}
+    docsUrl: http://localhost:{{ port }}/api-docs
+  healthCheckUrl: http://localhost:{{ port }}/health

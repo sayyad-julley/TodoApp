@@ -1,0 +1,83 @@
+{
+  "name": "{{ __APP_NAME__ }}",
+  "version": "1.0.0",
+  "description": "{{ description }}",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "node dist/server.js",
+    "dev": "nodemon src/server.{{#if useTypeScript}}ts{{else}}js{{/if}}",
+    "build": "{{#if useTypeScript}}tsc{{else}}echo 'No build step required for JavaScript'{{/if}}",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.{{#if useTypeScript}}ts{{else}}js{{/if}}",
+    "lint:fix": "eslint src/**/*.{{#if useTypeScript}}ts{{else}}js{{/if}} --fix",
+    "format": "prettier --write \"src/**/*.{js,ts,json}\"",
+    "docker:build": "docker build -t {{ __APP_NAME__ }} .",
+    "docker:run": "docker run -p {{ port }}:{{ port }} {{ __APP_NAME__ }}",
+    "migrate": "{{#if (eq databaseType 'postgresql')}}npx sequelize-cli db:migrate{{/if}}{{#if (eq databaseType 'mongodb')}}node dist/scripts/migrate{{/if}}{{#if (eq databaseType 'mysql')}}npx sequelize-cli db:migrate{{/if}}{{#if (eq databaseType 'sqlite')}}npx sequelize-cli db:migrate{{/if}}",
+    "seed": "{{#if (eq databaseType 'postgresql')}}npx sequelize-cli db:seed:all{{/if}}{{#if (eq databaseType 'mongodb')}}node dist/scripts/seed{{/if}}{{#if (eq databaseType 'mysql')}}npx sequelize-cli db:seed:all{{/if}}{{#if (eq databaseType 'sqlite')}}npx sequelize-cli db:seed:all{{/if}}"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "helmet": "^6.1.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.0.0",
+    "compression": "^1.7.0"
+    {{#if enableAuth}}
+    ,"jsonwebtoken": "^9.0.0","bcryptjs": "^2.4.0","express-rate-limit": "^6.7.0"
+    {{/if}}
+    {{#if enableCors}}
+    ,"cors": "^2.8.0"
+    {{/if}}
+    {{#if enableRateLimit}}
+    ,"express-rate-limit": "^6.7.0"
+    {{/if}}
+    {{#if enableSwagger}}
+    ,"swagger-jsdoc": "^6.2.0","swagger-ui-express": "^4.6.0"
+    {{/if}}
+    {{#if (eq databaseType 'mongodb')}}
+    ,"mongoose": "^7.0.0"
+    {{/if}}
+    {{#if (eq databaseType 'postgresql')}}
+    ,"pg": "^8.9.0","sequelize": "^6.31.0"
+    {{/if}}
+    {{#if (eq databaseType 'mysql')}}
+    ,"mysql2": "^3.2.0","sequelize": "^6.31.0"
+    {{/if}}
+    {{#if (eq databaseType 'sqlite')}}
+    ,"sqlite3": "^5.1.0","sequelize": "^6.31.0"
+    {{/if}}
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.0",
+    "@types/node": "^18.15.0",
+    "@types/morgan": "^1.9.0",
+    "@types/compression": "^1.7.0"
+    {{#if enableAuth}}
+    ,"@types/jsonwebtoken": "^9.0.0","@types/bcryptjs": "^2.4.0"
+    {{/if}}
+    {{#if enableCors}}
+    ,"@types/cors": "^2.8.0"
+    {{/if}}
+    {{#if enableSwagger}}
+    ,"@types/swagger-jsdoc": "^6.0.0","@types/swagger-ui-express": "^4.1.0"
+    {{/if}}
+    {{#if useTypeScript}}
+    ,"typescript": "^5.0.0","ts-node": "^10.9.0"
+    {{/if}}
+    ,"nodemon": "^2.0.0","jest": "^29.5.0","supertest": "^6.3.0","@types/jest": "^29.5.0","@types/supertest": "^2.0.0","eslint": "^8.38.0","prettier": "^2.8.0"
+    {{#if (eq databaseType 'postgresql')}}
+    ,"sequelize-cli": "^6.6.0"
+    {{/if}}
+    {{#if (eq databaseType 'mysql')}}
+    ,"sequelize-cli": "^6.6.0"
+    {{/if}}
+    {{#if (eq databaseType 'sqlite')}}
+    ,"sequelize-cli": "^6.6.0"
+    {{/if}}
+  },
+  "engines": {
+    "node": ">={{ nodeVersion }}"
+  }
+}

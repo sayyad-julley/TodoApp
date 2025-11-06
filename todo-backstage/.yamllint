@@ -1,0 +1,12 @@
+extends: default
+
+rules:
+  line-length: disable
+  document-start: disable
+  comments: disable
+
+# Disable schema validation for Backstage template files
+ignore: |
+  examples/template/**/*.yaml
+  examples/template/**/*.yml
+

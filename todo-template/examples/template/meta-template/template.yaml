@@ -1,0 +1,445 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: template-selector
+  title: Template Selector - Choose Your Application Type
+  description: |
+    A meta template that allows you to select one or multiple application templates:
+    
+    🎯 **Full-Stack Todo Application** - Complete todo app with React frontend, Node.js/Express backend, MongoDB, JWT auth, Docker, and AWS X-Ray support
+    
+    ⚛️ **React Application** - Modern React app with TypeScript, Vite, and best practices for frontend development
+    
+    🚀 **Node.js/Express API** - Production-ready Node.js/Express API with TypeScript, authentication, database integration, and microservice features
+    
+    Select one or multiple templates to create a monorepo or separate projects. Each template will be placed in its own directory.
+  tags:
+    - meta
+    - selector
+    - template
+    - fullstack
+    - react
+    - nodejs
+    - express
+    - scaffold
+    - starter
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+spec:
+  owner: user:guest
+  type: service
+
+  parameters:
+    - title: Template Selection
+      required:
+        - templateTypes
+      properties:
+        templateTypes:
+          title: Choose Template Types
+          type: array
+          description: Select one or more application templates to generate. Each template will be placed in its own directory.
+          items:
+            type: string
+            enum:
+              - fullstack-todo
+              - react-app
+              - nodejs-express
+            enumNames:
+              - Full-Stack Todo Application (React + Node.js + MongoDB)
+              - React Application (Frontend Only)
+              - Node.js/Express API (Backend Only)
+          ui:options:
+            order: 2
+          ui:field: ArrayField
+          ui:autofocus: true
+          minItems: 1
+          uniqueItems: true
+
+    - title: Project Information
+      required:
+        - name
+        - description
+        - owner
+      properties:
+        name:
+          title: Project Name
+          type: string
+          description: Unique name of the project (use lowercase letters, numbers, and hyphens only)
+          pattern: '^[a-z0-9-]+$'
+          ui:placeholder: my-awesome-app
+        description:
+          title: Description
+          type: string
+          description: Brief description of your application
+          ui:widget: textarea
+          ui:options:
+            rows: 3
+        owner:
+          title: Project Owner
+          type: string
+          description: Owner of the project (user or team)
+          ui:field: OwnerPicker
+          default: user:guest
+
+    # Full-Stack Todo Template specific parameters
+    - title: Full-Stack Todo Configuration
+      required: []
+      properties:
+        includeAuth:
+          title: Include Authentication
+          type: boolean
+          description: Include JWT-based user authentication system (Full-Stack Todo only)
+          default: true
+        includeDocker:
+          title: Include Docker Support
+          type: boolean
+          description: Include Docker files and docker-compose configuration (Full-Stack Todo only)
+          default: true
+        includeAWS:
+          title: Include AWS Integration
+          type: boolean
+          description: Include AWS X-Ray distributed tracing (Full-Stack Todo only)
+          default: false
+        databaseType:
+          title: Database Type
+          type: string
+          description: Choose your preferred database (Full-Stack Todo only)
+          enum: ['mongodb', 'postgresql', 'mysql']
+          default: mongodb
+        nodeVersion:
+          title: Node.js Version
+          type: string
+          description: Choose Node.js version (Full-Stack Todo only)
+          enum: ['18', '20', '21']
+          default: '18'
+        port:
+          title: Backend Port
+          type: number
+          description: Port for the backend API server (Full-Stack Todo only)
+          default: 5000
+        frontendPort:
+          title: Frontend Port
+          type: number
+          description: Port for the frontend development server (Full-Stack Todo only)
+          default: 5143
+
+    # React App specific parameters
+    - title: React Application Configuration
+      required: []
+      properties:
+        reactVersion:
+          title: React Version
+          type: string
+          description: React version to use (React App only)
+          enum: ['18.x', '17.x']
+          default: '18.x'
+        useTypeScript:
+          title: Use TypeScript
+          type: boolean
+          description: Whether to use TypeScript for type safety (React App only)
+          default: true
+        useRouter:
+          title: Include Router
+          type: boolean
+          description: Include React Router for navigation (React App only)
+          default: true
+        useStateManagement:
+          title: State Management
+          type: string
+          description: State management library to use (React App only)
+          enum: ['none', 'zustand', 'redux-toolkit', 'context-api']
+          default: 'none'
+        uiFramework:
+          title: UI Framework
+          type: string
+          description: UI component library to use (React App only)
+          enum: ['none', 'ant-design', 'material-ui', 'chakra-ui', 'tailwind']
+          default: 'none'
+        enableCI:
+          title: Enable CI/CD
+          type: boolean
+          description: Enable continuous integration and deployment (React App only)
+          default: true
+        deploymentTarget:
+          title: Deployment Target
+          type: string
+          description: Target deployment platform (React App only)
+          enum: ['vercel', 'netlify', 'aws-s3', 'none']
+          default: 'vercel'
+
+    # Node.js/Express App specific parameters
+    - title: Node.js/Express API Configuration
+      required: []
+      properties:
+        nodeVersion:
+          title: Node.js Version
+          type: string
+          description: Node.js version to use (Node.js/Express App only)
+          enum: ['20.x', '18.x', '16.x']
+          default: '18.x'
+        useTypeScript:
+          title: Use TypeScript
+          type: boolean
+          description: Whether to use TypeScript for type safety (Node.js/Express App only)
+          default: true
+        apiPort:
+          title: Application Port
+          type: number
+          description: Port number for the application (Node.js/Express App only)
+          default: 3000
+          minimum: 1000
+          maximum: 9999
+        enableAuth:
+          title: Enable Authentication
+          type: boolean
+          description: Include JWT authentication middleware (Node.js/Express App only)
+          default: true
+        enableCors:
+          title: Enable CORS
+          type: boolean
+          description: Include CORS middleware (Node.js/Express App only)
+          default: true
+        enableRateLimit:
+          title: Enable Rate Limiting
+          type: boolean
+          description: Include rate limiting middleware (Node.js/Express App only)
+          default: true
+        enableSwagger:
+          title: Enable Swagger Documentation
+          type: boolean
+          description: Include Swagger API documentation (Node.js/Express App only)
+          default: true
+        apiVersion:
+          title: API Version
+          type: string
+          description: Version of your API (Node.js/Express App only)
+          default: 'v1'
+          pattern: '^v[0-9]+$'
+        databaseType:
+          title: Database Type
+          type: string
+          description: Type of database to integrate (Node.js/Express App only)
+          enum: ['none', 'mongodb', 'postgresql', 'mysql', 'sqlite']
+          default: 'mongodb'
+        enableMigrations:
+          title: Enable Database Migrations
+          type: boolean
+          description: Include database migration scripts (Node.js/Express App only)
+          default: true
+        enableSeeding:
+          title: Enable Database Seeding
+          type: boolean
+          description: Include database seeding scripts (Node.js/Express App only)
+          default: true
+        enableDocker:
+          title: Enable Docker
+          type: boolean
+          description: Include Docker configuration (Node.js/Express App only)
+          default: true
+        apiDeploymentTarget:
+          title: Deployment Target
+          type: string
+          description: Target deployment platform (Node.js/Express App only)
+          enum: ['aws-ecs', 'heroku', 'digitalocean', 'none']
+          default: 'aws-ecs'
+
+    - title: Repository Configuration
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          description: Git repository URL where the project will be created
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+              - gitlab.com
+              - bitbucket.org
+        defaultBranch:
+          title: Default Branch
+          type: string
+          description: Default branch name for the repository
+          default: main
+        license:
+          title: License
+          type: string
+          description: Choose a license for your project
+          enum: ['MIT', 'Apache-2.0', 'GPL-3.0', 'BSD-3-Clause']
+          default: MIT
+
+  steps:
+    # Full-Stack Todo Template
+    - id: fetch-fullstack
+      name: 📥 Fetch Full-Stack Todo Template
+      if: ${{ 'fullstack-todo' in parameters.templateTypes }}
+      action: fetch:template
+      input:
+        url: ../content
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          includeAuth: ${{ parameters.includeAuth }}
+          includeDocker: ${{ parameters.includeDocker }}
+          includeAWS: ${{ parameters.includeAWS }}
+          databaseType: ${{ parameters.databaseType }}
+          nodeVersion: ${{ parameters.nodeVersion }}
+          port: ${{ parameters.port }}
+          frontendPort: ${{ parameters.frontendPort }}
+          license: ${{ parameters.license }}
+
+    # React App Template
+    - id: fetch-react
+      name: ⚛️ Fetch React Application Template
+      if: ${{ 'react-app' in parameters.templateTypes }}
+      action: fetch:template
+      input:
+        url: ../react-app/content
+        targetPath: react-app
+        values:
+          name: ${{ parameters.name }}-react
+          description: ${{ parameters.description }} - React Frontend
+          component_id: ${{ parameters.name }}-react
+          destination: ${{ parameters.repoUrl | parseRepoUrl | pick('repo') }}
+          __APP_NAME__: ${{ parameters.name }}-react
+          reactVersion: ${{ parameters.reactVersion }}
+          useTypeScript: ${{ parameters.useTypeScript }}
+          useRouter: ${{ parameters.useRouter }}
+          useStateManagement: ${{ parameters.useStateManagement }}
+          uiFramework: ${{ parameters.uiFramework }}
+          enableCI: ${{ parameters.enableCI }}
+          deploymentTarget: ${{ parameters.deploymentTarget }}
+
+    # Node.js/Express App Template
+    - id: fetch-nodejs
+      name: 🚀 Fetch Node.js/Express API Template
+      if: ${{ 'nodejs-express' in parameters.templateTypes }}
+      action: fetch:template
+      input:
+        url: ../nodejs-express-app/content
+        targetPath: api
+        values:
+          name: ${{ parameters.name }}-api
+          description: ${{ parameters.description }} - Node.js API
+          component_id: ${{ parameters.name }}-api
+          destination: ${{ parameters.repoUrl | parseRepoUrl | pick('repo') }}
+          __APP_NAME__: ${{ parameters.name }}-api
+          nodeVersion: ${{ parameters.nodeVersion }}
+          useTypeScript: ${{ parameters.useTypeScript }}
+          port: ${{ parameters.apiPort }}
+          enableAuth: ${{ parameters.enableAuth }}
+          enableCors: ${{ parameters.enableCors }}
+          enableRateLimit: ${{ parameters.enableRateLimit }}
+          enableSwagger: ${{ parameters.enableSwagger }}
+          apiVersion: ${{ parameters.apiVersion }}
+          databaseType: ${{ parameters.databaseType }}
+          enableMigrations: ${{ parameters.enableMigrations }}
+          enableSeeding: ${{ parameters.enableSeeding }}
+          enableCI: ${{ parameters.enableCI }}
+          enableDocker: ${{ parameters.enableDocker }}
+          deploymentTarget: ${{ parameters.apiDeploymentTarget }}
+
+    # Note: When multiple templates are selected, each will be in its own directory
+    # Full-Stack Todo goes to root, React App goes to react-app/, Node.js API goes to api/
+
+    # Publish to repository
+    - id: publish
+      name: 🚀 Publish to Repository
+      action: publish:github
+      input:
+        description: |
+          🎉 **Application Generated Successfully!**
+          
+          **Selected Templates:** ${{ parameters.templateTypes | join(', ') }}
+          **Project:** ${{ parameters.name }}
+          **Description:** ${{ parameters.description }}
+          
+          {{#each parameters.templateTypes}}
+          {{#if (eq this 'fullstack-todo')}}
+          **Full-Stack Todo Application**
+          - React 18 frontend with TypeScript and Vite
+          - Node.js/Express backend with ${{ ../parameters.databaseType }}
+          - JWT authentication and authorization
+          - Docker containerization
+          {{#if ../parameters.includeAWS}}- AWS X-Ray distributed tracing{{/if}}
+          {{/if}}
+          {{#if (eq this 'react-app')}}
+          **React Application** (in `react-app/` directory)
+          - React ${{ ../parameters.reactVersion }} with TypeScript
+          - Vite build tool
+          - Modern frontend development setup
+          {{/if}}
+          {{#if (eq this 'nodejs-express')}}
+          **Node.js/Express API** (in `api/` directory)
+          - Node.js ${{ ../parameters.nodeVersion }}
+          - Express.js framework
+          - Production-ready API setup
+          {{/if}}
+          {{/each}}
+          
+          {{#if (gt (length parameters.templateTypes) 1)}}
+          **Monorepo Structure:**
+          Each template has been placed in its own directory for easy management.
+          {{/if}}
+          
+          Built with ❤️ using the Template Selector
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: ${{ parameters.defaultBranch }}
+
+    # Register in catalog
+    # Note: Only register if single template selected (to avoid conflicts)
+    - id: register
+      name: 📋 Register in Catalog
+      if: ${{ parameters.templateTypes.length === 1 && 'fullstack-todo' in parameters.templateTypes }}
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+    # Send notification
+    - id: notify
+      name: 🎉 Notify User
+      action: notification:send
+      input:
+        recipients: entity
+        entityRefs:
+          - ${{ parameters.owner }}
+        title: '✅ Application Created Successfully!'
+        info: |
+          Your ${{ parameters.templateTypes.length === 1 ? parameters.templateTypes[0] : 'multi-template' }} application "${{ parameters.name }}" has been created and published to ${{ parameters.repoUrl }}.
+          
+          **Selected Templates:** ${{ parameters.templateTypes | join(', ') }}
+          
+          {{#if (gt (length parameters.templateTypes) 1)}}
+          **Directory Structure:**
+          {{#each parameters.templateTypes}}
+          {{#if (eq this 'fullstack-todo')}}- Full-Stack Todo: Root directory{{/if}}
+          {{#if (eq this 'react-app')}}- React App: `react-app/` directory{{/if}}
+          {{#if (eq this 'nodejs-express')}}- Node.js API: `api/` directory{{/if}}
+          {{/each}}
+          {{/if}}
+          
+          **Next Steps:**
+          1. 📁 Clone your repository: `git clone ${{ steps['publish'].output.remoteUrl }}`
+          2. 📦 Install dependencies: Follow the README.md in each project directory
+          3. 🚀 Start development and build amazing things!
+          
+          **Access Points:**
+          - Repository: ${{ steps['publish'].output.remoteUrl }}
+          - Catalog: Check the Backstage catalog for your new component
+        severity: 'success'
+
+  output:
+    links:
+      - title: 📂 Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+        icon: github
+      - title: 📋 Open in Catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
+      - title: 📚 Documentation
+        url: ${{ steps['publish'].output.remoteUrl }}/blob/${{ parameters.defaultBranch }}/README.md
+        icon: docs
+

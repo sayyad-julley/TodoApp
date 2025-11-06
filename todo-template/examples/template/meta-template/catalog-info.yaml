@@ -1,0 +1,20 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: template-selector
+  title: Template Selector
+  description: |
+    A meta template that allows users to select from multiple application templates:
+    - Full-Stack Todo Application
+    - React Application
+    - Node.js/Express API Application
+  tags:
+    - meta
+    - selector
+    - template
+    - scaffold
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+

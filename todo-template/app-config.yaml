@@ -58,7 +58,7 @@ proxy:
 techdocs:
   builder: 'local' # Alternatives - 'external'
   generator:
-    runIn: 'docker' # Alternatives - 'local'
+    runIn: 'local' # Alternatives - 'docker'. Changed to local to avoid Docker dependency
   publisher:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
 
@@ -82,9 +82,33 @@ catalog:
     - type: file
       target: ../../examples/entities.yaml
 
-    # Local example template
+    # Local example template (Full-Stack Todo Template)
     - type: file
       target: ../../examples/template/template.yaml
+      rules:
+        - allow: [Template]
+    
+    # Component entity for template documentation
+    - type: file
+      target: ../../examples/template/catalog-info.yaml
+      rules:
+        - allow: [Component]
+
+    # React Application Template
+    - type: file
+      target: ../../examples/template/react-app/template.yaml
+      rules:
+        - allow: [Template]
+
+    # Node.js/Express Application Template
+    - type: file
+      target: ../../examples/template/nodejs-express-app/template.yaml
+      rules:
+        - allow: [Template]
+
+    # Meta Template Selector (contains all templates)
+    - type: file
+      target: ../../examples/template/meta-template/template.yaml
       rules:
         - allow: [Template]
 

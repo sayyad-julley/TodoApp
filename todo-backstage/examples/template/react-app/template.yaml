@@ -1,27 +1,22 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: golden-path-todo
-  title: Golden Path Fullstack Todo
-  description: A complete full-stack todo application with Traycer AI integration, following golden path patterns
-  links:
-    - url: https://github.com/sayyad-julley/TodoApp/blob/main/todo-backstage/app-config.yaml
-      title: Template
-      icon: github
+  name: react-app-template
+  title: React Application
+  description: A modern React application with TypeScript, Vite, and best practices for frontend development
   tags:
     - react
-    - nodejs
-    - postgresql
-    - aws
-    - traycer
-    - golden-path
-    - production-ready
-    - fullstack
+    - typescript
+    - vite
+    - frontend
+    - spa
+    - component
+    - ui
   annotations:
     backstage.io/techdocs-ref: dir:.
 spec:
   owner: platform-team
-  type: service
+  type: component
   lifecycle: production
 
   parameters:
@@ -34,14 +29,14 @@ spec:
         name:
           title: Project Name
           type: string
-          description: Unique name of the project (use lowercase letters, numbers, and hyphens only)
+          description: Unique name of the React application (use lowercase letters, numbers, and hyphens only)
           pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
           ui:autofocus: true
           ui:field: EntityNamePicker
         description:
           title: Description
           type: string
-          description: Brief description of the project
+          description: Brief description of the React application
           ui:widget: textarea
           ui:options:
             rows: 3
@@ -54,21 +49,34 @@ spec:
             allowedKinds:
               - User
               - Group
-        featureType:
-          title: Feature Type
+        reactVersion:
+          title: React Version
           type: string
-          description: Type of feature to implement (for Traycer plan generation)
-          enum: [feature, bugfix, refactoring]
-          default: feature
-          ui:enum: [feature, bugfix, refactoring]
-          ui:enumDeprecated: []
-        featureDescription:
-          title: Feature Description
+          description: React version to use
+          enum: ['18.x', '17.x']
+          default: '18.x'
+        useTypeScript:
+          title: Use TypeScript
+          type: boolean
+          description: Whether to use TypeScript for type safety
+          default: true
+        useRouter:
+          title: Include Router
+          type: boolean
+          description: Include React Router for navigation
+          default: true
+        useStateManagement:
+          title: State Management
           type: string
-          description: Detailed description of the feature/change for Traycer plan generation
-          ui:widget: textarea
-          ui:options:
-            rows: 5
+          description: State management library to use
+          enum: ['none', 'zustand', 'redux-toolkit', 'context-api']
+          default: 'none'
+        uiFramework:
+          title: UI Framework
+          type: string
+          description: UI component library to use
+          enum: ['none', 'ant-design', 'material-ui', 'chakra-ui', 'tailwind']
+          default: 'none'
 
     - title: Repository Configuration
       required:
@@ -84,12 +92,25 @@ spec:
               - github.com
               - gitlab.com
 
+    - title: Build & Deployment
+      properties:
+        enableCI:
+          title: Enable CI/CD
+          type: boolean
+          description: Enable continuous integration and deployment
+          default: true
+        deploymentTarget:
+          title: Deployment Target
+          type: string
+          description: Target deployment platform
+          enum: ['vercel', 'netlify', 'aws-s3', 'none']
+          default: 'vercel'
+
   steps:
     - id: fetch-base
       name: Fetch Base Template
       action: fetch:template
       input:
-        # Using local template content
         url: ./content
         values:
           name: ${{ parameters.name }}
@@ -97,32 +118,13 @@ spec:
           component_id: ${{ parameters.name }}
           destination: ${{ parameters.repoUrl | parseRepoUrl | pick('repo') }}
           __APP_NAME__: ${{ parameters.name }}
-
-    - id: generate-traycer-plan
-      name: Generate Traycer Plan
-      action: traycer:generate-plan
-      input:
-        spec: ${{ parameters.featureType }}
-        projectName: ${{ parameters.name }}
-        description: ${{ parameters.featureDescription || parameters.description }}
-        template: backstage-golden-path
-        goldenPathTemplate: fullstack-todo
-
-    - id: create-implementation-guide
-      name: Create Implementation Guide
-      action: write:file
-      input:
-        path: ./IMPLEMENTATION_GUIDE.md
-        content: |
-          # Implementation Guide for ${{ parameters.name }}
-          
-          ${{ steps.generate-traycer-plan.output.plan }}
-          
-          ## Next Steps
-          1. Review the generated plan above
-          2. Follow the golden path patterns
-          3. Implement the changes
-          4. Run tests and submit for review
+          reactVersion: ${{ parameters.reactVersion }}
+          useTypeScript: ${{ parameters.useTypeScript }}
+          useRouter: ${{ parameters.useRouter }}
+          useStateManagement: ${{ parameters.useStateManagement }}
+          uiFramework: ${{ parameters.uiFramework }}
+          enableCI: ${{ parameters.enableCI }}
+          deploymentTarget: ${{ parameters.deploymentTarget }}
 
     - id: publish
       name: Publish to Repository
@@ -134,7 +136,7 @@ spec:
         description: ${{ parameters.description }}
         repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: main
-        gitCommitMessage: 'Initial commit: Created from Golden Path Fullstack Todo Template'
+        gitCommitMessage: 'Initial commit: Created from React Application Template'
         gitAuthorName: 'Backstage Scaffolder'
         gitAuthorEmail: 'scaffolder@backstage.io'
 
@@ -152,8 +154,8 @@ spec:
         recipients: entity
         entityRefs:
           - ${{ parameters.owner }}
-        title: 'Golden Path Todo Application Created Successfully!'
-        info: 'Your full-stack todo application "${{ parameters.name }}" has been created with Traycer implementation plan and is ready for development.'
+        title: 'React Application Created Successfully!'
+        info: 'Your React application "${{ parameters.name }}" has been created and is ready for development.'
         severity: success
 
   output:
@@ -164,10 +166,9 @@ spec:
       - title: Open in Catalog
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
-      - title: Implementation Guide
-        url: ${{ steps.publish.output.remoteUrl }}/blob/main/IMPLEMENTATION_GUIDE.md
-        icon: docs
       - title: View TechDocs
         icon: docs
         url: ${{ steps.publish.output.remoteUrl }}/blob/main/docs/index.md
-
+      - title: Storybook
+        url: ${{ steps.publish.output.remoteUrl }}/blob/main/.storybook/main.js
+        icon: book

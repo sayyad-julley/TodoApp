@@ -1,0 +1,4 @@
+# Ignore Backstage template files from schema validation
+examples/template/**/*.yaml
+examples/template/**/*.yml
+**/template.yaml

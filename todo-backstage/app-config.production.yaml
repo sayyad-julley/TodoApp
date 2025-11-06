@@ -48,6 +48,24 @@ catalog:
       rules:
         - allow: [Template]
 
+    # Golden Path Todo template with Traycer integration
+    - type: file
+      target: ./examples/template/golden-path-todo/template.yaml
+      rules:
+        - allow: [Template]
+
+    # Node.js/Express API Application template
+    - type: file
+      target: ./examples/template/nodejs-express-app/template.yaml
+      rules:
+        - allow: [Template]
+
+    # React Application template
+    - type: file
+      target: ./examples/template/react-app/template.yaml
+      rules:
+        - allow: [Template]
+
     # Local example organizational data
     - type: file
       target: ./examples/org.yaml

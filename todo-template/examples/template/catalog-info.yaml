@@ -1,12 +1,14 @@
 apiVersion: backstage.io/v1alpha1
-kind: Template
+kind: Component
 metadata:
   name: fullstack-todo-template
   title: Full-Stack Todo Application Template
   description: A comprehensive, production-ready todo application template with React frontend, Node.js backend, MongoDB database, JWT authentication, and Docker support
+  annotations:
+    backstage.io/techdocs-ref: dir:.
   links:
-    - url: https://github.com/sayyad-julley/TodoApp/blob/main/todo-backstage/app-config.yaml
-      title: Template
+    - url: https://github.com/sayyad-julley/TodoApp/blob/main/todo-template/examples/template/template.yaml
+      title: Template Source
       icon: github
   tags:
     - todo
@@ -18,9 +20,7 @@ metadata:
     - fullstack
     - template
 spec:
-  type: template
+  type: service
   lifecycle: production
   owner: user:guest
-  system: templates
-  dependsOn: []
-  
+

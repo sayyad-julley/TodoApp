@@ -1,0 +1,195 @@
+import express from 'express';
+
+const router = express.Router();
+
+{{#if enableSwagger}}
+/**
+ * @swagger
+ * /{{ apiVersion }}/:
+ *   get:
+ *     summary: Get API information
+ *     description: Returns basic information about the API
+ *     tags: [General]
+ *     responses:
+ *       200:
+ *         description: API information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "{{ __APP_NAME__ }} API"
+ *                 version:
+ *                   type: string
+ *                   example: "{{ apiVersion }}"
+ *                 status:
+ *                   type: string
+ *                   example: "running"
+ */
+{{/if}}
+router.get('/', (req, res) => {
+  res.json({
+    message: '{{ __APP_NAME__ }} API',
+    version: '{{ apiVersion }}',
+    status: 'running',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+{{#if enableSwagger}}
+/**
+ * @swagger
+ * /{{ apiVersion }}/users:
+ *   get:
+ *     summary: Get all users
+ *     description: Returns a list of all users
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+{{/if}}
+router.get('/users', {{#if enableAuth}}(req, res) => {
+  // This is a placeholder implementation
+  // In a real application, you would fetch users from your database
+  const users = [
+    { id: 1, name: 'John Doe', email: 'john@example.com' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
+  ];
+
+  res.json({
+    success: true,
+    data: users,
+    count: users.length,
+  });
+}{{else}}(req, res) => {
+  // This is a placeholder implementation
+  // In a real application, you would fetch users from your database
+  const users = [
+    { id: 1, name: 'John Doe', email: 'john@example.com' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
+  ];
+
+  res.json({
+    success: true,
+    data: users,
+    count: users.length,
+  });
+}{{/if}});
+
+{{#if enableSwagger}}
+/**
+ * @swagger
+ * /{{ apiVersion }}/users/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     description: Returns a single user by their ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *       404:
+ *         description: User not found
+ *       401:
+ *         description: Unauthorized
+ */
+{{/if}}
+router.get('/users/:id', (req, res) => {
+  const { id } = req.params;
+
+  // This is a placeholder implementation
+  // In a real application, you would fetch the user from your database
+  const user = { id, name: 'John Doe', email: 'john@example.com' };
+
+  res.json({
+    success: true,
+    data: user,
+  });
+});
+
+{{#if enableSwagger}}
+/**
+ * @swagger
+ * /{{ apiVersion }}/test:
+ *   post:
+ *     summary: Test endpoint
+ *     description: A test endpoint that echoes back the received data
+ *     tags: [Testing]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *               data:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Echo response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 received:
+ *                   type: object
+ *                 timestamp:
+ *                   type: string
+ */
+{{/if}}
+router.post('/test', (req, res) => {
+  res.json({
+    success: true,
+    received: req.body,
+    timestamp: new Date().toISOString(),
+    message: 'Data received successfully',
+  });
+});
+
+export default router;

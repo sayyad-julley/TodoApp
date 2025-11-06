@@ -8,7 +8,7 @@ metadata:
     - url: https://github.com/sayyad-julley/todo-template/blob/main/todo-template/examples/template/template.yaml
       title: Git template
       icon: template
-  description: A comprehensive, production-ready todo application template with React frontend, Node.js backend, MongoDB database, JWT authentication, and Docker support
+  description: A comprehensive todo application template with React frontend, Node.js backend, MongoDB database, JWT authentication, and Docker support
   annotations:
     backstage.io/techdocs-ref: dir:.
     # Uncomment and update if you want VIEW SOURCE to link to a GitHub repository:

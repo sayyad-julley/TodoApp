@@ -1,0 +1,16 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: {{ name }}
+  description: {{ description }}
+  annotations:
+    github.com/project-slug: {{ repoUrl | parseRepoUrl | pick('owner') }}/{{ repoUrl | parseRepoUrl | pick('repo') }}
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: component
+  lifecycle: production
+  owner: {{ owner }}
+  providesApis:
+    - {{ name }}-api
+  dependsOn:
+    - resource:{{ name }}-database

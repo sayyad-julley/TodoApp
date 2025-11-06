@@ -1,0 +1,12 @@
+{
+  "extends": "default",
+  "rules": {
+    "line-length": "off",
+    "document-start": "off"
+  },
+  "ignore": [
+    "examples/template/**/*.yaml",
+    "examples/template/**/*.yml"
+  ]
+}
+
