@@ -235,3 +235,9 @@ This will show:
 5. **Contact Support:**
    - If all else fails, check AWS X-Ray forums or support
 
+---
+
+## Summary
+
+This troubleshooting guide covers the most common X-Ray integration issues. For additional help, refer to the [AWS X-Ray Developer Guide](https://docs.aws.amazon.com/xray/latest/devguide/) and check the application logs for detailed error messages.
+

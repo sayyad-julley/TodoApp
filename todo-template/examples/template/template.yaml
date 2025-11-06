@@ -44,7 +44,7 @@ metadata:
     - crm
   annotations:
     backstage.io/techdocs-ref: dir:.
-    github.com/project-slug: 'fullstack-todo-${{ parameters.name | dump | lower | replace(/\s+/g, "-") }}'
+    github.com/project-slug: 'fullstack-todo-${{ parameters.name | dump | lower }}'
     github.com/project-repository: '${{ parameters.name | dump }}-todo-app'
 spec:
   owner: user:guest
@@ -359,7 +359,7 @@ spec:
           ✅ Responsive design with dark/light mode
           ✅ Docker containerization
           ✅ Production-ready deployment configuration
-          {{#parameters.includeAWS}}✅ AWS X-Ray distributed tracing{{/parameters.includeAWS}}
+          {{#if parameters.includeAWS}}✅ AWS X-Ray distributed tracing{{/if}}
 
           **Quick Start:**
           1. Clone the repository
