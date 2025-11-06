@@ -84,6 +84,24 @@ catalog:
     - allow: [Component, System, API, Resource, Location, Template]
   locations:
     # Local example data, file locations are relative to the backend process, typically `packages/backend`
+
+    # Full-Stack Todo Template from GitHub
+    # Note: Using raw GitHub URL - ensure the template content folder is accessible
+    # IMPORTANT: Only add template.yaml files as catalog locations, NOT catalog-info.yaml files
+    # inside template content folders. Those files contain template variables (e.g., ${{ values.name }})
+    # and are only processed when the template is executed, not as direct catalog entities.
+    - type: url
+      target: https://github.com/sayyad-julley/TodoApp/raw/main/todo-template/examples/template/template.yaml
+      rules:
+        - allow: [Template]
+    
+    # Alternative: Local file reference (if template is in local todo-template folder)
+    # Uncomment this if you prefer to use the local file instead of GitHub URL
+    # - type: file
+    #   target: ../../../todo-template/examples/template/template.yaml
+    #   rules:
+    #     - allow: [Template]
+
     - type: file
       target: ../../examples/entities.yaml
 
