@@ -4,7 +4,7 @@ metadata:
   name: {{ name }}
   description: {{ description }}
   annotations:
-    github.com/project-slug: {{ repoUrl | parseRepoUrl | pick('owner') }}/{{ repoUrl | parseRepoUrl | pick('repo') }}
+    github.com/project-slug: "{{ repoUrl | parseRepoUrl | pick('owner') }}/{{ repoUrl | parseRepoUrl | pick('repo') }}"
     backstage.io/techdocs-ref: dir:.
 spec:
   type: component

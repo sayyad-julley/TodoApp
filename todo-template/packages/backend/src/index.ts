@@ -13,9 +13,13 @@ const backend = createBackend();
 backend.add(import('@backstage/plugin-app-backend'));
 backend.add(import('@backstage/plugin-proxy-backend'));
 
+// events backend (required by notifications and scaffolder notifications module)
+backend.add(import('@backstage/plugin-events-backend'));
+
 // scaffolder plugin
 backend.add(import('@backstage/plugin-scaffolder-backend'));
 backend.add(import('@backstage/plugin-scaffolder-backend-module-github'));
+// Re-enabled after fixing events backend dependency
 backend.add(
   import('@backstage/plugin-scaffolder-backend-module-notifications'),
 );
