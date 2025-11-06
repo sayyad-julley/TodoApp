@@ -80,6 +80,11 @@ catalog:
   import:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
+    # IMPORTANT: The catalog import feature will automatically discover catalog-info.yaml files
+    # in repositories. To prevent errors, ensure that:
+    # 1. Only fully resolved catalog-info.yaml files (without template variables) are in repositories
+    # 2. Template content folders (containing ${{ values.* }} placeholders) are NOT registered as catalog locations
+    # 3. When registering components from templates, use the catalog:register action which processes template variables
   rules:
     - allow: [Component, System, API, Resource, Location, Template]
   locations:
