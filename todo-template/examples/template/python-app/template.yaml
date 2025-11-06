@@ -1,0 +1,239 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: python-app-template
+  title: Python API Application
+  description: A modern Python API application with Flask or FastAPI, authentication, database integration, and production-ready features
+  tags:
+    - python
+    - flask
+    - fastapi
+    - api
+    - backend
+    - rest
+    - microservice
+    - database
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+spec:
+  owner: platform-team
+  type: service
+  lifecycle: production
+
+  parameters:
+    - title: Project Information
+      required:
+        - name
+        - description
+        - owner
+      properties:
+        name:
+          title: Project Name
+          type: string
+          description: Unique name of the Python application (use lowercase letters, numbers, and hyphens only)
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+          ui:autofocus: true
+          ui:field: EntityNamePicker
+        description:
+          title: Description
+          type: string
+          description: Brief description of the Python API application
+          ui:widget: textarea
+          ui:options:
+            rows: 3
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component (user or team)
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - User
+              - Group
+        pythonVersion:
+          title: Python Version
+          type: string
+          description: Python version to use
+          enum: ['3.11', '3.10', '3.9']
+          default: '3.11'
+        framework:
+          title: Web Framework
+          type: string
+          description: Python web framework to use
+          enum: ['flask', 'fastapi']
+          default: 'fastapi'
+        port:
+          title: Application Port
+          type: number
+          description: Port number for the application
+          default: 8000
+          minimum: 1000
+          maximum: 9999
+
+    - title: API Configuration
+      properties:
+        enableAuth:
+          title: Enable Authentication
+          type: boolean
+          description: Include JWT authentication middleware
+          default: true
+        enableCors:
+          title: Enable CORS
+          type: boolean
+          description: Include CORS middleware
+          default: true
+        enableRateLimit:
+          title: Enable Rate Limiting
+          type: boolean
+          description: Include rate limiting middleware
+          default: true
+        enableSwagger:
+          title: Enable API Documentation
+          type: boolean
+          description: Include Swagger/OpenAPI documentation
+          default: true
+        apiVersion:
+          title: API Version
+          type: string
+          description: Version of your API
+          default: 'v1'
+          pattern: '^v[0-9]+$'
+
+    - title: Database Configuration
+      properties:
+        databaseType:
+          title: Database Type
+          type: string
+          description: Type of database to integrate
+          enum: ['none', 'postgresql', 'mysql', 'sqlite', 'mongodb']
+          default: 'postgresql'
+        enableMigrations:
+          title: Enable Database Migrations
+          type: boolean
+          description: Include database migration scripts (Alembic)
+          default: true
+        enableSeeding:
+          title: Enable Database Seeding
+          type: boolean
+          description: Include database seeding scripts
+          default: true
+        useORM:
+          title: Use ORM
+          type: boolean
+          description: Use SQLAlchemy ORM for database operations
+          default: true
+
+    - title: Repository Configuration
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          description: Where should the code be stored?
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+              - gitlab.com
+
+    - title: Build & Deployment
+      properties:
+        enableCI:
+          title: Enable CI/CD
+          type: boolean
+          description: Enable continuous integration and deployment
+          default: true
+        enableDocker:
+          title: Enable Docker
+          type: boolean
+          description: Include Docker configuration
+          default: true
+        enableTesting:
+          title: Enable Testing
+          type: boolean
+          description: Include pytest testing setup
+          default: true
+        deploymentTarget:
+          title: Deployment Target
+          type: string
+          description: Target deployment platform
+          enum: ['aws-ecs', 'heroku', 'digitalocean', 'none']
+          default: 'aws-ecs'
+
+  steps:
+    - id: fetch-base
+      name: Fetch Base Template
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          component_id: ${{ parameters.name }}
+          destination: ${{ parameters.repoUrl | parseRepoUrl | pick('repo') }}
+          __APP_NAME__: ${{ parameters.name }}
+          pythonVersion: ${{ parameters.pythonVersion }}
+          framework: ${{ parameters.framework }}
+          port: ${{ parameters.port }}
+          enableAuth: ${{ parameters.enableAuth }}
+          enableCors: ${{ parameters.enableCors }}
+          enableRateLimit: ${{ parameters.enableRateLimit }}
+          enableSwagger: ${{ parameters.enableSwagger }}
+          apiVersion: ${{ parameters.apiVersion }}
+          databaseType: ${{ parameters.databaseType }}
+          enableMigrations: ${{ parameters.enableMigrations }}
+          enableSeeding: ${{ parameters.enableSeeding }}
+          useORM: ${{ parameters.useORM }}
+          enableCI: ${{ parameters.enableCI }}
+          enableDocker: ${{ parameters.enableDocker }}
+          enableTesting: ${{ parameters.enableTesting }}
+          deploymentTarget: ${{ parameters.deploymentTarget }}
+
+    - id: publish
+      name: Publish to Repository
+      action: publish:github
+      input:
+        allowedHosts:
+          - github.com
+          - gitlab.com
+        description: ${{ parameters.description }}
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+        gitCommitMessage: 'Initial commit: Created from Python API Application Template'
+        gitAuthorName: 'Backstage Scaffolder'
+        gitAuthorEmail: 'scaffolder@backstage.io'
+
+    - id: register
+      name: Register Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+    - id: notify
+      name: Notify User
+      action: notification:send
+      input:
+        recipients: entity
+        entityRefs:
+          - ${{ parameters.owner }}
+        title: 'Python API Application Created Successfully!'
+        info: 'Your Python API application "${{ parameters.name }}" has been created and is ready for development.'
+        severity: success
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+        icon: source
+      - title: Open in Catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
+      - title: API Documentation
+        url: ${{ steps.publish.output.remoteUrl }}/blob/main/docs/api.md
+        icon: docs
+      - title: Swagger UI
+        url: ${{ steps.publish.output.remoteUrl }}/blob/main/docs/swagger.yaml
+        icon: docs
+

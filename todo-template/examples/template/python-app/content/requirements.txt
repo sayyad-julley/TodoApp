@@ -1,0 +1,66 @@
+# Core Framework
+{{#if values.framework == "fastapi"}}
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+{{else}}
+flask==3.0.0
+flask-cors==4.0.0
+{{/if}}
+
+# Authentication
+{{#if values.enableAuth}}
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+{{/if}}
+
+# Database
+{{#if values.databaseType == "postgresql"}}
+psycopg2-binary==2.9.9
+{{/if}}
+{{#if values.databaseType == "mysql"}}
+pymysql==1.1.0
+{{/if}}
+{{#if values.databaseType == "mongodb"}}
+pymongo==4.6.0
+motor==3.3.2
+{{/if}}
+{{#if values.useORM}}
+{{#if values.databaseType != "none"}}
+sqlalchemy==2.0.23
+{{/if}}
+{{/if}}
+{{#if values.enableMigrations}}
+alembic==1.12.1
+{{/if}}
+
+# Rate Limiting
+{{#if values.enableRateLimit}}
+slowapi==0.1.9
+{{/if}}
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# HTTP Client
+httpx==0.25.2
+requests==2.31.0
+
+# Logging
+loguru==0.7.2
+
+# Development
+{{#if values.enableTesting}}
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.25.2
+{{/if}}
+
+# Code Quality
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+
